@@ -19,9 +19,14 @@ io.on('connection', (socket) => {
   console.log('<EV> a user has connected!');
   printAppState();
 
-  socket.on(SocketEvents.CREATE_ROOM, (data, callback) => {
-    console.log('<EV> create room event received', data);
-    roomService.putRoom(data.roomId, { name: data.roomName });
+  socket.on(SocketEvents.CREATE_ROOM, ({ roomId, roomName }, callback) => {
+    console.log('<EV> create room event received', roomId);
+    try {
+      const room = roomService.putRoom(roomId, { id: roomId, name: roomName });
+      callback({ room, event: SocketEvents.CREATE_ROOM });
+    } catch (e) {
+      callback({ error: e, event: SocketEvents.CREATE_ROOM });
+    }
     printAppState();
   });
 
@@ -48,6 +53,18 @@ io.on('connection', (socket) => {
       });
     } catch (e) {
       callback(e);
+    }
+  });
+
+  socket.on(SocketEvents.ROOM_CHECK, ({ roomId }, callback) => {
+    console.log('<EV> room check event received', roomId);
+    try {
+      callback({
+        room: roomService.getRoom(roomId),
+        event: SocketEvents.ROOM_CHECK
+      });
+    } catch (e) {
+      callback({ error: e });
     }
   });
 

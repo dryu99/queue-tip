@@ -5,12 +5,7 @@ import socket, { SocketEvents } from '../socket';
 
 import SignInPopup from './SignInPopup';
 
-const Room = ({ isAdmin, user, setUser }) => {
-  const location = useLocation();
-  const match = useRouteMatch('/room/:id');
-
-  const [roomName, setRoomName] = useState(location.roomName);
-  const [roomId, setRoomId] = useState(match.params.id);
+const Room = ({ room, isAdmin, user, setUser }) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -32,33 +27,28 @@ const Room = ({ isAdmin, user, setUser }) => {
     };
   }, [users]);
 
-  // if current user is new, have to fetch room name data
-  // TODO can remove this if i just decide to return room name data in join acknowledgement
-  // useEffect(() => {
-  //   if (!roomName || roomName === '' ) {
-  //     socket.emit('visit', { roomId }, (room) => {
-  //       console.log('acknowledged from VISIT event', room);
-  //       setRoomName(room.name);
-  //     });
-  //   }
-  // }, []);
-
   return (
     <Container>
-      <h1>Room: {roomName}</h1>
-      <h2>Users:</h2>
-      <ul>
-        {users.map(u =>
-          <li key={u.id}>{u.name}</li>
-        )}
-      </ul>
-      <SignInPopup
-        roomId={roomId}
-        setUser={setUser}
-        users={users}
-        setUsers={setUsers}
-        setRoomName={setRoomName}
-      />
+      {room ?
+        <React.Fragment>
+          <h1>Room: {room.name}</h1>
+          <h2>Users:</h2>
+          <ul>
+            {users.map(u =>
+              <li key={u.id}>{u.name}</li>
+            )}
+          </ul>
+          <SignInPopup
+            room={room}
+            setUser={setUser}
+            users={users}
+            setUsers={setUsers}
+            // setRoomName={setRoomName}
+          />
+        </React.Fragment>
+        :
+        <h1>Sorry room doesn't exist...</h1>
+      }
     </Container>
   );
 };

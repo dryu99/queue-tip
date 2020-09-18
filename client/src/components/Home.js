@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Container, Form } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import { Link } from 'react-router-dom';
 import socket from '../socket';
 import { SocketEvents } from '../socket';
 
-const Home = ({ setIsAdmin }) => {
+const Home = ({ setIsAdmin, setRoomCallback }) => {
   const [newRoomName, setNewRoomName] = useState('');
+  const [newRoomId, setNewRoomId] = useState('');
 
-  // randomly generated uuid
-  const roomId = uuidv4();
+  useEffect(() => {
+    // randomly generates uuid
+    setNewRoomId(uuidv4());
+  }, []);
 
+  // users who create a room are considered as 'admins'
   const handleCreateRoomClick = (e) => {
-    if (roomId && newRoomName && newRoomName.trim() !== '') {
+    if (newRoomId && newRoomName && newRoomName.trim() !== '') {
       setIsAdmin(true);
-      socket.emit(SocketEvents.CREATE_ROOM, { roomName: newRoomName, roomId });
+      socket.emit(SocketEvents.CREATE_ROOM, { roomName: newRoomName, roomId: newRoomId }, setRoomCallback);
     } else {
       e.preventDefault();
       console.log('error creating room');
@@ -22,8 +26,7 @@ const Home = ({ setIsAdmin }) => {
   };
 
   const toProp = {
-    pathname: `/room/${roomId}`,
-    roomName: newRoomName
+    pathname: `/room/${newRoomId}`
   };
 
   return (

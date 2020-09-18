@@ -3,7 +3,8 @@ const SocketEvents = Object.freeze({
   CREATE_ROOM: 'create_room',
   DISCONNECT: 'disconnect',
   LEAVE: 'leave',
-  NEW_USER_JOIN: 'new_user_join'
+  NEW_USER_JOIN: 'new_user_join',
+  ROOM_CHECK: 'room_check'
 });
 
 module.exports = {
