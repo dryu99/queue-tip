@@ -1,43 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Form } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { useLocation, useRouteMatch } from 'react-router-dom';
-import queryString from 'query-string';
-import io from 'socket.io-client';
+import socket, { SocketEvents } from '../socket';
 
-let socket;
+import SignInPopup from './SignInPopup';
 
-const Room = () => {
-  const [roomName, setRoomName] = useState('');
-  const [roomId, setRoomId] = useState('');
-  const ENDPOINT = 'localhost:3003';
-
+const Room = ({ isAdmin, user, setUser }) => {
   const location = useLocation();
   const match = useRouteMatch('/room/:id');
 
+  const [roomName, setRoomName] = useState('');
+  const [roomId, setRoomId] = useState(match.params.id);
+  const [users, setUsers] = useState([]);
+
   useEffect(() => {
-    const { name } = queryString.parse(location.search);
-    const id = match.params.id;
-
-    socket = io(ENDPOINT);
-
-    setRoomName(name);
-    setRoomId(id);
-
-    socket.emit('join', { roomName: name, roomId: id }, () => {
-
+    // when someone else joins, add them to user list
+    socket.on(SocketEvents.NEW_USER_JOIN, ({ newUser }) => {
+      console.log('received JOIN event', user);
+      setUsers([...users, newUser]);
     });
 
     // on component unmount, disconnect and turn off socket
     return () => {
-      socket.emit('disconnect');
+      socket.emit(SocketEvents.DISCONNECT);
       socket.off();
     };
-  }, [ENDPOINT, location.search, match.params.id]);
+  }, [users]);
 
   return (
     <Container>
       <h1>Room: {roomName}</h1>
-
+      <h2>Users:</h2>
+      <ul>
+        {users.map(u =>
+          <li key={u.id}>{u.name}</li>
+        )}
+      </ul>
+      <SignInPopup roomId={roomId} setUser={setUser} users={users} setUsers={setUsers} />
     </Container>
   );
 };
