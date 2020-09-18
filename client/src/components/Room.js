@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
-import { useLocation, useRouteMatch } from 'react-router-dom';
 import socket, { SocketEvents } from '../socket';
 
 import SignInPopup from './SignInPopup';
@@ -8,6 +7,7 @@ import SignInPopup from './SignInPopup';
 const Room = ({ room, isAdmin, user, setUser }) => {
   const [users, setUsers] = useState([]);
 
+  // subscribe to relevant socket events
   useEffect(() => {
     // when someone else joins, add them to user list
     socket.on(SocketEvents.NEW_USER_JOIN, ({ newUser }) => {
@@ -43,7 +43,6 @@ const Room = ({ room, isAdmin, user, setUser }) => {
             setUser={setUser}
             users={users}
             setUsers={setUsers}
-            // setRoomName={setRoomName}
           />
         </React.Fragment>
         :
