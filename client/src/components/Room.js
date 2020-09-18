@@ -3,18 +3,20 @@ import { Container } from 'react-bootstrap';
 import socket, { SocketEvents } from '../socket';
 
 import SignInPopup from './SignInPopup';
+import Queue from './Queue';
 
 const Room = ({ room, isAdmin, user, setUser }) => {
   const [users, setUsers] = useState([]);
 
   // subscribe to relevant socket events
   useEffect(() => {
-    // when someone else joins, add them to user list
+    // when another user joins, add them to user list
     socket.on(SocketEvents.NEW_USER_JOIN, ({ newUser }) => {
       console.log('received JOIN event', newUser);
       setUsers([...users, newUser]);
     });
 
+    // when another user leaves, remove them from user list
     socket.on(SocketEvents.LEAVE, ({ leftUser }) => {
       console.log('received LEAVE event', leftUser);
       setUsers(users.filter(u => u.id !== leftUser.id));
@@ -38,6 +40,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
               <li key={u.id}>{u.name}</li>
             )}
           </ul>
+          <Queue user={user}/>
           <SignInPopup
             room={room}
             setUser={setUser}
