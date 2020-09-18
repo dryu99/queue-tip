@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Container, Form } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
-
-const baseUrl = 'http://localhost:3000';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [roomName, setRoomName] = useState('');
-  const [roomLink, setRoomLink] = useState('');
+  const [roomId, setRoomId] = useState('');
 
   useEffect(() => {
-    setRoomLink(`${baseUrl}/room/${uuidv4()}`);
+    // generate unique room id
+    setRoomId(uuidv4());
   }, []);
 
   return (
@@ -28,7 +28,12 @@ const Home = () => {
           <Form.Label>Link</Form.Label>
           <Form.Control readOnly value={roomLink} />
         </Form.Group> */}
-        <Button variant="primary" type="submit">Create Room</Button>
+        <Link
+          to={`/room/${roomId}?name=${roomName}`}
+          onClick={(e) => (!roomName || !roomId) ? e.preventDefault() : null}
+        >
+          <Button variant="primary" type="submit">Create Room</Button>
+        </Link>
       </Form>
     </Container>
   );
