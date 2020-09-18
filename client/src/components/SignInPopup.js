@@ -31,7 +31,7 @@ const SignInPopup = ({ room, setUser, users, setUsers, setRoomName, setIsRoomVal
   };
 
   return (
-    <Modal show={show}>
+    <Modal show={show} onHide={() => null}>
       <Modal.Header>
         <Modal.Title>{'Sign In'}</Modal.Title>
       </Modal.Header>
