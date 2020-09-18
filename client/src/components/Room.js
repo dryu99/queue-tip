@@ -16,8 +16,13 @@ const Room = ({ isAdmin, user, setUser }) => {
   useEffect(() => {
     // when someone else joins, add them to user list
     socket.on(SocketEvents.NEW_USER_JOIN, ({ newUser }) => {
-      console.log('received JOIN event', user);
+      console.log('received JOIN event', newUser);
       setUsers([...users, newUser]);
+    });
+
+    socket.on(SocketEvents.LEAVE, ({ leftUser }) => {
+      console.log('received LEAVE event', leftUser);
+      setUsers(users.filter(u => u.id !== leftUser.id));
     });
 
     // on component unmount, disconnect and turn off socket
@@ -26,6 +31,17 @@ const Room = ({ isAdmin, user, setUser }) => {
       socket.off();
     };
   }, [users]);
+
+  // if current user is new, have to fetch room name data
+  // TODO can remove this if i just decide to return room name data in join acknowledgement
+  // useEffect(() => {
+  //   if (!roomName || roomName === '' ) {
+  //     socket.emit('visit', { roomId }, (room) => {
+  //       console.log('acknowledged from VISIT event', room);
+  //       setRoomName(room.name);
+  //     });
+  //   }
+  // }, []);
 
   return (
     <Container>
@@ -36,7 +52,13 @@ const Room = ({ isAdmin, user, setUser }) => {
           <li key={u.id}>{u.name}</li>
         )}
       </ul>
-      <SignInPopup roomId={roomId} setUser={setUser} users={users} setUsers={setUsers} />
+      <SignInPopup
+        roomId={roomId}
+        setUser={setUser}
+        users={users}
+        setUsers={setUsers}
+        setRoomName={setRoomName}
+      />
     </Container>
   );
 };

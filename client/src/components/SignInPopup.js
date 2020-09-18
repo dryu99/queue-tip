@@ -2,17 +2,18 @@ import React, { useState } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 import socket, { SocketEvents } from '../socket';
 
-const SignInPopup = ({ roomId, setUser, users, setUsers }) => {
+const SignInPopup = ({ roomId, setUser, users, setUsers, setRoomName }) => {
   const [show, setShow] = useState(true);
   const [name, setName] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setShow(false);
-    socket.emit(SocketEvents.JOIN, { name, roomId }, ({ user, usersInRoom }) => {
+    socket.emit(SocketEvents.JOIN, { name, roomId }, ({ user, usersInRoom, room }) => {
       console.log('acknowledged from JOIN event', user);
       setUser(user);
       setUsers([...users, ...usersInRoom, user]); // users should be always empty in this case, but w/e
+      setRoomName(room.name);
     });
   };
 

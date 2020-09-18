@@ -28,10 +28,11 @@ io.on('connection', (socket) => {
   socket.on(SocketEvents.JOIN, ({ name, roomId }, callback) => {
     console.log('<EV> join event received', { name, roomId });
     try {
+      const room = roomService.getRoom(roomId);
       const usersInRoom = userService.getUsersInRoom(roomId);
       const user = userService.addUser({ id: socket.id, name, roomId });
 
-      // broadcast new user to all clients (including sender) in current room
+      // broadcast new user to all clients (not including sender) in current room
       socket.broadcast.to(roomId).emit(SocketEvents.NEW_USER_JOIN, {
         newUser: user
       });
@@ -42,34 +43,12 @@ io.on('connection', (socket) => {
       printAppState();
       callback({
         user,
-        usersInRoom
+        usersInRoom,
+        room
       });
     } catch (e) {
       callback(e);
     }
-
-    // try {
-    // const user = userService.addUser({ id: socket.id, userName, room });
-
-    //   // emit message to new client
-    //   socket.emit('message', {
-    //     userType: 'admin',
-    //     text: `${user.userName}, welcome to the room ${user.room}`
-    //   });
-
-    //   // broadcast message to all clients in current room
-    //   socket.broadcast.to(user.room.id).emit('message', {
-    //     userType: 'admin',
-    //     text: `${user.userName}, has joined the room!`
-    //   });
-
-    //   // join socket room
-    //   socket.join(user.room.id);
-    //   console.log(user);
-    //   callback(user);
-    // } catch (e) {
-    //   callback(e);
-    // }
   });
 
   socket.on('disconnect', () => {
@@ -77,13 +56,14 @@ io.on('connection', (socket) => {
     try {
       const user = userService.removeUser(socket.id);
 
+      // broadcast user left to all clients (not including sender) in current room
       io.in(user.roomId).emit(SocketEvents.LEAVE, {
-        user
+        leftUser: user
       });
 
       printAppState();
     } catch (error) {
-      console.log('o no');
+      console.error(error.message);
     }
   });
 
