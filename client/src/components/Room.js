@@ -9,7 +9,7 @@ const Room = ({ isAdmin, user, setUser }) => {
   const location = useLocation();
   const match = useRouteMatch('/room/:id');
 
-  const [roomName, setRoomName] = useState('');
+  const [roomName, setRoomName] = useState(location.roomName);
   const [roomId, setRoomId] = useState(match.params.id);
   const [users, setUsers] = useState([]);
 

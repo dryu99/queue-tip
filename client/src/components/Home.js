@@ -21,6 +21,11 @@ const Home = ({ setIsAdmin }) => {
     }
   };
 
+  const toProp = {
+    pathname: `/room/${roomId}`,
+    roomName: newRoomName
+  };
+
   return (
     <Container>
       <h1>Home</h1>
@@ -34,7 +39,7 @@ const Home = ({ setIsAdmin }) => {
           />
         </Form.Group>
         <Link
-          to={`/room/${roomId}`}
+          to={toProp}
           onClick={handleCreateRoomClick}
         >
           <Button variant="primary" type="submit">Create Room</Button>
