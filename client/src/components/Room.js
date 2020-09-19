@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container } from 'react-bootstrap';
+import { Col, Container, Row, Button } from 'react-bootstrap';
 import socket, { SocketEvents } from '../socket';
 
 import SignInPopup from './SignInPopup';
 import Queue from './Queue';
+import Users from './Users';
 
 const Room = ({ room, isAdmin, user, setUser }) => {
   const [users, setUsers] = useState([]);
@@ -46,27 +47,45 @@ const Room = ({ room, isAdmin, user, setUser }) => {
     };
   }, [users, queueUsers]);
 
+  const handleQueueToggle = (e) => {
+    if (inQueue) {
+      socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, ({ dequeuedUser }) => {
+        console.log('acknowledged from DEQUEUE event', dequeuedUser);
+        setQueueUsers(queueUsers.filter(qu => qu.id !== dequeuedUser.id));
+        setInQueue(false);
+      });
+    } else {
+      socket.emit(SocketEvents.ENQUEUE, { user, roomId: room.id }, (data) => {
+        console.log('acknowledged from ENQUEUE event', data.user);
+        setQueueUsers([...queueUsers, data.user]);
+        setInQueue(true);
+      });
+    }
+  };
+
   return (
-    <Container>
+    <Container className="mt-4">
       {room ?
         <React.Fragment>
-          <h1>Room: {room.name}</h1>
-          <h2>Users:</h2>
-          <ul>
-            {users.map(u =>
-              <li key={u.id}>
-                {user.name === u.name ? <b>{u.name}</b> : u.name}
-              </li>
-            )}
-          </ul>
-          <Queue
-            user={user}
-            room={room}
-            queueUsers={queueUsers}
-            setQueueUsers={setQueueUsers}
-            inQueue={inQueue}
-            setInQueue={setInQueue}
-          />
+          <Row>
+            <Col>
+              <h1>{room.name}</h1>
+            </Col>
+            <Col xs="4">
+              <Button onClick={handleQueueToggle} size="lg" block>
+                {inQueue ? 'Leave Queue' : 'Join Queue'}
+              </Button>
+            </Col>
+          </Row>
+          <hr/>
+          <Row>
+            <Col>
+              <Queue user={user} queueUsers={queueUsers}/>
+            </Col>
+            <Col xs="auto">
+              <Users user={user} users={users} />
+            </Col>
+          </Row>
           <SignInPopup
             room={room}
             setUser={setUser}

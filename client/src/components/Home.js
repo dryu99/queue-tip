@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Form } from 'react-bootstrap';
+import { Button, Container, Form, Col } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import { Link } from 'react-router-dom';
 import socket from '../socket';
@@ -30,23 +30,28 @@ const Home = ({ setIsAdmin, setRoomCallback }) => {
   };
 
   return (
-    <Container>
-      <h1>Home</h1>
+    <Container className="mt-4">
+      <h1 className="text-center mb-5">Queuety</h1>
       <Form>
-        <Form.Group controlId="formNewRoomName">
-          <Form.Label>Room Name</Form.Label>
-          <Form.Control
-            value={newRoomName}
-            onChange={(e) => setNewRoomName(e.target.value)}
-            placeholder="e.g. CPSC 110 Office Hours"
-          />
-        </Form.Group>
-        <Link
-          to={toProp}
-          onClick={handleCreateRoomClick}
-        >
-          <Button variant="primary" type="submit">Create Room</Button>
-        </Link>
+        <Form.Row className="justify-content-center mb-3">
+          <Col xs="auto">
+            <Form.Control
+              value={newRoomName}
+              onChange={(e) => setNewRoomName(e.target.value)}
+              placeholder="Room Name"
+            />
+          </Col>
+        </Form.Row>
+        <Form.Row className="justify-content-center">
+          <Col xs="auto">
+            <Link
+              to={toProp}
+              onClick={handleCreateRoomClick}
+            >
+              <Button variant="primary" type="submit">Create Room</Button>
+            </Link>
+          </Col>
+        </Form.Row>
       </Form>
     </Container>
   );

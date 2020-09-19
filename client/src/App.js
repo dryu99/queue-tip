@@ -40,7 +40,7 @@ function App() {
   };
 
   return (
-    <Switch>
+    <Switch className="mt-4">
       <Route path="/room/:id">
         <Room room={room} isAdmin={isAdmin} user={user} setUser={setUser}/>
       </Route>
