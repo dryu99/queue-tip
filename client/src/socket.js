@@ -9,7 +9,9 @@ export const SocketEvents = Object.freeze({
   DISCONNECT: 'disconnect',
   LEAVE: 'leave',
   NEW_USER_JOIN: 'new_user_join',
-  ROOM_CHECK: 'room_check'
+  ROOM_CHECK: 'room_check',
+  ENQUEUE: 'enqueue',
+  DEQUEUE: 'dequeue',
 });
 
 export default socket;
