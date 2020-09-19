@@ -4,7 +4,7 @@ import socket, { SocketEvents } from '../socket';
 
 const Queue = ({ user, queueUsers }) => {
   return (
-    <div>
+    <div className="border border-dark">
       <h4>Queue</h4>
       <ol>
         {queueUsers.map(qu =>

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Users = ({ user, users }) => {
   return (
-    <div>
+    <div className="border border-dark">
       <h4>Users: {users.length}</h4>
       <ul>
         {users.map(u =>

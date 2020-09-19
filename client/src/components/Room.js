@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Col, Container, Row, Button } from 'react-bootstrap';
 import socket, { SocketEvents } from '../socket';
 
@@ -47,6 +47,16 @@ const Room = ({ room, isAdmin, user, setUser }) => {
     };
   }, [users, queueUsers]);
 
+  const copyLinkToClipboard = (e) => {
+    // TODO manipulating DOM here directly feels sketchy, doing it the react way doesn't work see comments below
+    var dummy = document.createElement('textarea');
+    document.body.appendChild(dummy);
+    dummy.value = window.location.href;
+    dummy.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummy);
+  };
+
   const handleQueueToggle = (e) => {
     if (inQueue) {
       socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, ({ dequeuedUser }) => {
@@ -71,7 +81,12 @@ const Room = ({ room, isAdmin, user, setUser }) => {
             <Col>
               <h1>{room.name}</h1>
             </Col>
-            <Col xs="4">
+            <Col xs="auto">
+              <Button onClick={copyLinkToClipboard} size="lg" variant="secondary">
+                Copy Link
+              </Button>
+            </Col>
+            <Col xs="3">
               <Button onClick={handleQueueToggle} size="lg" block>
                 {inQueue ? 'Leave Queue' : 'Join Queue'}
               </Button>
@@ -96,8 +111,10 @@ const Room = ({ room, isAdmin, user, setUser }) => {
           />
         </React.Fragment>
         :
-        <h1>Sorry room doesn't exist...</h1>
+        <span>Sorry room doesn't exist...</span>
       }
+      {/* strangely enough, doing this doesn't work for copying to clipboard - setting display to none causes the copied value to be "window.location.href" */}
+      {/* <textarea ref={linkRef} style={{ display: 'none' }} value={window.location.href}/> */}
     </Container>
   );
 };
