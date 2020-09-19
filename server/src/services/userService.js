@@ -28,7 +28,7 @@ const removeUser = (id) => {
   // remove user
   const user = utils.removeIdFromArray(users, id);
   if (!user) {
-    throw new Error(`User with id ${id} doesn't exist!`);
+    throw new Error(`User "${id}" doesn't exist. Either an error or unregistered user disconnected.`);
   }
 
   // make sure user gets removed from appropriate room

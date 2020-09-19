@@ -120,6 +120,7 @@ io.on('connection', (socket) => {
 
   socket.on(SocketEvents.DISCONNECT, () => {
     logger.event(`${SocketEvents.DISCONNECT} event received`);
+
     try {
       const user = userService.removeUser(socket.id);
 
@@ -139,7 +140,6 @@ io.on('connection', (socket) => {
       console.error(error.message);
     }
   });
-
 });
 
 // boot up server
