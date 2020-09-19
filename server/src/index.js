@@ -123,6 +123,11 @@ io.on('connection', (socket) => {
     try {
       const user = userService.removeUser(socket.id);
 
+      // delete room from memory if its empty
+      if (roomService.getUsersInRoom(user.roomId).length === 0) {
+        roomService.removeRoom(user.roomId);
+      }
+
       // broadcast user left to all clients (not including sender) in current room
       io.in(user.roomId).emit(SocketEvents.LEAVE, {
         leftUser: user
@@ -130,6 +135,7 @@ io.on('connection', (socket) => {
 
       printAppState();
     } catch (error) {
+      // TODO this line will usually hit when a user who hasn't signed up disconnects, maybe emit LEAVE from client side?
       console.error(error.message);
     }
   });

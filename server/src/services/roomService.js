@@ -32,8 +32,16 @@ const putRoom = (id, room) => {
   return roomData;
 };
 
+
+const removeRoom = (id) => {
+  if (!rooms.has(id)) {
+    throw new Error(`room ${id} doesn't exist`);
+  }
+
+  rooms.delete(id);
+};
+
 /**
- * fdsfds
  * @param {string} id
  * @returns {Room}
  */
@@ -83,6 +91,7 @@ const dequeueUser = (id, roomId) => {
 
 module.exports = {
   putRoom,
+  removeRoom,
   getRoom,
   getAllRooms,
   getUsersInRoom,
