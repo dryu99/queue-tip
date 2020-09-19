@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Button, Modal, Form } from 'react-bootstrap';
 import socket, { SocketEvents } from '../socket';
 
-const SignInPopup = ({ room, setUser, users, setUsers, setRoomName, setIsRoomValid }) => {
+const SignInPopup = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers }) => {
   const [show, setShow] = useState(true);
   const [name, setName] = useState('');
 
@@ -23,10 +23,11 @@ const SignInPopup = ({ room, setUser, users, setUsers, setRoomName, setIsRoomVal
 
     setShow(false);
 
-    socket.emit(SocketEvents.JOIN, { name, roomId: room.id }, ({ user, usersInRoom, room }) => {
+    socket.emit(SocketEvents.JOIN, { name, roomId: room.id }, ({ user, usersInRoom, usersInQueue }) => {
       console.log('acknowledged from JOIN event', user);
       setUser(user);
       setUsers([...users, ...usersInRoom, user]); // users should be always empty in this case, but w/e
+      setQueueUsers([...queueUsers, ...usersInQueue]); // users should be always empty in this case, but w/e
     });
   };
 

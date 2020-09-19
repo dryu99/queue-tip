@@ -1,24 +1,38 @@
+const utils = require('../utils');
+const roomService = require('./roomService');
+
 const users = [];
 
-const addUser = ({ id, name, roomId }) => {
-  const cleanName = name.trim().toLowerCase();
-  const existingUser = users.find(u => u.roomId === roomId && u.name === cleanName);
+const addUser = (newUser) => {
+  // make sure there isn't another user with same name
+  const cleanName = newUser.name.trim().toLowerCase();
+  const existingUser = users.find(u => u.roomId === newUser.roomId && u.name === cleanName);
   if (existingUser) {
     throw new Error('Username is taken');
   }
 
-  const user = { id, name, roomId };
-  users.push(user);
-  return user;
+  users.push(newUser);
+
+  // make sure appropriate room has reference to new user
+  const room = roomService.getRoom(newUser.roomId);
+  room.users.push(newUser);
+
+  return newUser;
 };
 
 const removeUser = (id) => {
-  const index = users.findIndex(u => u.id === id);
-  if (index === -1) {
+  // remove user
+  const user = utils.removeIdFromArray(users, id);
+  if (!user) {
     throw new Error(`User with id ${id} doesn't exist!`);
   }
 
-  return users.splice(index, 1)[0];
+  // make sure user gets removed from appropriate room
+  const room = roomService.getRoom(user.roomId);
+  utils.removeIdFromArray(room.users, id);
+  utils.removeIdFromArray(room.queue, id);
+
+  return user;
 };
 
 const getUser = (id) => {
@@ -34,14 +48,9 @@ const getAllUsers = () => {
   return users;
 };
 
-const getUsersInRoom = (roomId) => {
-  return users.filter(u => u.roomId === roomId);
-};
-
 module.exports = {
   addUser,
   removeUser,
   getUser,
-  getAllUsers,
-  getUsersInRoom
+  getAllUsers
 };

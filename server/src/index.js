@@ -12,7 +12,12 @@ const io = socketio(server);
 const printAppState = () => {
   console.log('--- SERVER STATE ---');
   console.log('  USERS: ', userService.getAllUsers());
-  console.log('  ROOMS: ', roomService.getAllRooms());
+  console.log('  ROOMS: ', roomService.getAllRooms().map(r => ({
+    id: r.id,
+    name: r.name,
+    users: r.users.map(u => u.name),
+    queue: r.queue.map(q => q.name),
+  })));
 };
 
 io.on('connection', (socket) => {
@@ -33,23 +38,27 @@ io.on('connection', (socket) => {
   socket.on(SocketEvents.JOIN, ({ name, roomId }, callback) => {
     console.log('<EV> join event received', { name, roomId });
     try {
-      const room = roomService.getRoom(roomId);
-      const usersInRoom = userService.getUsersInRoom(roomId);
-      const user = userService.addUser({ id: socket.id, name, roomId });
+      const user = { id: socket.id, name, roomId };
+
+      // const room = roomService.getRoom(roomId);
+      const usersInRoom = roomService.getUsersInRoom(roomId);
+      userService.addUser(user);
+
+      const usersInQueue  = roomService.getQueuedUsersInRoom(roomId);
 
       // broadcast new user to all clients (not including sender) in current room
       socket.broadcast.to(roomId).emit(SocketEvents.NEW_USER_JOIN, {
         newUser: user
       });
 
-      // add current user to current room
+      // add user to current room
       socket.join(roomId);
 
       printAppState();
       callback({
         user,
         usersInRoom,
-        room
+        usersInQueue,
       });
     } catch (e) {
       callback(e);

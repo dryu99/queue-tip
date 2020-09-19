@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 
-const Queue = ({ user }) => {
-  const [queueUsers, setQueueUsers] = useState([]);
+const Queue = ({ user, queueUsers, setQueueUsers }) => {
 
   const handleJoinQueue = (e) => {
     setQueueUsers([...queueUsers, user]);
