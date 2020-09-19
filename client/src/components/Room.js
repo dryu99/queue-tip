@@ -8,6 +8,7 @@ import Queue from './Queue';
 const Room = ({ room, isAdmin, user, setUser }) => {
   const [users, setUsers] = useState([]);
   const [queueUsers, setQueueUsers] = useState([]);
+  const [inQueue, setInQueue] = useState(false);
 
   // subscribe to relevant socket events
   useEffect(() => {
@@ -23,6 +24,12 @@ const Room = ({ room, isAdmin, user, setUser }) => {
         console.log('received LEAVE event', leftUser);
         setUsers(users.filter(u => u.id !== leftUser.id));
       });
+
+      // when another user joins queue, add them to queue list
+      socket.on(SocketEvents.ENQUEUE, ({ newQueueUser }) => {
+        console.log('received ENQUEUE event', newQueueUser);
+        setQueueUsers([...queueUsers, newQueueUser]);
+      });
     }
 
     // on component unmount, disconnect and turn off socket
@@ -30,7 +37,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
       socket.emit(SocketEvents.DISCONNECT);
       socket.off();
     };
-  }, [users]);
+  }, [users, queueUsers]);
 
   return (
     <Container>
@@ -43,7 +50,13 @@ const Room = ({ room, isAdmin, user, setUser }) => {
               <li key={u.id}>{u.name}</li>
             )}
           </ul>
-          <Queue user={user} queueUsers={queueUsers} setQueueUsers={setQueueUsers}/>
+          <Queue
+            user={user}
+            queueUsers={queueUsers}
+            setQueueUsers={setQueueUsers}
+            inQueue={inQueue}
+            setInQueue={setInQueue}
+          />
           <SignInPopup
             room={room}
             setUser={setUser}

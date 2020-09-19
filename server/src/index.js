@@ -77,8 +77,26 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on(SocketEvents.ENQUEUE, (callback) => {
-    logger.event('room check event received', roomId);
+  socket.on(SocketEvents.ENQUEUE, ({ user, roomId }, callback) => {
+    // TODO would be nice to do some kind of validation here to make sure user is a user lol typescript bb
+    logger.event(`${SocketEvents.ENQUEUE} event received`);
+    try {
+      // TODO kinda unnecessary since user has roomId, but w/e
+      roomService.enqueueUser(user, roomId);
+      // const usersInQueue = roomService.getQueuedUsersInRoom(roomId);
+
+      // broadcast new queue to all clients (not including sender) in current room
+      socket.broadcast.to(roomId).emit(SocketEvents.ENQUEUE, {
+        newQueueUser: user
+      });
+
+      printAppState();
+      callback({
+        user
+      });
+    } catch (e) {
+      callback(e);
+    }
   });
 
   socket.on(SocketEvents.DISCONNECT, () => {

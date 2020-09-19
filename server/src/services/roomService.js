@@ -58,10 +58,25 @@ const getQueuedUsersInRoom = (roomId) => {
   return [...getRoom(roomId).queue];
 };
 
+/**
+ * @param {object} user
+ * @param {string} roomId
+ * @returns {number}
+ */
+const enqueueUser = (user, roomId) => {
+  return getRoom(roomId).queue.push(user);
+};
+
+const dequeueUser = (roomId) => {
+  return getRoom(roomId).queue.shift();
+};
+
 module.exports = {
   putRoom,
   getRoom,
   getAllRooms,
   getUsersInRoom,
-  getQueuedUsersInRoom
+  getQueuedUsersInRoom,
+  enqueueUser,
+  dequeueUser
 };
