@@ -85,14 +85,33 @@ io.on('connection', (socket) => {
       roomService.enqueueUser(user, roomId);
       // const usersInQueue = roomService.getQueuedUsersInRoom(roomId);
 
-      // broadcast new queue to all clients (not including sender) in current room
+      // broadcast new queue user to all clients (not including sender) in current room
       socket.broadcast.to(roomId).emit(SocketEvents.ENQUEUE, {
         newQueueUser: user
       });
 
       printAppState();
       callback({
-        user
+        user // TODO rename to newqueue user, have to change in client side too
+      });
+    } catch (e) {
+      callback(e);
+    }
+  });
+
+  socket.on(SocketEvents.DEQUEUE, ({ roomId }, callback) => {
+    logger.event(`${SocketEvents.DEQUEUE} event received`);
+    try {
+      const dequeuedUser = roomService.dequeueUser(socket.id, roomId);
+
+      // broadcast dequeued user to all clients (not including sender) in current room
+      socket.broadcast.to(roomId).emit(SocketEvents.DEQUEUE, {
+        dequeuedUser
+      });
+
+      printAppState();
+      callback({
+        dequeuedUser
       });
     } catch (e) {
       callback(e);

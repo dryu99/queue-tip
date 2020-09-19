@@ -20,6 +20,10 @@ const addUser = (newUser) => {
   return newUser;
 };
 
+/**
+ * Remove user with given id completely; remove from user service, rooms, and queues
+ * @param {string} id
+ */
 const removeUser = (id) => {
   // remove user
   const user = utils.removeIdFromArray(users, id);

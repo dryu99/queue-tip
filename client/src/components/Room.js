@@ -23,12 +23,19 @@ const Room = ({ room, isAdmin, user, setUser }) => {
       socket.on(SocketEvents.LEAVE, ({ leftUser }) => {
         console.log('received LEAVE event', leftUser);
         setUsers(users.filter(u => u.id !== leftUser.id));
+        setQueueUsers(queueUsers.filter(qu => qu.id !== leftUser.id));
       });
 
       // when another user joins queue, add them to queue list
       socket.on(SocketEvents.ENQUEUE, ({ newQueueUser }) => {
         console.log('received ENQUEUE event', newQueueUser);
         setQueueUsers([...queueUsers, newQueueUser]);
+      });
+
+      // when another user joins queue, add them to queue list
+      socket.on(SocketEvents.DEQUEUE, ({ dequeuedUser }) => {
+        console.log('received DEQUEUE event', dequeuedUser);
+        setQueueUsers(queueUsers.filter(qu => qu.id !== dequeuedUser.id));
       });
     }
 
@@ -47,11 +54,14 @@ const Room = ({ room, isAdmin, user, setUser }) => {
           <h2>Users:</h2>
           <ul>
             {users.map(u =>
-              <li key={u.id}>{u.name}</li>
+              <li key={u.id}>
+                {user.name === u.name ? <b>{u.name}</b> : u.name}
+              </li>
             )}
           </ul>
           <Queue
             user={user}
+            room={room}
             queueUsers={queueUsers}
             setQueueUsers={setQueueUsers}
             inQueue={inQueue}

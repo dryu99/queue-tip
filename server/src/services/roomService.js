@@ -1,3 +1,5 @@
+const utils = require('../utils');
+
 /**
  * @typedef Room
  * @property {string} id
@@ -64,11 +66,19 @@ const getQueuedUsersInRoom = (roomId) => {
  * @returns {number}
  */
 const enqueueUser = (user, roomId) => {
-  return getRoom(roomId).queue.push(user);
+  const queue = getRoom(roomId).queue;
+  return queue.push(user);
 };
 
-const dequeueUser = (roomId) => {
-  return getRoom(roomId).queue.shift();
+/**
+ * TODO Not really a true 'dequeue' but yknow
+ * @param {string} id - user id
+ * @param {string} roomId
+ * @returns {object}
+ */
+const dequeueUser = (id, roomId) => {
+  const queue = getRoom(roomId).queue;
+  return utils.removeIdFromArray(queue, id);
 };
 
 module.exports = {
