@@ -125,7 +125,8 @@ io.on('connection', (socket) => {
       const user = userService.removeUser(socket.id);
 
       // delete room from memory if its empty
-      if (roomService.getUsersInRoom(user.roomId).length === 0) {
+      // we check for development env b/c it's annoying to have rooms be deleted everytime client refreshes after changes
+      if (process.env.NODE_ENV !== 'development' && roomService.getUsersInRoom(user.roomId).length === 0) {
         roomService.removeRoom(user.roomId);
       }
 
