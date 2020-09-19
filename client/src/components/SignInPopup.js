@@ -5,6 +5,7 @@ import socket, { SocketEvents } from '../socket';
 
 const SignInPopup = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers }) => {
   const [show, setShow] = useState(true);
+  const [alertText, setAlertText] = useState('');
   const [name, setName] = useState('');
 
   // keep track of input component so we can focus on it
@@ -21,13 +22,18 @@ const SignInPopup = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    setShow(false);
-
-    socket.emit(SocketEvents.JOIN, { name, roomId: room.id }, ({ user, usersInRoom, usersInQueue }) => {
-      console.log('acknowledged from JOIN event', user);
-      setUser(user);
-      setUsers([...users, ...usersInRoom, user]); // users should be always empty in this case, but w/e
-      setQueueUsers([...queueUsers, ...usersInQueue]); // users should be always empty in this case, but w/e
+    socket.emit(SocketEvents.JOIN, { name, roomId: room.id }, ({ user, usersInRoom, usersInQueue, error }) => {
+      console.log('acknowledged from JOIN event');
+      if (error) {
+        console.error(error);
+        setAlertText('Name is already taken, please try something else.');
+      } else {
+        setUser(user);
+        setUsers([...users, ...usersInRoom, user]); // users should be always empty in this case, but w/e
+        setQueueUsers([...queueUsers, ...usersInQueue]); // users should be always empty in this case, but w/e
+        setShow(false);
+        setAlertText('');
+      }
     });
   };
 
@@ -46,6 +52,9 @@ const SignInPopup = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers
               onChange={(e) => setName(e.target.value)}
               placeholder="Gregor Kiczales"
             />
+            <Form.Text className="text-muted">
+              {alertText}
+            </Form.Text>
           </Form.Group>
         </Form>
       </Modal.Body>

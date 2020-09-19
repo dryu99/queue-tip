@@ -32,7 +32,7 @@ io.on('connection', (socket) => {
       const room = roomService.putRoom(roomId, { id: roomId, name: roomName });
       callback({ room, event: SocketEvents.CREATE_ROOM });
     } catch (e) {
-      callback({ error: e, event: SocketEvents.CREATE_ROOM });
+      callback({ error: e.message, event: SocketEvents.CREATE_ROOM });
     }
     printAppState();
   });
@@ -61,7 +61,7 @@ io.on('connection', (socket) => {
         usersInQueue,
       });
     } catch (e) {
-      callback(e);
+      callback({ error: e.message });
     }
   });
 
@@ -73,7 +73,7 @@ io.on('connection', (socket) => {
         event: SocketEvents.ROOM_CHECK
       });
     } catch (e) {
-      callback({ error: e });
+      callback({ error: e.message });
     }
   });
 
@@ -95,7 +95,7 @@ io.on('connection', (socket) => {
         user // TODO rename to newqueue user, have to change in client side too
       });
     } catch (e) {
-      callback(e);
+      callback({ error: e.message });
     }
   });
 
@@ -114,7 +114,7 @@ io.on('connection', (socket) => {
         dequeuedUser
       });
     } catch (e) {
-      callback(e);
+      callback({ error: e.message });
     }
   });
 
