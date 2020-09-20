@@ -31,7 +31,7 @@ const Home = ({ setIsAdmin, setRoomCallback }) => {
 
   return (
     <Container className="mt-4">
-      <h1 className="text-center mb-5">Queuety</h1>
+      <h1 className="text-center mb-5">queue-tip</h1>
       <Form>
         <Form.Row className="justify-content-center mb-3">
           <Col xs="auto">

@@ -3,6 +3,7 @@ import { Col, Container, Row, Button } from 'react-bootstrap';
 import socket, { SocketEvents } from '../socket';
 
 import SignInPopup from './SignInPopup';
+import SignInForm from './SignInForm';
 import Queue from './Queue';
 import Users from './Users';
 
@@ -75,7 +76,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
 
   return (
     <Container className="mt-4">
-      {room ?
+      {room && user ?
         <React.Fragment>
           <Row>
             <Col>
@@ -106,7 +107,10 @@ const Room = ({ room, isAdmin, user, setUser }) => {
               <Users user={user} users={users} />
             </Col>
           </Row>
-          <SignInPopup
+        </React.Fragment>
+        :
+        room ?
+          <SignInForm
             room={room}
             setUser={setUser}
             users={users}
@@ -114,9 +118,8 @@ const Room = ({ room, isAdmin, user, setUser }) => {
             queueUsers={queueUsers}
             setQueueUsers={setQueueUsers}
           />
-        </React.Fragment>
-        :
-        <span>Sorry room doesn't exist...</span>
+          :
+          <span>Sorry room doesn't exist...</span>
       }
       {/* strangely enough, doing this doesn't work for copying to clipboard - setting display to none causes the copied value to be "window.location.href" */}
       {/* <textarea ref={linkRef} style={{ display: 'none' }} value={window.location.href}/> */}
