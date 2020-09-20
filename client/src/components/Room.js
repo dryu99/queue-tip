@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Button } from 'react-bootstrap';
 import socket, { SocketEvents } from '../socket';
 
@@ -45,7 +45,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
       socket.emit(SocketEvents.DISCONNECT);
       socket.off();
     };
-  }, [users, queueUsers]);
+  }, [users, queueUsers, room]);
 
   const copyLinkToClipboard = (e) => {
     // TODO manipulating DOM here directly feels sketchy, doing it the react way doesn't work see comments below
@@ -86,7 +86,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
                 Copy Link
               </Button>
             </Col>
-            <Col xs="3">
+            <Col xs="2">
               <Button onClick={handleQueueToggle} size="lg" block>
                 {inQueue ? 'Leave Queue' : 'Join Queue'}
               </Button>
@@ -95,9 +95,14 @@ const Room = ({ room, isAdmin, user, setUser }) => {
           <hr/>
           <Row>
             <Col>
-              <Queue user={user} queueUsers={queueUsers}/>
+              <Queue
+                user={user}
+                isAdmin={isAdmin}
+                queueUsers={queueUsers}
+                setQueueUsers={setQueueUsers}
+              />
             </Col>
-            <Col xs="auto">
+            <Col xs="3">
               <Users user={user} users={users} />
             </Col>
           </Row>

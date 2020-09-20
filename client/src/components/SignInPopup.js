@@ -33,6 +33,10 @@ const SignInPopup = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers
         setQueueUsers([...queueUsers, ...usersInQueue]); // users should be always empty in this case, but w/e
         setShow(false);
         setAlertText('');
+
+        // save user locally on browser
+        // TODO have to make sure admin permissions get saved too i.e. user.type
+        localStorage.setItem('currentUserData', JSON.stringify(user));
       }
     });
   };

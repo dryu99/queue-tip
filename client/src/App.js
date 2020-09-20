@@ -29,6 +29,12 @@ function App() {
     }
   }, [match, isAdmin, room]);
 
+  // TODO this won't work properly because modal popup won't know to close
+  useEffect(() => {
+    const userJSON = localStorage.getItem('currentUserData');
+    setUser(JSON.parse(userJSON));
+  }, []);
+
   // event acknowledgement callback that sets room
   const setRoomCallback = ({ room, error, event }) => {
     console.log(`${event} event acknowledged`, room);
