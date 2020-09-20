@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Home from './components/Home';
 import Room from './components/Room';
+import Error from './components/Error';
 
 import {
   Switch,
@@ -30,10 +31,10 @@ function App() {
   }, [match, isAdmin, room]);
 
   // TODO this won't work properly because modal popup won't know to close
-  useEffect(() => {
-    const userJSON = localStorage.getItem('currentUserData');
-    setUser(JSON.parse(userJSON));
-  }, []);
+  // useEffect(() => {
+  //   const userJSON = localStorage.getItem('currentUserData');
+  //   setUser(JSON.parse(userJSON));
+  // }, []);
 
   // event acknowledgement callback that sets room
   const setRoomCallback = ({ room, error, event }) => {
@@ -50,8 +51,11 @@ function App() {
       <Route path="/room/:id">
         <Room room={room} isAdmin={isAdmin} user={user} setUser={setUser}/>
       </Route>
-      <Route path="/">
+      <Route exact path="/">
         <Home setIsAdmin={setIsAdmin} setRoomCallback={setRoomCallback}/>
+      </Route>
+      <Route>
+        <Error text="404 resource not found"/>
       </Route>
     </Switch>
   );
