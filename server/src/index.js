@@ -37,10 +37,10 @@ io.on('connection', (socket) => {
     printAppState();
   });
 
-  socket.on(SocketEvents.JOIN, ({ name, roomId }, callback) => {
-    logger.event(`${SocketEvents.JOIN} event received`, { name, roomId });
+  socket.on(SocketEvents.JOIN, ({ name, type, roomId }, callback) => {
+    logger.event(`${SocketEvents.JOIN} event received`, { name, type, roomId });
     try {
-      const user = { id: socket.id, name, roomId };
+      const user = { id: socket.id, name, type, roomId };
       const usersInRoom = roomService.getUsersInRoom(roomId);
       const usersInQueue  = roomService.getQueuedUsersInRoom(roomId);
 

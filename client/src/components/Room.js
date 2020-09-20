@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Button } from 'react-bootstrap';
 import socket, { SocketEvents } from '../socket';
 
-import SignInPopup from './SignInPopup';
-import SignInForm from './SignInForm';
+import SignIn from './SignIn';
 import Queue from './Queue';
 import Users from './Users';
 
@@ -11,6 +10,14 @@ const Room = ({ room, isAdmin, user, setUser }) => {
   const [users, setUsers] = useState([]);
   const [queueUsers, setQueueUsers] = useState([]);
   const [inQueue, setInQueue] = useState(false);
+
+  // TODO this won't work properly because modal popup won't know to close
+  // useEffect(() => {
+  //   const userJSON = localStorage.getItem('queueTipUserData');
+  //   if (userJSON) {
+  //     setUser(JSON.parse(userJSON));
+  //   }
+  // }, [setUser]);
 
   // subscribe to relevant socket events
   useEffect(() => {
@@ -76,7 +83,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
 
   return (
     <Container className="mt-4">
-      {room && user ?
+      {room && user.name ?
         <React.Fragment>
           <Row>
             <Col>
@@ -110,13 +117,14 @@ const Room = ({ room, isAdmin, user, setUser }) => {
         </React.Fragment>
         :
         room ?
-          <SignInForm
+          <SignIn
             room={room}
             setUser={setUser}
             users={users}
             setUsers={setUsers}
             queueUsers={queueUsers}
             setQueueUsers={setQueueUsers}
+            isAdmin={isAdmin}
           />
           :
           <span>Sorry room doesn't exist...</span>

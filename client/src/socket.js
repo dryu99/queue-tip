@@ -3,6 +3,14 @@ const SERVER_URL = 'localhost:3003';
 
 const socket = io(SERVER_URL);
 
+export const emitCreateRoom = (newRoom, callback) => {
+  socket.emit(SocketEvents.CREATE_ROOM, newRoom, callback);
+};
+
+export const emitCheckRoom = (roomId, callback) => {
+  socket.emit(SocketEvents.ROOM_CHECK, { roomId }, callback);
+};
+
 export const SocketEvents = Object.freeze({
   JOIN: 'join',
   CREATE_ROOM: 'create_room',

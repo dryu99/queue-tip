@@ -9,36 +9,44 @@ import {
   useRouteMatch
 } from 'react-router-dom';
 
-
-import socket from './socket';
-import { SocketEvents } from './socket';
+import socket, { SocketEvents } from './socket';
+import { UserTypes } from './enums';
 
 function App() {
-  const [user, setUser] = useState(null);
-  // const [users, setUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState({ type: UserTypes.BASIC });
   const [isAdmin, setIsAdmin] = useState(false); // user is only admin if they created room
   const [room, setRoom] = useState(null);
 
   const match = useRouteMatch('/room/:id');
 
-  // if user entered via link, check to see if specified room id exists
+  // if user entered via link, check to see if specified room id exists and init room
   useEffect(() => {
-    if (match && !isAdmin && !room) {
+    if (match && !room) {
       console.log('emitting room check event');
-      const roomId = match.params.id;
-      socket.emit(SocketEvents.ROOM_CHECK, { roomId }, setRoomCallback);
+      checkRoom(match.params.id);
     }
-  }, [match, isAdmin, room]);
+  }, [match, room]);
 
-  // TODO this won't work properly because modal popup won't know to close
-  // useEffect(() => {
-  //   const userJSON = localStorage.getItem('currentUserData');
-  //   setUser(JSON.parse(userJSON));
-  // }, []);
+  const initCurrentUser = (user) => {
+    setCurrentUser(user);
+  };
 
-  // event acknowledgement callback that sets room
-  const setRoomCallback = ({ room, error, event }) => {
-    console.log(`${event} event acknowledged`, room);
+  const setCurrentUserType = (type) => {
+    setCurrentUser({ ...currentUser, type });
+  };
+
+  const createRoom = (newRoom) => {
+    socket.emit(SocketEvents.CREATE_ROOM, newRoom, setRoomCallback);
+  };
+
+  const checkRoom = (roomId) => {
+    socket.emit(SocketEvents.ROOM_CHECK, { roomId }, setRoomCallback);
+  };
+
+  // socket event acknowledgement callback
+  const setRoomCallback = (resData) => {
+    const { room, error } = resData;
+    console.log('room event acknowledged', room);
     if (room && !error) {
       setRoom(room);
     } else {
@@ -49,10 +57,13 @@ function App() {
   return (
     <Switch className="mt-4">
       <Route path="/room/:id">
-        <Room room={room} isAdmin={isAdmin} user={user} setUser={setUser}/>
+        <Room room={room} isAdmin={isAdmin} user={currentUser} setUser={setCurrentUser}/>
       </Route>
       <Route exact path="/">
-        <Home setIsAdmin={setIsAdmin} setRoomCallback={setRoomCallback}/>
+        <Home
+          setCurrentUserType={setCurrentUserType}
+          createRoom={createRoom}
+        />
       </Route>
       <Route>
         <Error text="404 resource not found"/>

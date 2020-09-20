@@ -1,32 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Container, Form, Col } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
-import { Link } from 'react-router-dom';
-import socket from '../socket';
-import { SocketEvents } from '../socket';
+import { useHistory } from 'react-router-dom';
+import { UserTypes } from '../enums';
 
-const Home = ({ setIsAdmin, setRoomCallback }) => {
+import { emitCreateRoom } from '../socket';
+
+const Home = ({ setCurrentUserType, setRoomCallback }) => {
   const [newRoomName, setNewRoomName] = useState('');
-  const [newRoomId, setNewRoomId] = useState('');
 
-  useEffect(() => {
-    // randomly generates uuid
-    setNewRoomId(uuidv4());
-  }, []);
+  const history = useHistory();
 
-  // users who create a room are considered as 'admins'
   const handleCreateRoomClick = (e) => {
+    const newRoomId = uuidv4();
+
     if (newRoomId && newRoomName && newRoomName.trim() !== '') {
-      setIsAdmin(true);
-      socket.emit(SocketEvents.CREATE_ROOM, { roomName: newRoomName, roomId: newRoomId }, setRoomCallback);
+      // users who create rooms are admins
+      setCurrentUserType(UserTypes.ADMIN);
+
+      // send a create room event to server
+      emitCreateRoom(
+        { roomName: newRoomName, roomId: newRoomId },
+        setRoomCallback
+      );
+
+      // route to room resource
+      history.push(`/room/${newRoomId}`);
     } else {
       e.preventDefault();
-      console.log('error creating room');
+      console.error('error creating room');
     }
-  };
-
-  const toProp = {
-    pathname: `/room/${newRoomId}`
   };
 
   return (
@@ -44,12 +47,7 @@ const Home = ({ setIsAdmin, setRoomCallback }) => {
         </Form.Row>
         <Form.Row className="justify-content-center">
           <Col xs="auto">
-            <Link
-              to={toProp}
-              onClick={handleCreateRoomClick}
-            >
-              <Button variant="primary" type="submit">Create Room</Button>
-            </Link>
+            <Button onClick={handleCreateRoomClick} variant="primary" type="submit">Create Room</Button>
           </Col>
         </Form.Row>
       </Form>

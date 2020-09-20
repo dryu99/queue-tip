@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Button, Container, Form, Col } from 'react-bootstrap';
 import socket, { SocketEvents } from '../socket';
+import { UserTypes } from '../enums';
 
-const SignInForm = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers }) => {
+const SignIn = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers, isAdmin }) => {
   const [newName, setNewName] = useState('');
   const [alertText, setAlertText] = useState('');
 
@@ -19,8 +20,10 @@ const SignInForm = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    socket.emit(SocketEvents.JOIN, { name: newName, roomId: room.id }, ({ user, usersInRoom, usersInQueue, error }) => {
-      console.log('acknowledged from JOIN event');
+    const userType = isAdmin ? UserTypes.ADMIN : UserTypes.BASIC;
+
+    socket.emit(SocketEvents.JOIN, { name: newName, type: userType, roomId: room.id }, ({ user, usersInRoom, usersInQueue, error }) => {
+      console.log('acknowledged from JOIN event', user);
       if (error) {
         console.error(error);
         setAlertText('Name is already taken, please try something else.');
@@ -71,4 +74,4 @@ const SignInForm = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers 
   );
 };
 
-export default SignInForm;
+export default SignIn;
