@@ -30,7 +30,9 @@ io.on('connection', (socket) => {
     logger.event(`${SocketEvents.CREATE_ROOM} event received`, roomId);
     try {
       const room = roomService.putRoom(roomId, { id: roomId, name: roomName });
-      callback({ room, event: SocketEvents.CREATE_ROOM });
+      const cleanRoom = roomService.cleanRoom(room);
+
+      callback({ room: cleanRoom, event: SocketEvents.CREATE_ROOM });
     } catch (e) {
       callback({ error: e.message, event: SocketEvents.CREATE_ROOM });
     }
@@ -68,8 +70,11 @@ io.on('connection', (socket) => {
   socket.on(SocketEvents.ROOM_CHECK, ({ roomId }, callback) => {
     logger.event(`${SocketEvents.ROOM_CHECK} event received`, roomId);
     try {
+      const room = roomService.getRoom(roomId);
+      const cleanRoom = roomService.cleanRoom(room);
+
       callback({
-        room: roomService.getRoom(roomId),
+        room: cleanRoom,
         event: SocketEvents.ROOM_CHECK
       });
     } catch (e) {

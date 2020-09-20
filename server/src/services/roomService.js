@@ -60,6 +60,17 @@ const getAllRooms = () => {
   return Array.from(rooms.values());
 };
 
+/**
+ * Cleans room data for safe client return
+ * @param {Room} room
+ */
+const cleanRoom = (room) => {
+  const roomCopy = { ...room };
+  delete roomCopy.users;
+  delete roomCopy.queue;
+  return roomCopy;
+};
+
 const getUsersInRoom = (roomId) => {
   return [...getRoom(roomId).users];
 };
@@ -93,6 +104,7 @@ module.exports = {
   putRoom,
   removeRoom,
   getRoom,
+  cleanRoom,
   getAllRooms,
   getUsersInRoom,
   getQueuedUsersInRoom,
