@@ -1,5 +1,6 @@
 const http = require('http');
 const socketio = require('socket.io');
+const { v4: uuidv4 } = require('uuid');
 const app = require('./app');
 const config = require('./config');
 const logger = require('./logger');
@@ -26,6 +27,7 @@ io.on('connection', (socket) => {
   logger.event('a user has connected!');
   printAppState();
 
+  // should generate uuid on server not client
   socket.on(SocketEvents.CREATE_ROOM, ({ roomId, roomName }, callback) => {
     logger.event(`${SocketEvents.CREATE_ROOM} event received`, roomId);
     try {
@@ -39,18 +41,27 @@ io.on('connection', (socket) => {
     printAppState();
   });
 
-  socket.on(SocketEvents.JOIN, ({ name, type, roomId }, callback) => {
+  socket.on(SocketEvents.JOIN, ({ name, type, id, roomId }, callback) => {
     logger.event(`${SocketEvents.JOIN} event received`, { name, type, roomId });
     try {
-      const user = { id: socket.id, name, type, roomId };
+      const user = {
+        id: id || uuidv4(), // randomly generate one if id isn't given
+        socketId: socket.id,
+        name,
+        type,
+        roomId
+      };
+
       const usersInRoom = roomService.getUsersInRoom(roomId);
       const usersInQueue  = roomService.getQueuedUsersInRoom(roomId);
 
       userService.addUser(user);
 
+      const cleanUser = userService.cleanUser(user);
+
       // broadcast new user to all clients (not including sender) in current room
       socket.broadcast.to(roomId).emit(SocketEvents.NEW_USER_JOIN, {
-        newUser: user
+        newUser: cleanUser
       });
 
       // add user to current room
@@ -58,7 +69,7 @@ io.on('connection', (socket) => {
 
       printAppState();
       callback({
-        user,
+        user: cleanUser,
         usersInRoom,
         usersInQueue,
       });
@@ -88,46 +99,48 @@ io.on('connection', (socket) => {
     try {
       // TODO kinda unnecessary since user has roomId, but w/e
       roomService.enqueueUser(user, roomId);
-      // const usersInQueue = roomService.getQueuedUsersInRoom(roomId);
+      const cleanUser = userService.cleanUser(user);
 
       // broadcast new queue user to all clients (not including sender) in current room
       socket.broadcast.to(roomId).emit(SocketEvents.ENQUEUE, {
-        newQueueUser: user
+        enqueuedUser: cleanUser
       });
 
       printAppState();
       callback({
-        user // TODO rename to newqueue user, have to change in client side too
+        enqueuedUser: cleanUser // TODO rename to newqueue user, have to change in client side too
       });
     } catch (e) {
       callback({ error: e.message });
     }
   });
 
-  socket.on(SocketEvents.DEQUEUE, ({ roomId }, callback) => {
+  socket.on(SocketEvents.DEQUEUE, ({ userId, roomId }, callback) => {
     logger.event(`${SocketEvents.DEQUEUE} event received`);
     try {
-      const dequeuedUser = roomService.dequeueUser(socket.id, roomId);
+      const dequeuedUser = roomService.dequeueUser(userId, roomId);
+      const cleanUser = userService.cleanUser(dequeuedUser);
 
       // broadcast dequeued user to all clients (not including sender) in current room
       socket.broadcast.to(roomId).emit(SocketEvents.DEQUEUE, {
-        dequeuedUser
+        dequeuedUser: cleanUser
       });
 
       printAppState();
       callback({
-        dequeuedUser
+        dequeuedUser: cleanUser
       });
     } catch (e) {
       callback({ error: e.message });
     }
   });
 
-  socket.on(SocketEvents.DISCONNECT, () => {
-    logger.event(`${SocketEvents.DISCONNECT} event received`);
+  socket.on(SocketEvents.DISCONNECT, (data) => {
+    logger.event(`${SocketEvents.DISCONNECT} event received`, data);
 
     try {
       const user = userService.removeUser(socket.id);
+      const cleanUser = userService.cleanUser(user);
 
       // delete room from memory if its empty
       // we check for development env b/c it's annoying to have rooms be deleted everytime client refreshes after changes
@@ -137,7 +150,7 @@ io.on('connection', (socket) => {
 
       // broadcast user left to all clients (not including sender) in current room
       io.in(user.roomId).emit(SocketEvents.LEAVE, {
-        leftUser: user
+        leftUser: cleanUser
       });
 
       printAppState();

@@ -11,6 +11,14 @@ export const emitCheckRoom = (roomId, callback) => {
   socket.emit(SocketEvents.ROOM_CHECK, { roomId }, callback);
 };
 
+export const emitEnqueue = (data, callback) => {
+  socket.emit(SocketEvents.ENQUEUE, data, callback);
+};
+
+export const emitDequeue = (data, callback) => {
+  socket.emit(SocketEvents.DEQUEUE, data, callback);
+};
+
 export const SocketEvents = Object.freeze({
   JOIN: 'join',
   CREATE_ROOM: 'create_room',

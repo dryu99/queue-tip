@@ -2,8 +2,7 @@ import React from 'react';
 import { Row, Col, Container, ListGroup } from 'react-bootstrap';
 import User from './User';
 
-const Queue = ({ isAdmin, user, queueUsers, setQueueUsers }) => {
-
+const Queue = ({ isAdmin, user, queueUsers }) => {
   // const removeFromQueue = (e) => {
   //   const nameToRemove = e.target.textContent;
   //   setQueueUsers(queueUsers.filter(qu => qu.name !== nameToRemove));

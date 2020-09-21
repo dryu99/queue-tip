@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Button } from 'react-bootstrap';
-import socket, { SocketEvents } from '../socket';
+import socket, { SocketEvents, emitEnqueue, emitDequeue } from '../socket';
 
 import SignIn from './SignIn';
 import Queue from './Queue';
@@ -21,39 +21,53 @@ const Room = ({ room, isAdmin, user, setUser }) => {
 
   // subscribe to relevant socket events
   useEffect(() => {
-    if (room) {
-      // when another user joins, add them to user list
-      socket.on(SocketEvents.NEW_USER_JOIN, ({ newUser }) => {
-        console.log('received JOIN event', newUser);
-        setUsers([...users, newUser]);
-      });
+    // when another user joins, add them to user list
+    socket.on(SocketEvents.NEW_USER_JOIN, ({ newUser }) => {
+      console.log('received JOIN event', newUser);
+      addNewUser(newUser);
+    });
 
-      // when another user leaves, remove them from user list
-      socket.on(SocketEvents.LEAVE, ({ leftUser }) => {
-        console.log('received LEAVE event', leftUser);
-        setUsers(users.filter(u => u.id !== leftUser.id));
-        setQueueUsers(queueUsers.filter(qu => qu.id !== leftUser.id));
-      });
+    // when another user leaves, remove them from user list
+    socket.on(SocketEvents.LEAVE, ({ leftUser }) => {
+      console.log('received LEAVE event', leftUser);
+      removeUser(leftUser.id);
+      removeQueueUser(leftUser.id);
+    });
 
-      // when another user joins queue, add them to queue list
-      socket.on(SocketEvents.ENQUEUE, ({ newQueueUser }) => {
-        console.log('received ENQUEUE event', newQueueUser);
-        setQueueUsers([...queueUsers, newQueueUser]);
-      });
+    // when another user joins queue, add them to queue list
+    socket.on(SocketEvents.ENQUEUE, ({ enqueuedUser }) => {
+      console.log('received ENQUEUE event', enqueuedUser);
+      addNewQueueUser(enqueuedUser);
+    });
 
-      // when another user joins queue, add them to queue list
-      socket.on(SocketEvents.DEQUEUE, ({ dequeuedUser }) => {
-        console.log('received DEQUEUE event', dequeuedUser);
-        setQueueUsers(queueUsers.filter(qu => qu.id !== dequeuedUser.id));
-      });
-    }
+    // when another user joins queue, add them to queue list
+    socket.on(SocketEvents.DEQUEUE, ({ dequeuedUser }) => {
+      console.log('received DEQUEUE event', dequeuedUser);
+      removeQueueUser(dequeuedUser.id);
+    });
 
     // on component unmount, disconnect and turn off socket
     return () => {
-      socket.emit(SocketEvents.DISCONNECT);
+      socket.emit(SocketEvents.DISCONNECT, 'testtesttest');
       socket.off();
     };
-  }, [users, queueUsers, room]);
+  }, [users, queueUsers]);
+
+  const addNewUser = (newUser) => {
+    setUsers([...users, newUser]);
+  };
+
+  const removeUser = (id) => {
+    setUsers(users.filter(u => u.id !== id));
+  };
+
+  const addNewQueueUser = (newQueueUser) => {
+    setQueueUsers([...queueUsers, newQueueUser]);
+  };
+
+  const removeQueueUser = (id) => {
+    setQueueUsers(queueUsers.filter(u => u.id !== id));
+  };
 
   const copyLinkToClipboard = (e) => {
     // TODO manipulating DOM here directly feels sketchy, doing it the react way doesn't work see comments below
@@ -67,15 +81,15 @@ const Room = ({ room, isAdmin, user, setUser }) => {
 
   const handleQueueToggle = (e) => {
     if (inQueue) {
-      socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, ({ dequeuedUser }) => {
-        console.log('acknowledged from DEQUEUE event', dequeuedUser);
-        setQueueUsers(queueUsers.filter(qu => qu.id !== dequeuedUser.id));
+      emitDequeue({ userId: user.id, roomId: room.id }, (data) => {
+        console.log('acknowledged from DEQUEUE event', data.dequeuedUser);
+        removeQueueUser(data.dequeuedUser.id);
         setInQueue(false);
       });
     } else {
-      socket.emit(SocketEvents.ENQUEUE, { user, roomId: room.id }, (data) => {
-        console.log('acknowledged from ENQUEUE event', data.user);
-        setQueueUsers([...queueUsers, data.user]);
+      emitEnqueue({ user, roomId: room.id }, (data) => {
+        console.log('acknowledged from ENQUEUE event', data.enqueuedUser);
+        addNewQueueUser(data.enqueuedUser);
         setInQueue(true);
       });
     }
@@ -83,7 +97,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
 
   return (
     <Container className="mt-4">
-      {room && user.name ?
+      {user.name ?
         <React.Fragment>
           <Row>
             <Col>
@@ -107,7 +121,6 @@ const Room = ({ room, isAdmin, user, setUser }) => {
                 user={user}
                 isAdmin={isAdmin}
                 queueUsers={queueUsers}
-                setQueueUsers={setQueueUsers}
               />
             </Col>
             <Col xs="3">

@@ -9,7 +9,7 @@ import {
   useRouteMatch
 } from 'react-router-dom';
 
-import socket, { SocketEvents } from './socket';
+import { emitCheckRoom } from './socket';
 import { UserTypes } from './enums';
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
   useEffect(() => {
     if (match && !room) {
       console.log('emitting room check event');
-      checkRoom(match.params.id);
+      emitCheckRoom(match.params.id, setRoomCallback);
     }
   }, [match, room]);
 
@@ -33,14 +33,6 @@ function App() {
 
   const setCurrentUserType = (type) => {
     setCurrentUser({ ...currentUser, type });
-  };
-
-  const createRoom = (newRoom) => {
-    socket.emit(SocketEvents.CREATE_ROOM, newRoom, setRoomCallback);
-  };
-
-  const checkRoom = (roomId) => {
-    socket.emit(SocketEvents.ROOM_CHECK, { roomId }, setRoomCallback);
   };
 
   // socket event acknowledgement callback
@@ -62,7 +54,7 @@ function App() {
       <Route exact path="/">
         <Home
           setCurrentUserType={setCurrentUserType}
-          createRoom={createRoom}
+          setRoomCallback={setRoomCallback}
         />
       </Route>
       <Route>

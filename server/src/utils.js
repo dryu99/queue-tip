@@ -1,5 +1,10 @@
-const removeIdFromArray = (array, id) => {
-  const index = array.findIndex(el => el.id === id);
+/**
+ * @param {object[]} array
+ * @param {string} id
+ * @param {string} [propName] - name of id property (might not be id)
+ */
+const removeIdFromArray = (array, id, propName='id') => {
+  const index = array.findIndex(el => el[propName] === id);
   if (index === -1) {
     // throw new Error(`Id ${id} not found in array`);
     return null;

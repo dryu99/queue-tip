@@ -22,19 +22,19 @@ const addUser = (newUser) => {
 
 /**
  * Remove user with given id completely; remove from user service, rooms, and queues
- * @param {string} id
+ * @param {string} socketId - should be socket id
  */
-const removeUser = (id) => {
+const removeUser = (socketId) => {
   // remove user
-  const user = utils.removeIdFromArray(users, id);
+  const user = utils.removeIdFromArray(users, socketId, 'socketId');
   if (!user) {
-    throw new Error(`User "${id}" doesn't exist. Either an error or unregistered user disconnected.`);
+    throw new Error(`User socket id "${socketId}" doesn't exist. Either an error or unregistered user disconnected.`);
   }
 
   // make sure user gets removed from appropriate room
   const room = roomService.getRoom(user.roomId);
-  utils.removeIdFromArray(room.users, id);
-  utils.removeIdFromArray(room.queue, id);
+  utils.removeIdFromArray(room.users, user.id);
+  utils.removeIdFromArray(room.queue, user.id);
 
   return user;
 };
@@ -48,6 +48,13 @@ const getUser = (id) => {
   return user;
 };
 
+const cleanUser = (user) => {
+  const userCopy = { ...user };
+  delete userCopy.roomId;
+  delete userCopy.socketId;
+  return userCopy;
+};
+
 const getAllUsers = () => {
   return users;
 };
@@ -56,5 +63,6 @@ module.exports = {
   addUser,
   removeUser,
   getUser,
+  cleanUser,
   getAllUsers
 };
