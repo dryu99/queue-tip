@@ -6,7 +6,7 @@ const config = require('./config');
 const logger = require('./logger');
 const userService = require('./services/userService');
 const roomService = require('./services/roomService');
-const { SocketEvents } = require('../../config/common');
+const { SocketEvents } = require('./types');
 
 const server = http.createServer(app);
 const io = socketio(server);

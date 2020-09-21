@@ -11,4 +11,4 @@ const SocketEvents = Object.freeze({
 
 module.exports = {
   SocketEvents
-}
+};

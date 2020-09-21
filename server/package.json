@@ -6,7 +6,10 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node src/index.js",
     "dev": "cross-env NODE_ENV=development nodemon src/index.js",
-    "build:ui": "rm -rf build && cd ../client && yarn build --prod && cp -r build ../server/"
+    "build:ui": "rm -rf build && cd ../client && yarn build --prod && cp -r build ../server/",
+    "deploy": "git push heroku master",
+    "deploy:full": "yarn build:ui && git add . && git commit -m uibuild && yarn deploy",    
+    "logs:prod": "heroku logs --tail"
   },
   "dependencies": {
     "cross-env": "^7.0.2",
