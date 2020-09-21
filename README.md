@@ -14,4 +14,4 @@ The socket.io library was used to facilitate bi-directional client-server commun
 Because UI is my passion.
 
 ## Feedback
-If you hate this or hate me please submit an issue and I'll try to respond in a timely manner. If you love this or love me, I love you too.
+Please please please provide any feedback if you have any. I'll try to respond in a timely manner.
