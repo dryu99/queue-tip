@@ -108,7 +108,7 @@ const Room = ({ room, user, setUser }) => {
                 Copy Link
               </Button>
             </Col>
-            <Col xs="2">
+            <Col xs="3">
               <Button onClick={handleQueueToggle} size="lg" block>
                 {inQueue ? 'Leave Queue' : 'Join Queue'}
               </Button>
