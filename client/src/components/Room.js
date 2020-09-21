@@ -36,6 +36,10 @@ const Room = ({ room, user, setUser }) => {
     socket.on(SocketEvents.DEQUEUE, ({ dequeuedUser }) => {
       console.log('received DEQUEUE event', dequeuedUser);
       removeQueueUser(dequeuedUser.id);
+
+      if (dequeuedUser.id === user.id) {
+        setInQueue(false);
+      }
     });
 
     // on component unmount, disconnect and turn off socket
@@ -114,8 +118,11 @@ const Room = ({ room, user, setUser }) => {
           <Row>
             <Col>
               <Queue
+                room={room}
                 user={user}
                 queueUsers={queueUsers}
+                removeQueueUser={removeQueueUser}
+                setInQueue={setInQueue}
               />
             </Col>
             <Col xs="3">
