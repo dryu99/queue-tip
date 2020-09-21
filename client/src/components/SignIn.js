@@ -29,10 +29,6 @@ const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
         setUser(user);
         addNewUser([...usersInRoom, user]);
         addNewQueueUser(usersInQueue);
-
-        // save user locally on browser
-        // TODO have to make sure admin permissions get saved too i.e. user.type
-        localStorage.setItem('queueTipUserData', JSON.stringify(user));
       } else {
         console.error(error);
         setAlertText('Name is already taken, please try something else.');
