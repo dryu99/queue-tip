@@ -3,6 +3,7 @@ import { Button, Container, Form, Col } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import { useHistory } from 'react-router-dom';
 import { UserTypes } from '../enums';
+import logger from '../utils/logger';
 
 import { emitCreateRoom } from '../socket';
 
@@ -28,7 +29,7 @@ const Home = ({ setCurrentUserType, setRoomCallback }) => {
       history.push(`/room/${newRoomId}`);
     } else {
       e.preventDefault();
-      console.error('error creating room');
+      logger.error('error creating room');
     }
   };
 

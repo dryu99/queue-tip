@@ -1,7 +1,6 @@
 import io from 'socket.io-client';
-const SERVER_URL = 'localhost:3003';
 
-const socket = io(SERVER_URL);
+const socket = io();
 
 export const emitCreateRoom = (newRoom, callback) => {
   socket.emit(SocketEvents.CREATE_ROOM, newRoom, callback);

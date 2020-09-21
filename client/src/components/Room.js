@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Button } from 'react-bootstrap';
 import socket, { SocketEvents, emitEnqueue, emitDequeue } from '../socket';
+import logger from '../utils/logger';
 
 import SignIn from './SignIn';
 import Queue from './Queue';
@@ -15,26 +16,26 @@ const Room = ({ room, user, setUser }) => {
   useEffect(() => {
     // when another user joins, add them to user list
     socket.on(SocketEvents.NEW_USER_JOIN, ({ newUser }) => {
-      console.log('received JOIN event', newUser);
+      logger.info('received JOIN event', newUser);
       addNewUser(newUser);
     });
 
     // when another user leaves, remove them from user list
     socket.on(SocketEvents.LEAVE, ({ leftUser }) => {
-      console.log('received LEAVE event', leftUser);
+      logger.info('received LEAVE event', leftUser);
       removeUser(leftUser.id);
       removeQueueUser(leftUser.id);
     });
 
     // when another user joins queue, add them to queue list
     socket.on(SocketEvents.ENQUEUE, ({ enqueuedUser }) => {
-      console.log('received ENQUEUE event', enqueuedUser);
+      logger.info('received ENQUEUE event', enqueuedUser);
       addNewQueueUser(enqueuedUser);
     });
 
     // when another user joins queue, add them to queue list
     socket.on(SocketEvents.DEQUEUE, ({ dequeuedUser }) => {
-      console.log('received DEQUEUE event', dequeuedUser);
+      logger.info('received DEQUEUE event', dequeuedUser);
       removeQueueUser(dequeuedUser.id);
 
       if (dequeuedUser.id === user.id) {
@@ -79,13 +80,13 @@ const Room = ({ room, user, setUser }) => {
   const handleQueueToggle = (e) => {
     if (inQueue) {
       emitDequeue({ userId: user.id, roomId: room.id }, (data) => {
-        console.log('acknowledged from DEQUEUE event', data.dequeuedUser);
+        logger.info('acknowledged from DEQUEUE event', data.dequeuedUser);
         removeQueueUser(data.dequeuedUser.id);
         setInQueue(false);
       });
     } else {
       emitEnqueue({ user, roomId: room.id }, (data) => {
-        console.log('acknowledged from ENQUEUE event', data.enqueuedUser);
+        logger.info('acknowledged from ENQUEUE event', data.enqueuedUser);
         addNewQueueUser(data.enqueuedUser);
         setInQueue(true);
       });

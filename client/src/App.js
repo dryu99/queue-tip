@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Home from './components/Home';
 import Room from './components/Room';
 import Error from './components/Error';
+import logger from './utils/logger';
 
 import {
   Switch,
@@ -22,7 +23,7 @@ function App() {
   // if user entered via link, check to see if specified room id exists and init room
   useEffect(() => {
     if (match && !room) {
-      console.log('emitting room check event');
+      logger.info('emitting room check event');
       emitCheckRoom(match.params.id, setRoomCallback);
     }
   }, [match, room]);
@@ -34,11 +35,11 @@ function App() {
   // socket event acknowledgement callback
   const setRoomCallback = (resData) => {
     const { room, error } = resData;
-    console.log('room event acknowledged', room);
+    logger.info('room event acknowledged', room);
     if (room && !error) {
       setRoom(room);
     } else {
-      console.error(error);
+      logger.info(error);
       setRoomError('sorry room doesn\'t exist...');
     }
   };

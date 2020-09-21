@@ -3,12 +3,13 @@ import { Row, Col, Container, ListGroup } from 'react-bootstrap';
 import { UserTypes } from '../enums';
 import User from './User';
 import { emitDequeue } from '../socket';
+import logger from '../utils/logger';
 
 const Queue = ({ room, user, queueUsers, removeQueueUser, setInQueue }) => {
 
   const removeUserFromQueue = (e, userId) => {
     emitDequeue({ userId, roomId: room.id }, (data) => {
-      console.log('acknowledged from DEQUEUE event', data.dequeuedUser);
+      logger.info('acknowledged from DEQUEUE event', data.dequeuedUser);
       removeQueueUser(data.dequeuedUser.id);
 
       if (data.dequeuedUser.id === user.id) {

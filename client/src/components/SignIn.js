@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Button, Container, Form, Col } from 'react-bootstrap';
 import { emitJoin } from '../socket';
+import logger from '../utils/logger';
 
 const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
   const [newName, setNewName] = useState('');
@@ -22,14 +23,14 @@ const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
 
     emitJoin({ name: newName, type: user.type, roomId: room.id }, (resData) => {
       const { user, usersInRoom, usersInQueue, error } = resData;
-      console.log('acknowledged from JOIN event', user);
+      logger.info('acknowledged from JOIN event', user);
 
       if (!error) {
         setUser(user);
         addNewUser([...usersInRoom, user]);
         addNewQueueUser(usersInQueue);
       } else {
-        console.error(error);
+        logger.error(error);
         setAlertText('Name is already taken, please try something else.');
       }
     });
