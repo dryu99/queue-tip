@@ -41,6 +41,21 @@ io.on('connection', (socket) => {
     printAppState();
   });
 
+  socket.on(SocketEvents.ROOM_CHECK, ({ roomId }, callback) => {
+    logger.event(`${SocketEvents.ROOM_CHECK} event received`, roomId);
+    try {
+      const room = roomService.getRoom(roomId);
+      const cleanRoom = roomService.cleanRoom(room);
+
+      callback({
+        room: cleanRoom,
+        event: SocketEvents.ROOM_CHECK
+      });
+    } catch (e) {
+      callback({ error: e.message });
+    }
+  });
+
   socket.on(SocketEvents.JOIN, ({ name, type, id, roomId }, callback) => {
     logger.event(`${SocketEvents.JOIN} event received`, { name, type, roomId });
     try {
@@ -72,21 +87,6 @@ io.on('connection', (socket) => {
         user: cleanUser,
         usersInRoom,
         usersInQueue,
-      });
-    } catch (e) {
-      callback({ error: e.message });
-    }
-  });
-
-  socket.on(SocketEvents.ROOM_CHECK, ({ roomId }, callback) => {
-    logger.event(`${SocketEvents.ROOM_CHECK} event received`, roomId);
-    try {
-      const room = roomService.getRoom(roomId);
-      const cleanRoom = roomService.cleanRoom(room);
-
-      callback({
-        room: cleanRoom,
-        event: SocketEvents.ROOM_CHECK
       });
     } catch (e) {
       callback({ error: e.message });
