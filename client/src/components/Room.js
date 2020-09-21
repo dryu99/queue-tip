@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Button } from 'react-bootstrap';
-import socket, { SocketEvents, emitEnqueue, emitDequeue } from '../socket';
+import socket, { SocketEvents, emitEnqueue, emitDequeue, emitJoin } from '../socket';
 
 import SignIn from './SignIn';
 import Queue from './Queue';
@@ -11,13 +11,33 @@ const Room = ({ room, isAdmin, user, setUser }) => {
   const [queueUsers, setQueueUsers] = useState([]);
   const [inQueue, setInQueue] = useState(false);
 
-  // TODO this won't work properly because modal popup won't know to close
-  // useEffect(() => {
-  //   const userJSON = localStorage.getItem('queueTipUserData');
-  //   if (userJSON) {
-  //     setUser(JSON.parse(userJSON));
-  //   }
-  // }, [setUser]);
+  useEffect(() => {
+    const userJSON = localStorage.getItem('queueTipUserData');
+    if (userJSON && room) { // room might not be done being fetched
+      const parsedUser = JSON.parse(userJSON);
+
+      emitJoin({ ...parsedUser, roomId: room.id }, (resData) => {
+        const { user, usersInRoom, usersInQueue, error } = resData;
+        console.log('acknowledged from JOIN event', user);
+
+        if (!error) {
+          setUser(user);
+          addNewUser([...usersInRoom, user]);
+          addNewQueueUser(usersInQueue);
+
+          // save user locally on browser
+          // TODO have to make sure admin permissions get saved too i.e. user.type
+          localStorage.setItem('queueTipUserData', JSON.stringify(user));
+        } else {
+          console.error(error);
+
+          // TODO theres an edge case where a user disconnects,
+          // another user joins with the same name, and this user reconnects, what happens?
+          // the server won't be able to add this user. Should handle on both client and server.
+        }
+      });
+    }
+  }, [setUser, room]);
 
   // subscribe to relevant socket events
   useEffect(() => {
@@ -69,6 +89,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
     setQueueUsers(queueUsers.filter(u => u.id !== id));
   };
 
+
   const copyLinkToClipboard = (e) => {
     // TODO manipulating DOM here directly feels sketchy, doing it the react way doesn't work see comments below
     var dummy = document.createElement('textarea');
@@ -100,7 +121,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
 
   return (
     <Container className="mt-4">
-      {isUserSignedIn ?
+      {room && isUserSignedIn ?
         <React.Fragment>
           <Row>
             <Col>

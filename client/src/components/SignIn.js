@@ -21,7 +21,7 @@ const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    emitJoin({ name: newName,type: user.type, roomId: room.id }, (resData) => {
+    emitJoin({ name: newName, type: user.type, roomId: room.id }, (resData) => {
       const { user, usersInRoom, usersInQueue, error } = resData;
       console.log('acknowledged from JOIN event', user);
 
