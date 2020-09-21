@@ -10,21 +10,21 @@ const Users = ({ user, users }) => {
       <h4>Users: {users.length}</h4>
       <ListGroup>
         {users.map(u => {
-          const isUserCurrent = user.name === u.name;
+          const isCurrentUser = user.name === u.name;
 
           const listItemProps = {
-            variant: isUserCurrent ? 'secondary' : null,
-            action: isUserCurrent ? true : false,
+            // variant: isCurrentUser ? 'secondary' : null,
+            action: isCurrentUser ? true : false,
           };
 
           const listItem = (
             <ListGroup.Item key={u.id} {...listItemProps}>
-              <User user={u}/>
+              <User user={u} isCurrentUser={isCurrentUser}/>
             </ListGroup.Item>
           );
 
           return (
-            isUserCurrent ?
+            isCurrentUser ?
               <TooltipWrapper
                 key={u.id}
                 placement="left"

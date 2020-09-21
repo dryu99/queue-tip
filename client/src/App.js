@@ -14,7 +14,6 @@ import { UserTypes } from './enums';
 
 function App() {
   const [currentUser, setCurrentUser] = useState({ type: UserTypes.BASIC });
-  const [isAdmin, setIsAdmin] = useState(false); // user is only admin if they created room
   const [room, setRoom] = useState(null);
   const [roomError, setRoomError] = useState(null);
 
@@ -48,7 +47,7 @@ function App() {
     <Switch className="mt-4">
       <Route path="/room/:id">
         {!roomError ?
-          <Room room={room} isAdmin={isAdmin} user={currentUser} setUser={setCurrentUser}/>
+          <Room room={room} user={currentUser} setUser={setCurrentUser}/>
           :
           // would be nice to put a spinner or sth here
           <Error text={roomError}/>

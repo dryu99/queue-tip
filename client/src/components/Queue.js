@@ -1,23 +1,19 @@
 import React from 'react';
 import { Row, Col, Container, ListGroup } from 'react-bootstrap';
+import { UserTypes } from '../enums';
 import User from './User';
 
-const Queue = ({ isAdmin, user, queueUsers }) => {
-  // const removeFromQueue = (e) => {
-  //   const nameToRemove = e.target.textContent;
-  //   setQueueUsers(queueUsers.filter(qu => qu.name !== nameToRemove));
-  // };
-
+const Queue = ({ user, queueUsers }) => {
   return (
     <div >
       <h4>Queue</h4>
       <ListGroup>
         {queueUsers.map((qu, i) => {
-          const isUserCurrent = user.name === qu.name;
+          const isCurrentUser = user.name === qu.name;
 
           const listItemProps = {
-            variant: isUserCurrent ? 'secondary' : null,
-            action: isAdmin ? true : false,
+            // variant: isCurrentUser ? 'secondary' : null,
+            action: user.type === UserTypes.ADMIN ? true : false,
             // onClick: isAdmin ? removeFromQueue : null
           };
 
@@ -29,7 +25,7 @@ const Queue = ({ isAdmin, user, queueUsers }) => {
                 </Col>
                 <Col>
                   <ListGroup.Item {...listItemProps}>
-                    <User currentUser={user} user={qu}/>
+                    <User user={qu} isCurrentUser={isCurrentUser}/>
                   </ListGroup.Item>
                 </Col>
               </Row>

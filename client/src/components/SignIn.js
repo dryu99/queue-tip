@@ -6,7 +6,6 @@ import { emitJoin } from '../socket';
 const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
   const [newName, setNewName] = useState('');
   const [alertText, setAlertText] = useState('');
-  // const [isMounted, setAlertText] = useState('');
 
   // keep track of input component so we can focus on it
   const nameInputRef = React.createRef();

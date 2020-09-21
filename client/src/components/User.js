@@ -1,9 +1,17 @@
 import React from 'react';
+import { UserTypes } from '../enums';
 
-const User = ({ user }) => {
+const User = ({ user, isCurrentUser }) => {
+  const isAdmin = user.type === UserTypes.ADMIN;
+  const colourClass = isAdmin
+    ? 'text-danger'
+    : isCurrentUser
+      ? 'text-primary'
+      : '';
+
   return (
-    <span>
-      {user.name}
+    <span className={colourClass}>
+      {user.name} {isAdmin ? '(admin)' : ''}
     </span>
   );
 };

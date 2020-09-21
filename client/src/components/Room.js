@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Button } from 'react-bootstrap';
-import socket, { SocketEvents, emitEnqueue, emitDequeue, emitJoin } from '../socket';
+import socket, { SocketEvents, emitEnqueue, emitDequeue } from '../socket';
 
 import SignIn from './SignIn';
 import Queue from './Queue';
 import Users from './Users';
 
-const Room = ({ room, isAdmin, user, setUser }) => {
+const Room = ({ room, user, setUser }) => {
   const [users, setUsers] = useState([]);
   const [queueUsers, setQueueUsers] = useState([]);
   const [inQueue, setInQueue] = useState(false);
@@ -115,7 +115,6 @@ const Room = ({ room, isAdmin, user, setUser }) => {
             <Col>
               <Queue
                 user={user}
-                isAdmin={isAdmin}
                 queueUsers={queueUsers}
               />
             </Col>
