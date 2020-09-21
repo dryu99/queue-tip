@@ -97,7 +97,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
 
   return (
     <Container className="mt-4">
-      {user.name ?
+      {room && user.name ?
         <React.Fragment>
           <Row>
             <Col>
@@ -129,18 +129,15 @@ const Room = ({ room, isAdmin, user, setUser }) => {
           </Row>
         </React.Fragment>
         :
-        room ?
-          <SignIn
-            room={room}
-            setUser={setUser}
-            users={users}
-            setUsers={setUsers}
-            queueUsers={queueUsers}
-            setQueueUsers={setQueueUsers}
-            isAdmin={isAdmin}
-          />
-          :
-          <span>Sorry room doesn't exist...</span>
+        <SignIn
+          room={room}
+          setUser={setUser}
+          users={users}
+          setUsers={setUsers}
+          queueUsers={queueUsers}
+          setQueueUsers={setQueueUsers}
+          isAdmin={isAdmin}
+        />
       }
       {/* strangely enough, doing this doesn't work for copying to clipboard - setting display to none causes the copied value to be "window.location.href" */}
       {/* <textarea ref={linkRef} style={{ display: 'none' }} value={window.location.href}/> */}

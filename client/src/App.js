@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Home from './components/Home';
 import Room from './components/Room';
+import SignIn from './components/SignIn';
 import Error from './components/Error';
 
 import {
@@ -16,6 +17,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState({ type: UserTypes.BASIC });
   const [isAdmin, setIsAdmin] = useState(false); // user is only admin if they created room
   const [room, setRoom] = useState(null);
+  const [roomError, setRoomError] = useState(null);
 
   const match = useRouteMatch('/room/:id');
 
@@ -26,10 +28,6 @@ function App() {
       emitCheckRoom(match.params.id, setRoomCallback);
     }
   }, [match, room]);
-
-  const initCurrentUser = (user) => {
-    setCurrentUser(user);
-  };
 
   const setCurrentUserType = (type) => {
     setCurrentUser({ ...currentUser, type });
@@ -43,13 +41,19 @@ function App() {
       setRoom(room);
     } else {
       console.error(error);
+      setRoomError('sorry room doesn\'t exist...');
     }
   };
 
   return (
     <Switch className="mt-4">
       <Route path="/room/:id">
-        <Room room={room} isAdmin={isAdmin} user={currentUser} setUser={setCurrentUser}/>
+        {!roomError ?
+          <Room room={room} isAdmin={isAdmin} user={currentUser} setUser={setCurrentUser}/>
+          :
+          // would be nice to put a spinner or sth here
+          <Error text={roomError}/>
+        }
       </Route>
       <Route exact path="/">
         <Home
