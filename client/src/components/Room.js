@@ -54,7 +54,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
   }, [users, queueUsers]);
 
   const addNewUser = (newUser) => {
-    setUsers([...users, newUser]);
+    setUsers(users.concat(newUser));
   };
 
   const removeUser = (id) => {
@@ -62,7 +62,7 @@ const Room = ({ room, isAdmin, user, setUser }) => {
   };
 
   const addNewQueueUser = (newQueueUser) => {
-    setQueueUsers([...queueUsers, newQueueUser]);
+    setQueueUsers(queueUsers.concat(newQueueUser));
   };
 
   const removeQueueUser = (id) => {
@@ -95,9 +95,12 @@ const Room = ({ room, isAdmin, user, setUser }) => {
     }
   };
 
+  // user is considered signed in when name and id exist
+  const isUserSignedIn = user && user.name && user.id;
+
   return (
     <Container className="mt-4">
-      {room && user.name ?
+      {isUserSignedIn ?
         <React.Fragment>
           <Row>
             <Col>
@@ -131,12 +134,10 @@ const Room = ({ room, isAdmin, user, setUser }) => {
         :
         <SignIn
           room={room}
+          user={user}
           setUser={setUser}
-          users={users}
-          setUsers={setUsers}
-          queueUsers={queueUsers}
-          setQueueUsers={setQueueUsers}
-          isAdmin={isAdmin}
+          addNewUser={addNewUser}
+          addNewQueueUser={addNewQueueUser}
         />
       }
       {/* strangely enough, doing this doesn't work for copying to clipboard - setting display to none causes the copied value to be "window.location.href" */}

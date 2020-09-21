@@ -19,6 +19,10 @@ export const emitDequeue = (data, callback) => {
   socket.emit(SocketEvents.DEQUEUE, data, callback);
 };
 
+export const emitJoin = (data, callback) => {
+  socket.emit(SocketEvents.JOIN, data, callback);
+};
+
 export const SocketEvents = Object.freeze({
   JOIN: 'join',
   CREATE_ROOM: 'create_room',

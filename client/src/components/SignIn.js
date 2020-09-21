@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Button, Container, Form, Col } from 'react-bootstrap';
-import socket, { SocketEvents } from '../socket';
-import { UserTypes } from '../enums';
+import { emitJoin } from '../socket';
 
-const SignIn = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers, isAdmin }) => {
+const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
   const [newName, setNewName] = useState('');
   const [alertText, setAlertText] = useState('');
+  // const [isMounted, setAlertText] = useState('');
 
   // keep track of input component so we can focus on it
   const nameInputRef = React.createRef();
@@ -15,27 +15,27 @@ const SignIn = ({ room, setUser, users, setUsers, queueUsers, setQueueUsers, isA
   useEffect(() => {
     // eslint-disable-next-line react/no-find-dom-node
     ReactDOM.findDOMNode(nameInputRef.current).focus();
+
   }, [nameInputRef]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const userType = isAdmin ? UserTypes.ADMIN : UserTypes.BASIC;
-
-    socket.emit(SocketEvents.JOIN, { name: newName, type: userType, roomId: room.id }, ({ user, usersInRoom, usersInQueue, error }) => {
+    emitJoin({ name: newName,type: user.type, roomId: room.id }, (resData) => {
+      const { user, usersInRoom, usersInQueue, error } = resData;
       console.log('acknowledged from JOIN event', user);
-      if (error) {
-        console.error(error);
-        setAlertText('Name is already taken, please try something else.');
-      } else {
+
+      if (!error) {
         setUser(user);
-        setUsers([...users, ...usersInRoom, user]); // users should be always empty in this case, but w/e
-        setQueueUsers([...queueUsers, ...usersInQueue]); // users should be always empty in this case, but w/e
-        setAlertText('');
+        addNewUser([...usersInRoom, user]);
+        addNewQueueUser(usersInQueue);
 
         // save user locally on browser
         // TODO have to make sure admin permissions get saved too i.e. user.type
         localStorage.setItem('queueTipUserData', JSON.stringify(user));
+      } else {
+        console.error(error);
+        setAlertText('Name is already taken, please try something else.');
       }
     });
   };
