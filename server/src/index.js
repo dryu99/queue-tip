@@ -2,11 +2,11 @@ const http = require('http');
 const socketio = require('socket.io');
 const { v4: uuidv4 } = require('uuid');
 const app = require('./app');
-const config = require('./config');
-const logger = require('./logger');
+const config = require('./utils/config');
+const logger = require('./utils/logger');
+const { SocketEvents } = require('./utils/types');
 const userService = require('./services/userService');
 const roomService = require('./services/roomService');
-const { SocketEvents } = require('./types');
 
 const server = http.createServer(app);
 const io = socketio(server);
