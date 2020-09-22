@@ -15,19 +15,24 @@ export enum UserType {
 }
 
 export interface UserBase {
-  id: string,
   name: string,
   roomId: string,
   type: UserType
 }
 
 export interface User extends UserBase {
+  id: string,
   socketId: string,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface NewUser extends UserBase {
   // TODO new user shouldnt have id
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface CleanUser extends UserBase {
+  id: string
 }
 
 export interface RoomBase {
@@ -43,6 +48,11 @@ export interface Room extends RoomBase {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface NewRoom extends RoomBase {
 // TODO new room shouldnt have id
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface CleanRoom extends RoomBase {
+
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -9,7 +9,7 @@ const addRoom = (newRoom: NewRoom): Room => {
   }
 
   const room: Room = {
-    id: uuidv4(), // generate random id
+    id: newRoom.id || uuidv4(), // generate random id
     name: newRoom.name,
     users: [],
     queue: []
@@ -51,7 +51,7 @@ const cleanRoom = (room: Room): NewRoom  => {
   };
 };
 
-const addUserToRoom = (newUser: NewUser, socketId: string): User => {
+const addUserToRoom = (socketId: string, newUser: NewUser): User => {
   const users = getRoom(newUser.roomId).users;
 
   const user: User = {

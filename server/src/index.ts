@@ -23,8 +23,12 @@ const printAppState = () => {
   logger.info('--------------------');
 };
 
+// keeps track of current connections
+let connectCounter = 0;
+
 io.on('connection', (socket) => {
   logger.event('a user has connected!');
+  console.log(`current number of users connected: ${++connectCounter}`);
   printAppState();
 
   // TODO should generate uuid on server not client
@@ -41,7 +45,7 @@ io.on('connection', (socket) => {
       callback({ room: cleanRoom });
     } catch (e) {
       const error = e as Error;
-      logger.error(error.message);
+      logger.error(error);
       callback({ error: error.message });
     }
     printAppState();
@@ -59,14 +63,14 @@ io.on('connection', (socket) => {
       callback({ room: cleanRoom });
     } catch (e) {
       const error = e as Error;
-      logger.error(error.message);
+      logger.error(error);
       callback({ error: error.message });
     }
   });
 
-
   socket.on(SocketEvents.JOIN, (data, callback: AckCallback) => {
     logger.event(`${SocketEvents.JOIN} event received`, data);
+
     try {
       const newUser = toNewUser(data);
 
@@ -76,7 +80,7 @@ io.on('connection', (socket) => {
 
       // add user to user map + room
       userService.addUser(socket.id, newUser);
-      const user = roomService.addUserToRoom(newUser, socket.id);
+      const user = roomService.addUserToRoom(socket.id, newUser);
 
       // clean data before returning to client
       const cleanUser = userService.cleanUser(user);
@@ -96,7 +100,7 @@ io.on('connection', (socket) => {
       });
     } catch (e) {
       const error = e as Error;
-      logger.error(error.message);
+      logger.error(error);
       callback({ error: error.message });
     }
     printAppState();
@@ -121,7 +125,7 @@ io.on('connection', (socket) => {
       });
     } catch (e) {
       const error = e as Error;
-      logger.error(error.message);
+      logger.error(error);
       callback({ error: error.message });
     }
     printAppState();
@@ -146,7 +150,7 @@ io.on('connection', (socket) => {
       });
     } catch (e) {
       const error = e as Error;
-      logger.error(error.message);
+      logger.error(error);
       callback({ error: error.message });
     }
     printAppState();
@@ -154,6 +158,7 @@ io.on('connection', (socket) => {
 
   socket.on(SocketEvents.DISCONNECT, () => {
     logger.event(`${SocketEvents.DISCONNECT} event received`);
+    console.log(`current number of users connected: ${--connectCounter}`);
 
     try {
       // remove user from user map + room
@@ -176,7 +181,7 @@ io.on('connection', (socket) => {
     } catch (e) {
       // TODO this line will usually hit when a user who hasn't signed up disconnects, maybe emit LEAVE from client side?
       const error = e as Error;
-      logger.error(error.message);
+      logger.error(error);
     }
     printAppState();
   });

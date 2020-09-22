@@ -16,9 +16,9 @@ export const toNewRoom = (object: any): NewRoom  => {
 export const toNewUser = (object: any): NewUser  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
-    id: parseString(object.id, 'NewUser', 'id'),
+    // id: parseString(object.id, 'NewUser', 'id'),
     name: parseString(object.name, 'NewUser', 'name'),
-    roomId: parseString(object.name, 'NewUser', 'roomId'),
+    roomId: parseString(object.roomId, 'NewUser', 'roomId'),
     type: parseUserType(object.type)
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
