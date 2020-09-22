@@ -7,7 +7,7 @@ import logger from './utils/logger';
 import { AcknowledgementCallback as AckCallback, SocketEvents } from './types';
 import roomService from './services/roomService';
 import userService from './services/userService';
-import { toNewRoom, toNewUser, toSocketData, toSocketRoomData } from './utils';
+import { toCleanUser, toNewRoom, toNewUser, toSocketData, toSocketRoomData } from './utils';
 
 const server = http.createServer(app);
 const io = socketio(server);
@@ -106,7 +106,6 @@ io.on('connection', (socket) => {
     printAppState();
   });
 
-  // { user, roomId }
   socket.on(SocketEvents.ENQUEUE, (data, callback: AckCallback) => {
     logger.event(`${SocketEvents.ENQUEUE} event received`, data);
     try {
@@ -131,9 +130,8 @@ io.on('connection', (socket) => {
     printAppState();
   });
 
-  // { userId, roomId }
   socket.on(SocketEvents.DEQUEUE, (data, callback: AckCallback) => {
-    logger.event(`${SocketEvents.DEQUEUE} event received`);
+    logger.event(`${SocketEvents.DEQUEUE} event received`, data);
     try {
       const { userId, roomId } = toSocketData(data);
 
@@ -156,6 +154,30 @@ io.on('connection', (socket) => {
     printAppState();
   });
 
+  socket.on(SocketEvents.UPDATE_USER, (data, callback: AckCallback) => {
+    logger.event(`${SocketEvents.UPDATE_USER} event received`, data);
+    try {
+      const cleanUser = toCleanUser(data);
+
+      const updatedUser = roomService.updateUserInRoom(cleanUser);
+      const cleanUpdatedUser = toCleanUser(updatedUser); // TODO redundant? just return cleanUser?
+
+      // broadcast updated user to all clients (not including sender) in current room
+      socket.broadcast.to(updatedUser.roomId).emit(SocketEvents.UPDATE_USER, {
+        updatedUser: cleanUpdatedUser
+      });
+
+      callback({
+        updatedUser: cleanUpdatedUser
+      });
+    } catch (e) {
+      const error = e as Error;
+      logger.error(error.message);
+      callback({ error: error.message });
+    }
+    printAppState();
+  });
+
   socket.on(SocketEvents.DISCONNECT, () => {
     logger.event(`${SocketEvents.DISCONNECT} event received`);
     console.log(`current number of users connected: ${--connectCounter}`);
@@ -165,7 +187,7 @@ io.on('connection', (socket) => {
       const minUser = userService.removeUser(socket.id);
       const user = roomService.removeUserFromRoom(socket.id, minUser.roomId);
 
-      // // clean data before returning to client TODO this is redundant?
+      // clean data before returning to client TODO this is redundant?
       const cleanUser = userService.cleanUser(user);
 
       // delete room from memory if its empty

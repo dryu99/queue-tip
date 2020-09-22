@@ -7,6 +7,7 @@ export enum SocketEvents {
   ROOM_CHECK = 'room_check',
   ENQUEUE = 'enqueue',
   DEQUEUE = 'dequeue',
+  UPDATE_USER = 'update_user'
 }
 
 export enum UserType {

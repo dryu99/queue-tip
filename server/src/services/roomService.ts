@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { NewRoom, Room, User, NewUser, CleanRoom } from '../types';
+import { NewRoom, Room, User, NewUser, CleanRoom, CleanUser } from '../types';
 
 const rooms = new Map<string, Room>();
 
@@ -87,6 +87,29 @@ const removeUserFromRoom = (socketId: string, roomId: string): User => {
   return users.splice(index, 1)[0];
 };
 
+const updateUserInRoom = (cleanUser: CleanUser): User => {
+  const users = getRoom(cleanUser.id).users;
+
+  const index = users.findIndex(u => u.id === cleanUser.id);
+  if (index === -1) {
+    throw new Error(`user ${cleanUser.name} doesn't exists in room ${cleanUser.roomId}; couldn't update.`);
+  }
+
+  // get user in room
+  const existingUser = users[index];
+
+  // init an updated version of user
+  const updatedUser = {
+    ...cleanUser,
+    socketId: existingUser.socketId
+  };
+
+  // replace existing user with updated user
+  users[index] = updatedUser;
+
+  return updatedUser;
+};
+
 // returns a ref to a new User array (not array linked to room!)
 const getUsersInRoom = (roomId: string): User[] => {
   return [...getRoom(roomId).users];
@@ -135,5 +158,6 @@ export default {
   getUsersInRoom,
   getQueuedUsersInRoom,
   enqueueUser,
-  dequeueUser
+  dequeueUser,
+  updateUserInRoom
 };
