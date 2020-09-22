@@ -65,7 +65,7 @@ const addUserToRoom = (socketId: string, newUser: NewUser): User => {
 
   const existingUser = users.find(u => {
     return u.id === user.id
-      && u.name.trim().toLowerCase() === bareName;
+      || u.name.trim().toLowerCase() === bareName;
   });
   if (existingUser) {
     throw new Error(`user ${user.name} already exists in room ${user.roomId}; didn't add.`);

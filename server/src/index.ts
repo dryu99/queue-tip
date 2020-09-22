@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
       callback({ room: cleanRoom });
     } catch (e) {
       const error = e as Error;
-      logger.error(error);
+      logger.error(error.message);
       callback({ error: error.message });
     }
     printAppState();
@@ -63,7 +63,7 @@ io.on('connection', (socket) => {
       callback({ room: cleanRoom });
     } catch (e) {
       const error = e as Error;
-      logger.error(error);
+      logger.error(error.message);
       callback({ error: error.message });
     }
   });
@@ -100,7 +100,7 @@ io.on('connection', (socket) => {
       });
     } catch (e) {
       const error = e as Error;
-      logger.error(error);
+      logger.error(error.message);
       callback({ error: error.message });
     }
     printAppState();
@@ -125,7 +125,7 @@ io.on('connection', (socket) => {
       });
     } catch (e) {
       const error = e as Error;
-      logger.error(error);
+      logger.error(error.message);
       callback({ error: error.message });
     }
     printAppState();
@@ -150,7 +150,7 @@ io.on('connection', (socket) => {
       });
     } catch (e) {
       const error = e as Error;
-      logger.error(error);
+      logger.error(error.message);
       callback({ error: error.message });
     }
     printAppState();
@@ -162,26 +162,26 @@ io.on('connection', (socket) => {
 
     try {
       // remove user from user map + room
-      const user = userService.removeUser(socket.id);
-      roomService.removeUserFromRoom(socket.id, user.roomId);
+      const minUser = userService.removeUser(socket.id);
+      const user = roomService.removeUserFromRoom(socket.id, minUser.roomId);
 
       // // clean data before returning to client TODO this is redundant?
-      // const cleanUser = userService.cleanUser(user);
+      const cleanUser = userService.cleanUser(user);
 
       // delete room from memory if its empty
       // we check for development env b/c it's annoying to have rooms be deleted everytime client refreshes after changes
-      if (process.env.NODE_ENV !== 'development' && roomService.getUsersInRoom(user.roomId).length === 0) {
-        roomService.removeRoom(user.roomId);
+      if (process.env.NODE_ENV !== 'development' && roomService.getUsersInRoom(cleanUser.roomId).length === 0) {
+        roomService.removeRoom(cleanUser.roomId);
       }
 
       // broadcast user left to all clients (not including sender) in current room
-      io.in(user.roomId).emit(SocketEvents.LEAVE, {
-        leftUser: user
+      io.in(cleanUser.roomId).emit(SocketEvents.LEAVE, {
+        leftUser: cleanUser
       });
     } catch (e) {
       // TODO this line will usually hit when a user who hasn't signed up disconnects, maybe emit LEAVE from client side?
       const error = e as Error;
-      logger.error(error);
+      logger.error(error.message);
     }
     printAppState();
   });

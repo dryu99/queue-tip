@@ -1,4 +1,5 @@
 import { CleanUser, NewUser, User } from '../types';
+import logger from '../utils/logger';
 
 // TODO might be good to change this map to CleanUser but eh
 /**
@@ -9,7 +10,7 @@ const users = new Map<string, NewUser>();
 
 const addUser = (socketId: string, newUser: NewUser): void => {
   if (users.has(socketId)) {
-    throw new Error(`User ${socketId} already exists in user map; didn't add.`);
+    logger.error(`User ${socketId} already exists in user map; re-added user.`);
   }
 
   users.set(socketId, newUser);
