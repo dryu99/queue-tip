@@ -24,24 +24,24 @@ function App() {
   useEffect(() => {
     if (match && !room) {
       logger.info('emitting room check event');
-      emitCheckRoom(match.params.id, setRoomCallback);
+
+      // check to see if room exists on server, set room on client if it does
+      emitCheckRoom(match.params.id, (resData) => {
+        const { room, error } = resData;
+
+        logger.info('room event acknowledged', room);
+        if (room && !error) {
+          setRoom(room);
+        } else {
+          logger.error(error);
+          setRoomError('sorry room doesn\'t exist...');
+        }
+      });
     }
   }, [match, room]);
 
   const setCurrentUserType = (type) => {
     setCurrentUser({ ...currentUser, type });
-  };
-
-  // socket event acknowledgement callback
-  const setRoomCallback = (resData) => {
-    const { room, error } = resData;
-    logger.info('room event acknowledged', room);
-    if (room && !error) {
-      setRoom(room);
-    } else {
-      logger.info(error);
-      setRoomError('sorry room doesn\'t exist...');
-    }
   };
 
   return (
@@ -57,7 +57,8 @@ function App() {
       <Route exact path="/">
         <Home
           setCurrentUserType={setCurrentUserType}
-          setRoomCallback={setRoomCallback}
+          setRoom={setRoom}
+          setRoomError={setRoomError}
         />
       </Route>
       <Route>

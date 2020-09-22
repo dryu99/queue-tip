@@ -1,36 +1,40 @@
 import React, { useState } from 'react';
 import { Button, Container, Form, Col } from 'react-bootstrap';
-import { v4 as uuidv4 } from 'uuid';
 import { useHistory } from 'react-router-dom';
 import { UserTypes } from '../enums';
 import logger from '../utils/logger';
 
 import { emitCreateRoom } from '../socket';
 
-const Home = ({ setCurrentUserType, setRoomCallback }) => {
+const Home = ({ setCurrentUserType, setRoom, setRoomError }) => {
   const [newRoomName, setNewRoomName] = useState('');
 
   const history = useHistory();
 
   const handleCreateRoomClick = (e) => {
-    const newRoomId = uuidv4();
+    e.preventDefault();
 
-    if (newRoomId && newRoomName && newRoomName.trim() !== '') {
+    if (newRoomName && newRoomName.trim() !== '') {
       // users who create rooms are admins
       setCurrentUserType(UserTypes.ADMIN);
 
-      // send a create room event to server
+      // create room on server, set room on client and enter room if it does
       logger.info('emitting room creation event');
-      emitCreateRoom(
-        { name: newRoomName, id: newRoomId },
-        setRoomCallback
-      );
+      emitCreateRoom({ name: newRoomName }, (resData) => {
+        const { room, error } = resData;
 
-      // route to room resource
-      history.push(`/room/${newRoomId}`);
+        if (room && !error) {
+          setRoom(room);
+
+          // go to room url
+          history.push(`/room/${resData.room.id}`);
+        } else {
+          logger.error(error);
+          setRoomError('sorry room doesn\'t exist...');
+        }
+      });
     } else {
-      e.preventDefault();
-      logger.error('error creating room');
+      logger.error('can"t submit room with empty name!');
     }
   };
 
