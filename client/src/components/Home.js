@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button, Container, Form, Col } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import { useHistory } from 'react-router-dom';
@@ -20,8 +20,9 @@ const Home = ({ setCurrentUserType, setRoomCallback }) => {
       setCurrentUserType(UserTypes.ADMIN);
 
       // send a create room event to server
+      logger.info('emitting room creation event');
       emitCreateRoom(
-        { roomName: newRoomName, roomId: newRoomId },
+        { name: newRoomName, id: newRoomId },
         setRoomCallback
       );
 

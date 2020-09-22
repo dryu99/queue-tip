@@ -85,7 +85,7 @@ const Room = ({ room, user, setUser }) => {
         setInQueue(false);
       });
     } else {
-      emitEnqueue({ user, roomId: room.id }, (data) => {
+      emitEnqueue({ userId: user.id, roomId: room.id }, (data) => {
         logger.info('acknowledged from ENQUEUE event', data.enqueuedUser);
         addNewQueueUser(data.enqueuedUser);
         setInQueue(true);
