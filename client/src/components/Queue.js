@@ -1,6 +1,6 @@
 import React from 'react';
 import { Row, Col, Container, ListGroup } from 'react-bootstrap';
-import { UserTypes } from '../enums';
+import { UserTypes } from '../types';
 import User from './User';
 import { emitDequeue } from '../socket';
 import logger from '../utils/logger';

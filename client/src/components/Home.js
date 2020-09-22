@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Container, Form, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
-import { UserTypes } from '../enums';
+import { UserTypes } from '../types';
 import logger from '../utils/logger';
 
 import { emitCreateRoom } from '../socket';
@@ -44,10 +44,11 @@ const Home = ({ setCurrentUserType, setRoom, setRoomError }) => {
       <Form>
         <Form.Row className="justify-content-center mb-3">
           <Col xs="auto">
+            <Form.Label>Room Name</Form.Label>
             <Form.Control
               value={newRoomName}
               onChange={(e) => setNewRoomName(e.target.value)}
-              placeholder="Room Name"
+              placeholder="CPSC 110 Office Hours"
             />
           </Col>
         </Form.Row>

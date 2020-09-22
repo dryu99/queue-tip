@@ -1,5 +1,5 @@
 import React from 'react';
-import { UserTypes } from '../enums';
+import { UserTypes } from '../types';
 
 const User = ({ user, isCurrentUser }) => {
   const isAdmin = user.type === UserTypes.ADMIN;

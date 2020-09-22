@@ -11,7 +11,8 @@ import {
 } from 'react-router-dom';
 
 import { emitCheckRoom } from './socket';
-import { UserTypes } from './enums';
+import { UserTypes } from './types';
+import Notification from './components/Notification';
 
 function App() {
   const [currentUser, setCurrentUser] = useState({ type: UserTypes.BASIC });
@@ -45,26 +46,29 @@ function App() {
   };
 
   return (
-    <Switch className="mt-4">
-      <Route path="/room/:id">
-        {!roomError ?
-          <Room room={room} user={currentUser} setUser={setCurrentUser}/>
-          :
+    <React.Fragment>
+      <Switch className="mt-4">
+        <Route path="/room/:id">
+          {!roomError ?
+            <Room room={room} user={currentUser} setUser={setCurrentUser}/>
+            :
           // would be nice to put a spinner or sth here
-          <Error text={roomError}/>
-        }
-      </Route>
-      <Route exact path="/">
-        <Home
-          setCurrentUserType={setCurrentUserType}
-          setRoom={setRoom}
-          setRoomError={setRoomError}
-        />
-      </Route>
-      <Route>
-        <Error text="404 resource not found"/>
-      </Route>
-    </Switch>
+            <Error text={roomError}/>
+          }
+        </Route>
+        <Route exact path="/">
+          <Home
+            setCurrentUserType={setCurrentUserType}
+            setRoom={setRoom}
+            setRoomError={setRoomError}
+          />
+        </Route>
+        <Route>
+          <Error text="404 resource not found"/>
+        </Route>
+      </Switch>
+      {/* <Notification /> */}
+    </React.Fragment>
   );
 }
 
