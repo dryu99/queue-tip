@@ -7,7 +7,6 @@ import { NewRoom, NewUser, SocketData, SocketRoomData, UserType } from '../types
 export const toNewRoom = (object: any): NewRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
-    id: parseString(object.id, 'NewRoom', 'id'),
     name: parseString(object.name, 'NewRoom', 'name'),
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */

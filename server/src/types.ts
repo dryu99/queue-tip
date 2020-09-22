@@ -36,11 +36,11 @@ export interface CleanUser extends UserBase {
 }
 
 export interface RoomBase {
-  id: string,
   name: string
 }
 
 export interface Room extends RoomBase {
+  id: string,
   users: User[],
   queue: User[]
 }
@@ -50,9 +50,8 @@ export interface NewRoom extends RoomBase {
 // TODO new room shouldnt have id
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface CleanRoom extends RoomBase {
-
+  id: string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

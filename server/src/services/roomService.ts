@@ -1,21 +1,21 @@
 import { v4 as uuidv4 } from 'uuid';
-import { NewRoom, Room, User, NewUser } from '../types';
+import { NewRoom, Room, User, NewUser, CleanRoom } from '../types';
 
 const rooms = new Map<string, Room>();
 
 const addRoom = (newRoom: NewRoom): Room => {
-  if (rooms.has(newRoom.id)) {
-    throw new Error('Room already exists, uuid fudged up somehow');
-  }
-
   const room: Room = {
-    id: newRoom.id || uuidv4(), // generate random id
+    id: uuidv4(), // generate random id
     name: newRoom.name,
     users: [],
     queue: []
   };
 
-  rooms.set(newRoom.id, room);
+  if (rooms.has(room.id)) {
+    throw new Error('Trying to add room but id already exists, uuid fudged up or sth else went wrong.');
+  }
+
+  rooms.set(room.id, room);
 
   return room;
 };
@@ -44,7 +44,7 @@ const getAllRooms = (): Room[] => {
   return Array.from(rooms.values());
 };
 
-const cleanRoom = (room: Room): NewRoom  => {
+const cleanRoom = (room: Room): CleanRoom  => {
   return {
     id: room.id,
     name: room.name
