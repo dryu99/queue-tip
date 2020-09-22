@@ -1,4 +1,5 @@
-import { NewRoom, Room, User } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+import { NewRoom, Room, User, NewUser } from '../types';
 
 const rooms = new Map<string, Room>();
 
@@ -8,7 +9,7 @@ const addRoom = (newRoom: NewRoom): Room => {
   }
 
   const room: Room = {
-    id: newRoom.id,
+    id: uuidv4(), // generate random id
     name: newRoom.name,
     users: [],
     queue: []
@@ -50,15 +51,29 @@ const cleanRoom = (room: Room): NewRoom  => {
   };
 };
 
-const addUserToRoom = (user: User, roomId: string): number => {
-  const users = getRoom(roomId).users;
+const addUserToRoom = (newUser: NewUser, socketId: string): User => {
+  const users = getRoom(newUser.roomId).users;
 
-  const existingUser = users.find(u => u.id === user.id);
+  const user: User = {
+    ...newUser,
+    id: uuidv4(), // randomly generate id
+    socketId
+  };
+
+  // note: we aren't storing the bare name, just using it for duplication checks
+  const bareName = user.name.trim().toLowerCase();
+
+  const existingUser = users.find(u => {
+    return u.id === user.id
+      && u.name.trim().toLowerCase() === bareName;
+  });
   if (existingUser) {
-    throw new Error(`user ${user.id} already exists in room ${user.roomId}; didn't add.`);
+    throw new Error(`user ${user.name} already exists in room ${user.roomId}; didn't add.`);
   }
 
-  return users.push(user);
+  users.push(user);
+
+  return user;
 };
 
 const removeUserFromRoom = (socketId: string, roomId: string): User => {
@@ -82,9 +97,18 @@ const getQueuedUsersInRoom = (roomId: string): User[] => {
   return [...getRoom(roomId).queue];
 };
 
-const enqueueUser = (user: User, roomId: string): number => {
+const enqueueUser = (id: string, roomId: string): User => {
+  const users = getRoom(roomId).users;
+
+  const existingUser = users.find(u => u.id === id);
+  if (!existingUser) {
+    throw new Error(`user ${id} doesn't exist in user list in room ${roomId}; couldn't be enqueued`);
+  }
+
   const queue = getRoom(roomId).queue;
-  return queue.push(user);
+  queue.push(existingUser);
+
+  return existingUser;
 };
 
 // TODO rename id param to userId
@@ -93,7 +117,7 @@ const dequeueUser = (id: string, roomId: string): User => {
 
   const index = queue.findIndex(u => u.id === id);
   if (index === -1) {
-    throw new Error(`user ${id} doesn't exist in room ${roomId}; couldn't be dequeued`);
+    throw new Error(`user ${id} doesn't exist in queue in room ${roomId}; couldn't be dequeued`);
   }
 
   return queue.splice(index, 1)[0];
