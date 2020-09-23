@@ -180,6 +180,7 @@ io.on('connection', (socket) => {
             logger_1.default.error(error.message);
         }
         printAppState();
+        console.log(`current number of rooms: ${roomService_1.default.getAllRooms().length}`);
     });
 });
 // boot up server
