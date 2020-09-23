@@ -180,7 +180,7 @@ io.on('connection', (socket) => {
 
   socket.on(SocketEvents.DISCONNECT, () => {
     logger.event(`${SocketEvents.DISCONNECT} event received`);
-    console.log(`current number of users connected: ${--connectCounter}`);
+    console.log(`current number of users connected: ${--connectCounter}`);    
 
     try {
       // remove user from user map + room
@@ -194,7 +194,7 @@ io.on('connection', (socket) => {
       // we check for development env b/c it's annoying to have rooms be deleted everytime client refreshes after changes
       if (process.env.NODE_ENV !== 'development' && roomService.getUsersInRoom(cleanUser.roomId).length === 0) {
         roomService.removeRoom(cleanUser.roomId);
-      }
+      }      
 
       // broadcast user left to all clients (not including sender) in current room
       io.in(cleanUser.roomId).emit(SocketEvents.LEAVE, {
@@ -206,6 +206,7 @@ io.on('connection', (socket) => {
       logger.error(error.message);
     }
     printAppState();
+    console.log(`current number of rooms: ${roomService.getAllRooms().length}`);
   });
 });
 
