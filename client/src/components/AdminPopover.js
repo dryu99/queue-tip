@@ -9,7 +9,6 @@ const AdminPopover = (props) => {
   delete props.user;
 
   const handleMakeAdminClick = () => {
-    console.log('only here');
     makeAdmin(user);
   };
 

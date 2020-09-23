@@ -27,6 +27,7 @@ const removeUser = (socketId: string): NewUser => {
   return user as NewUser;
 };
 
+// TODO shouldn't need this fn, can use the utils toCleanUser fn
 const cleanUser = (user: User): CleanUser => {
   return {
     id: user.id,
