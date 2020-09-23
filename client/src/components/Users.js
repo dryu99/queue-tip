@@ -1,7 +1,7 @@
 import React from 'react';
 import { ListGroup } from 'react-bootstrap';
 import User from './User';
-import PopoverWrapper from './PopoverWrapper';
+import PopoverWrapper from './AdminPopoverWrapper';
 import { UserTypes } from '../types';
 
 const Users = ({ user, users, makeAdmin }) => {

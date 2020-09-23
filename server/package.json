@@ -9,7 +9,7 @@
     "dev": "cross-env NODE_ENV=development ts-node-dev src/index.ts",
     "build:ui": "rm -rf build && cd ../client && yarn build --prod && cp -r build ../server/ && mv ../server/build ../server/build-client",
     "deploy": "cd .. && git subtree push --prefix server heroku-server master",
-    "deploy:full": "yarn build:ui && git add . && git commit -m uibuild && yarn deploy",
+    "deploy:full": "yarn build:ui && yarn tsc && git add . && git commit -m build && yarn deploy",
     "logs:prod": "heroku logs --tail",
     "test": "cross-env NODE_ENV=test jest --verbose --runInBand"
   },

@@ -8,6 +8,7 @@ import { emitCreateRoom } from '../socket';
 
 const Home = ({ setCurrentUserType, setRoom, setRoomError }) => {
   const [newRoomName, setNewRoomName] = useState('');
+  const [alertText, setAlertText] = useState('');
 
   const history = useHistory();
 
@@ -34,7 +35,7 @@ const Home = ({ setCurrentUserType, setRoom, setRoomError }) => {
         }
       });
     } else {
-      logger.error('can"t submit room with empty name!');
+      setAlertText('Room name can\'t be empty!');
     }
   };
 
@@ -50,6 +51,13 @@ const Home = ({ setCurrentUserType, setRoom, setRoomError }) => {
               onChange={(e) => setNewRoomName(e.target.value)}
               placeholder="CPSC 110 Office Hours"
             />
+          </Col>
+        </Form.Row>
+        <Form.Row className="justify-content-center mb-3">
+          <Col xs="auto">
+            <Form.Text className="text-muted">
+              {alertText}
+            </Form.Text>
           </Col>
         </Form.Row>
         <Form.Row className="justify-content-center">

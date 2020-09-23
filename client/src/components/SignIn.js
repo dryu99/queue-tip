@@ -4,8 +4,6 @@ import { Button, Container, Form, Col } from 'react-bootstrap';
 import { emitJoin } from '../socket';
 import logger from '../utils/logger';
 
-const placeHolderNames = ['Mr. Recursion', 'Prof. G', 'Gregor Kiczales'];
-
 const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
   const [newName, setNewName] = useState('');
   const [alertText, setAlertText] = useState('');
@@ -42,10 +40,6 @@ const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
     }
   };
 
-  // randomly select a placeholder name
-  const randomIndex = Math.floor(placeHolderNames.length * Math.random());
-  const placeHolderName = placeHolderNames[randomIndex];
-
   return (
     <Container className="mt-4">
       <h1 className="text-center mb-5">Sign In</h1>
@@ -57,7 +51,7 @@ const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
               ref={nameInputRef}
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder={placeHolderName}
+              placeholder="Gregor"
             />
           </Col>
         </Form.Row>
