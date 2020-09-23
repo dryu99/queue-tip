@@ -88,7 +88,7 @@ const removeUserFromRoom = (socketId: string, roomId: string): User => {
 };
 
 const updateUserInRoom = (cleanUser: CleanUser): User => {
-  const users = getRoom(cleanUser.id).users;
+  const users = getRoom(cleanUser.roomId).users;
 
   const index = users.findIndex(u => u.id === cleanUser.id);
   if (index === -1) {

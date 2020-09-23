@@ -17,8 +17,8 @@ const printAppState = () => {
   logger.info('ROOMS: ', roomService.getAllRooms().map(r => ({
     id: r.id,
     name: r.name,
-    users: r.users.map(u => u.name),
-    queue: r.queue.map(q => q.name),
+    users: r.users.map(u => `${u.name}: ${u.id}`),
+    queue: r.queue.map(u => `${u.name}: ${u.id}`),
   })));
   logger.info('--------------------');
 };
