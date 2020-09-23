@@ -12,7 +12,6 @@ const Room = ({ room, user, setUser }) => {
   const [users, setUsers] = useState([]);
   const [queueUsers, setQueueUsers] = useState([]);
   const [inQueue, setInQueue] = useState(false);
-  const [testText, setTestText] = useState('');
 
   // subscribe to relevant socket events
   useEffect(() => {
@@ -45,6 +44,17 @@ const Room = ({ room, user, setUser }) => {
       }
     });
 
+    // when another user gets updated, replace their status in your list.
+    socket.on(SocketEvents.UPDATE_USER, ({ updatedUser }) => {
+      logger.info('received UPDATE_USER event', updatedUser);
+      replaceUser(updatedUser);
+
+      // If current user is the one who got updated, update that state too.
+      if (updatedUser.id === user.id) {
+        setUser(updatedUser);
+      }
+    });
+
     // on component unmount, disconnect and turn off socket
     return () => {
       socket.emit(SocketEvents.DISCONNECT);
@@ -68,25 +78,38 @@ const Room = ({ room, user, setUser }) => {
     setQueueUsers(queueUsers.filter(u => u.id !== id));
   };
 
+  const replaceUser = (updatedUser) => {
+    const index = users.findIndex(u => u.id === updatedUser.id);
+    if (index !== -1) {
+      const usersCopy = [...users];
+
+      // replace updated user at specified index
+      usersCopy.splice(index, 1, updatedUser);
+
+      setUsers(usersCopy);
+    } else {
+      logger.error(`couldn't find user ${updatedUser.name} so couldn't update them`);
+    }
+  };
+
   const makeAdmin = (userToUpdate) => {
     const reqData = {
       ...userToUpdate,
       type: UserTypes.ADMIN
     };
-    console.log('update data', reqData);
-    if (testText !== '') {
-      setTestText('');
-    } else {
-      setTestText('this feels wack');
-    }
 
-    // socket.emit(SocketEvents.UPDATE_USER, reqData, (resData) => {
-    //   logger.info('acknowledged from UPDATE_USER event', resData);
-    // });
+    socket.emit(SocketEvents.UPDATE_USER, reqData, (resData) => {
+      logger.info('acknowledged from UPDATE_USER event', resData);
+      const { updatedUser, error } = resData;
+
+      if (!error) {
+        replaceUser(updatedUser);
+      }
+    });
   };
 
 
-  const copyLinkToClipboard = (e) => {
+  const copyLinkToClipboard = () => {
     // TODO manipulating DOM here directly feels sketchy, doing it the react way doesn't work see comments below
     var dummy = document.createElement('textarea');
     document.body.appendChild(dummy);
@@ -96,18 +119,30 @@ const Room = ({ room, user, setUser }) => {
     document.body.removeChild(dummy);
   };
 
-  const handleQueueToggle = (e) => {
+  const handleQueueToggle = () => {
     if (inQueue) {
       emitDequeue({ userId: user.id, roomId: room.id }, (resData) => {
-        logger.info('acknowledged from DEQUEUE event', resData.dequeuedUser);
-        removeQueueUser(resData.dequeuedUser.id);
-        setInQueue(false);
+        logger.info('acknowledged from DEQUEUE event', resData);
+        const { dequeuedUser, error } = resData;
+
+        if (!error) {
+          removeQueueUser(dequeuedUser.id);
+          setInQueue(false);
+        } else {
+          logger.error(error);
+        }
       });
     } else {
       emitEnqueue({ userId: user.id, roomId: room.id }, (resData) => {
-        logger.info('acknowledged from ENQUEUE event', resData.enqueuedUser);
-        addNewQueueUser(resData.enqueuedUser);
-        setInQueue(true);
+        logger.info('acknowledged from ENQUEUE event', resData);
+        const { enqueuedUser, error } = resData;
+
+        if (!error) {
+          addNewQueueUser(enqueuedUser);
+          setInQueue(true);
+        } else {
+          logger.error(error);
+        }
       });
     }
   };
@@ -165,7 +200,6 @@ const Room = ({ room, user, setUser }) => {
       }
       {/* strangely enough, doing this doesn't work for copying to clipboard - setting display to none causes the copied value to be "window.location.href" */}
       {/* <textarea ref={linkRef} style={{ display: 'none' }} value={window.location.href}/> */}
-      <h1>{testText}</h1>
     </Container>
   );
 };

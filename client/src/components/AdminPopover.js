@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ListGroup, Popover } from 'react-bootstrap';
 
 const AdminPopover = (props) => {
@@ -8,9 +8,9 @@ const AdminPopover = (props) => {
   delete props.makeAdmin;
   delete props.user;
 
-  const handleMakeAdminClick = (e) => {
-    console.log(user);
-    console.log(makeAdmin(user));
+  const handleMakeAdminClick = () => {
+    console.log('only here');
+    makeAdmin(user);
   };
 
   return (

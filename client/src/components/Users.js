@@ -2,11 +2,9 @@ import React from 'react';
 import { ListGroup } from 'react-bootstrap';
 import User from './User';
 import PopoverWrapper from './PopoverWrapper';
-import TooltipWrapper from './TooltipWrapper';
 import { UserTypes } from '../types';
 
 const Users = ({ user, users, makeAdmin }) => {
-
   return (
     <div>
       <h4>Users: {users.length}</h4>
@@ -16,7 +14,6 @@ const Users = ({ user, users, makeAdmin }) => {
           const isAdmin = user.type === UserTypes.ADMIN;
 
           const listItemProps = {
-            // variant: isCurrentUser ? 'secondary' : null,
             action: isAdmin ? true : false,
           };
 
