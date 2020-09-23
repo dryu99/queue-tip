@@ -6,11 +6,13 @@ import logger from '../utils/logger';
 import SignIn from './SignIn';
 import Queue from './Queue';
 import Users from './Users';
+import { UserTypes } from '../types';
 
 const Room = ({ room, user, setUser }) => {
   const [users, setUsers] = useState([]);
   const [queueUsers, setQueueUsers] = useState([]);
   const [inQueue, setInQueue] = useState(false);
+  const [testText, setTestText] = useState('');
 
   // subscribe to relevant socket events
   useEffect(() => {
@@ -45,7 +47,7 @@ const Room = ({ room, user, setUser }) => {
 
     // on component unmount, disconnect and turn off socket
     return () => {
-      socket.emit(SocketEvents.DISCONNECT, 'testtesttest');
+      socket.emit(SocketEvents.DISCONNECT);
       socket.off();
     };
   }, [users, queueUsers]);
@@ -66,6 +68,23 @@ const Room = ({ room, user, setUser }) => {
     setQueueUsers(queueUsers.filter(u => u.id !== id));
   };
 
+  const makeAdmin = (userToUpdate) => {
+    const reqData = {
+      ...userToUpdate,
+      type: UserTypes.ADMIN
+    };
+    console.log('update data', reqData);
+    if (testText !== '') {
+      setTestText('');
+    } else {
+      setTestText('this feels wack');
+    }
+
+    // socket.emit(SocketEvents.UPDATE_USER, reqData, (resData) => {
+    //   logger.info('acknowledged from UPDATE_USER event', resData);
+    // });
+  };
+
 
   const copyLinkToClipboard = (e) => {
     // TODO manipulating DOM here directly feels sketchy, doing it the react way doesn't work see comments below
@@ -79,15 +98,15 @@ const Room = ({ room, user, setUser }) => {
 
   const handleQueueToggle = (e) => {
     if (inQueue) {
-      emitDequeue({ userId: user.id, roomId: room.id }, (data) => {
-        logger.info('acknowledged from DEQUEUE event', data.dequeuedUser);
-        removeQueueUser(data.dequeuedUser.id);
+      emitDequeue({ userId: user.id, roomId: room.id }, (resData) => {
+        logger.info('acknowledged from DEQUEUE event', resData.dequeuedUser);
+        removeQueueUser(resData.dequeuedUser.id);
         setInQueue(false);
       });
     } else {
-      emitEnqueue({ userId: user.id, roomId: room.id }, (data) => {
-        logger.info('acknowledged from ENQUEUE event', data.enqueuedUser);
-        addNewQueueUser(data.enqueuedUser);
+      emitEnqueue({ userId: user.id, roomId: room.id }, (resData) => {
+        logger.info('acknowledged from ENQUEUE event', resData.enqueuedUser);
+        addNewQueueUser(resData.enqueuedUser);
         setInQueue(true);
       });
     }
@@ -127,7 +146,11 @@ const Room = ({ room, user, setUser }) => {
               />
             </Col>
             <Col xs="3">
-              <Users user={user} users={users} />
+              <Users
+                user={user}
+                users={users}
+                makeAdmin={makeAdmin}
+              />
             </Col>
           </Row>
         </React.Fragment>
@@ -142,6 +165,7 @@ const Room = ({ room, user, setUser }) => {
       }
       {/* strangely enough, doing this doesn't work for copying to clipboard - setting display to none causes the copied value to be "window.location.href" */}
       {/* <textarea ref={linkRef} style={{ display: 'none' }} value={window.location.href}/> */}
+      <h1>{testText}</h1>
     </Container>
   );
 };

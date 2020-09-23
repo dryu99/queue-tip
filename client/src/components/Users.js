@@ -1,9 +1,11 @@
 import React from 'react';
 import { ListGroup } from 'react-bootstrap';
 import User from './User';
+import PopoverWrapper from './PopoverWrapper';
 import TooltipWrapper from './TooltipWrapper';
+import { UserTypes } from '../types';
 
-const Users = ({ user, users }) => {
+const Users = ({ user, users, makeAdmin }) => {
 
   return (
     <div>
@@ -11,10 +13,11 @@ const Users = ({ user, users }) => {
       <ListGroup>
         {users.map(u => {
           const isCurrentUser = user.name === u.name;
+          const isAdmin = user.type === UserTypes.ADMIN;
 
           const listItemProps = {
             // variant: isCurrentUser ? 'secondary' : null,
-            action: isCurrentUser ? true : false,
+            action: isAdmin ? true : false,
           };
 
           const listItem = (
@@ -24,13 +27,10 @@ const Users = ({ user, users }) => {
           );
 
           return (
-            isCurrentUser ?
-              <TooltipWrapper
-                key={u.id}
-                placement="left"
-                text="You!">
+            isAdmin ?
+              <PopoverWrapper key={u.id} makeAdmin={makeAdmin} user={u}>
                 {listItem}
-              </TooltipWrapper>
+              </PopoverWrapper>
               :
               listItem
           );

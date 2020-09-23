@@ -12,10 +12,10 @@ import {
 
 import { emitCheckRoom } from './socket';
 import { UserTypes } from './types';
-import Notification from './components/Notification';
 
 function App() {
-  const [currentUser, setCurrentUser] = useState({ type: UserTypes.BASIC });
+  // const [currentUser, setCurrentUser] = useState({ type: UserTypes.BASIC });
+  const [currentUser, setCurrentUser] = useState({ type: UserTypes.ADMIN });
   const [room, setRoom] = useState(null);
   const [roomError, setRoomError] = useState(null);
 

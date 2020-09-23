@@ -1,1 +1,0 @@
-export const placeHolderNames = ['Mr. Recursion', 'Prof. G', 'Gregor Kiczales'];

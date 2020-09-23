@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import { Button, Container, Form, Col } from 'react-bootstrap';
 import { emitJoin } from '../socket';
 import logger from '../utils/logger';
-import { placeHolderNames } from '../utils/index';
+
+const placeHolderNames = ['Mr. Recursion', 'Prof. G', 'Gregor Kiczales'];
 
 const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
   const [newName, setNewName] = useState('');
@@ -22,19 +23,23 @@ const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    emitJoin({ name: newName, type: user.type, roomId: room.id }, (resData) => {
-      const { user, usersInRoom, usersInQueue, error } = resData;
-      logger.info('acknowledged from JOIN event', user);
+    if (newName.trim() !== '') {
+      emitJoin({ name: newName, type: user.type, roomId: room.id }, (resData) => {
+        const { user, usersInRoom, usersInQueue, error } = resData;
+        logger.info('acknowledged from JOIN event', user);
 
-      if (!error) {
-        setUser(user);
-        addNewUser([...usersInRoom, user]);
-        addNewQueueUser(usersInQueue);
-      } else {
-        logger.error(error);
-        setAlertText('Name is already taken, please try something else.');
-      }
-    });
+        if (!error) {
+          setUser(user);
+          addNewUser([...usersInRoom, user]);
+          addNewQueueUser(usersInQueue);
+        } else {
+          logger.error(error);
+          setAlertText('Name is already taken, please try something else.');
+        }
+      });
+    } else {
+      setAlertText('Your name can\'t be empty!');
+    }
   };
 
   // randomly select a placeholder name

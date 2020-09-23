@@ -31,6 +31,7 @@ export const SocketEvents = Object.freeze({
   ROOM_CHECK: 'room_check',
   ENQUEUE: 'enqueue',
   DEQUEUE: 'dequeue',
+  UPDATE_USER: 'update_user'
 });
 
 export default socket;
