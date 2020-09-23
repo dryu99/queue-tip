@@ -46,8 +46,6 @@ const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
         <h1>Sign In</h1>
         <h3><u>{room ? room.name : ''}</u></h3>
       </div>
-      {/* <h1 className="text-center mb-5">Sign In</h1>
-      <h3>{room ? room.name : ''}</h3> */}
       <Form>
         <Form.Row className="justify-content-center mb-3">
           <Col xs="auto">
@@ -56,7 +54,7 @@ const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
               ref={nameInputRef}
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder="Gregor"
+              placeholder="Bobby"
             />
           </Col>
         </Form.Row>
