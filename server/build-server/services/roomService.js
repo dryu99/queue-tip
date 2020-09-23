@@ -34,6 +34,7 @@ const getRoom = (id) => {
 const getAllRooms = () => {
     return Array.from(rooms.values());
 };
+// TODO shouldn't need this fn, can use the utils toCleanRoom fn
 const cleanRoom = (room) => {
     return {
         id: room.id,
