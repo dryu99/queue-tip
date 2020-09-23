@@ -8,9 +8,9 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const app = express_1.default();
 // middleware
-app.use(express_1.default.static(path_1.default.join(__dirname, '..', 'build')));
+app.use(express_1.default.static(path_1.default.join(__dirname, '..', 'build-client')));
 // catch all route for serving index.html despite the requested route. Ensures react routing still works on client side.
 app.get('*', (_req, res) => {
-    res.sendFile(path_1.default.join(__dirname, '..', 'build', 'index.html'));
+    res.sendFile(path_1.default.join(__dirname, '..', 'build-client', 'index.html'));
 });
 exports.default = app;

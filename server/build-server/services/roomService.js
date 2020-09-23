@@ -3,16 +3,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const uuid_1 = require("uuid");
 const rooms = new Map();
 const addRoom = (newRoom) => {
-    if (rooms.has(newRoom.id)) {
-        throw new Error('Room already exists, uuid fudged up somehow');
-    }
     const room = {
-        id: newRoom.id || uuid_1.v4(),
+        id: uuid_1.v4(),
         name: newRoom.name,
         users: [],
         queue: []
     };
-    rooms.set(newRoom.id, room);
+    if (rooms.has(room.id)) {
+        throw new Error('Trying to add room but id already exists, uuid fudged up or sth else went wrong.');
+    }
+    rooms.set(room.id, room);
     return room;
 };
 // TODO change output to boolean
@@ -48,7 +48,7 @@ const addUserToRoom = (socketId, newUser) => {
     const bareName = user.name.trim().toLowerCase();
     const existingUser = users.find(u => {
         return u.id === user.id
-            && u.name.trim().toLowerCase() === bareName;
+            || u.name.trim().toLowerCase() === bareName;
     });
     if (existingUser) {
         throw new Error(`user ${user.name} already exists in room ${user.roomId}; didn't add.`);
@@ -63,6 +63,20 @@ const removeUserFromRoom = (socketId, roomId) => {
         throw new Error(`user with socket id ${socketId} doesn't exist in room ${roomId}; couldn't remove.`);
     }
     return users.splice(index, 1)[0];
+};
+const updateUserInRoom = (cleanUser) => {
+    const users = getRoom(cleanUser.roomId).users;
+    const index = users.findIndex(u => u.id === cleanUser.id);
+    if (index === -1) {
+        throw new Error(`user ${cleanUser.name} doesn't exists in room ${cleanUser.roomId}; couldn't update.`);
+    }
+    // get user in room
+    const existingUser = users[index];
+    // init an updated version of user
+    const updatedUser = Object.assign(Object.assign({}, cleanUser), { socketId: existingUser.socketId });
+    // replace existing user with updated user
+    users[index] = updatedUser;
+    return updatedUser;
 };
 // returns a ref to a new User array (not array linked to room!)
 const getUsersInRoom = (roomId) => {
@@ -103,5 +117,6 @@ exports.default = {
     getUsersInRoom,
     getQueuedUsersInRoom,
     enqueueUser,
-    dequeueUser
+    dequeueUser,
+    updateUserInRoom
 };

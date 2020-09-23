@@ -11,6 +11,7 @@ var SocketEvents;
     SocketEvents["ROOM_CHECK"] = "room_check";
     SocketEvents["ENQUEUE"] = "enqueue";
     SocketEvents["DEQUEUE"] = "dequeue";
+    SocketEvents["UPDATE_USER"] = "update_user";
 })(SocketEvents = exports.SocketEvents || (exports.SocketEvents = {}));
 var UserType;
 (function (UserType) {

@@ -19,13 +19,16 @@ const printAppState = () => {
     logger_1.default.info('ROOMS: ', roomService_1.default.getAllRooms().map(r => ({
         id: r.id,
         name: r.name,
-        users: r.users.map(u => u.name),
-        queue: r.queue.map(q => q.name),
+        users: r.users.map(u => `${u.name}: ${u.id}`),
+        queue: r.queue.map(u => `${u.name}: ${u.id}`),
     })));
     logger_1.default.info('--------------------');
 };
+// keeps track of current connections
+let connectCounter = 0;
 io.on('connection', (socket) => {
     logger_1.default.event('a user has connected!');
+    console.log(`current number of users connected: ${++connectCounter}`);
     printAppState();
     // TODO should generate uuid on server not client
     // Create a new room and send back room data on completion. Return error message on failure.
@@ -84,12 +87,11 @@ io.on('connection', (socket) => {
         }
         catch (e) {
             const error = e;
-            logger_1.default.error(error);
+            logger_1.default.error(error.message);
             callback({ error: error.message });
         }
         printAppState();
     });
-    // { user, roomId }
     socket.on(types_1.SocketEvents.ENQUEUE, (data, callback) => {
         logger_1.default.event(`${types_1.SocketEvents.ENQUEUE} event received`, data);
         try {
@@ -111,9 +113,8 @@ io.on('connection', (socket) => {
         }
         printAppState();
     });
-    // { userId, roomId }
     socket.on(types_1.SocketEvents.DEQUEUE, (data, callback) => {
-        logger_1.default.event(`${types_1.SocketEvents.DEQUEUE} event received`);
+        logger_1.default.event(`${types_1.SocketEvents.DEQUEUE} event received`, data);
         try {
             const { userId, roomId } = utils_1.toSocketData(data);
             const dequeuedUser = roomService_1.default.dequeueUser(userId, roomId);
@@ -133,22 +134,44 @@ io.on('connection', (socket) => {
         }
         printAppState();
     });
+    socket.on(types_1.SocketEvents.UPDATE_USER, (data, callback) => {
+        logger_1.default.event(`${types_1.SocketEvents.UPDATE_USER} event received`, data);
+        try {
+            const cleanUser = utils_1.toCleanUser(data);
+            const updatedUser = roomService_1.default.updateUserInRoom(cleanUser);
+            const cleanUpdatedUser = utils_1.toCleanUser(updatedUser); // TODO redundant? just return cleanUser?
+            // broadcast updated user to all clients (not including sender) in current room
+            socket.broadcast.to(updatedUser.roomId).emit(types_1.SocketEvents.UPDATE_USER, {
+                updatedUser: cleanUpdatedUser
+            });
+            callback({
+                updatedUser: cleanUpdatedUser
+            });
+        }
+        catch (e) {
+            const error = e;
+            logger_1.default.error(error.message);
+            callback({ error: error.message });
+        }
+        printAppState();
+    });
     socket.on(types_1.SocketEvents.DISCONNECT, () => {
         logger_1.default.event(`${types_1.SocketEvents.DISCONNECT} event received`);
+        console.log(`current number of users connected: ${--connectCounter}`);
         try {
             // remove user from user map + room
-            const user = userService_1.default.removeUser(socket.id);
-            roomService_1.default.removeUserFromRoom(socket.id, user.roomId);
-            // // clean data before returning to client TODO this is redundant?
-            // const cleanUser = userService.cleanUser(user);
+            const minUser = userService_1.default.removeUser(socket.id);
+            const user = roomService_1.default.removeUserFromRoom(socket.id, minUser.roomId);
+            // clean data before returning to client TODO this is redundant?
+            const cleanUser = userService_1.default.cleanUser(user);
             // delete room from memory if its empty
             // we check for development env b/c it's annoying to have rooms be deleted everytime client refreshes after changes
-            if (process.env.NODE_ENV !== 'development' && roomService_1.default.getUsersInRoom(user.roomId).length === 0) {
-                roomService_1.default.removeRoom(user.roomId);
+            if (process.env.NODE_ENV !== 'development' && roomService_1.default.getUsersInRoom(cleanUser.roomId).length === 0) {
+                roomService_1.default.removeRoom(cleanUser.roomId);
             }
             // broadcast user left to all clients (not including sender) in current room
-            io.in(user.roomId).emit(types_1.SocketEvents.LEAVE, {
-                leftUser: user
+            io.in(cleanUser.roomId).emit(types_1.SocketEvents.LEAVE, {
+                leftUser: cleanUser
             });
         }
         catch (e) {
