@@ -180,7 +180,7 @@ const Room = ({ room, user, setUser }) => {
                 setInQueue={setInQueue}
               />
             </Col>
-            <Col xs="3">
+            <Col xs="4">
               <Users
                 user={user}
                 users={users}

@@ -53,7 +53,7 @@ const Home = ({ setCurrentUserType, setRoom, setRoomError }) => {
             />
           </Col>
         </Form.Row>
-        <Form.Row className="justify-content-center mb-3">
+        <Form.Row className="justify-content-center mb-2">
           <Col xs="auto">
             <Form.Text className="text-muted">
               {alertText}
