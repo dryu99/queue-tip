@@ -12,6 +12,7 @@ import {
 
 import { emitCheckRoom } from './socket';
 import { UserTypes } from './types';
+import NavHeader from './components/NavHeader';
 
 function App() {
   const [currentUser, setCurrentUser] = useState({ type: UserTypes.BASIC });
@@ -46,6 +47,7 @@ function App() {
 
   return (
     <React.Fragment>
+      <NavHeader />
       <Switch className="mt-4">
         <Route path="/room/:id">
           {!roomError ?
