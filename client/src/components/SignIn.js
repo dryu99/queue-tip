@@ -4,7 +4,7 @@ import { Button, Container, Form, Col } from 'react-bootstrap';
 import { emitJoin } from '../socket';
 import logger from '../utils/logger';
 
-const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
+const SignIn = ({ room, user, setUser, addQueueMember }) => {
   const [newName, setNewName] = useState('');
   const [alertText, setAlertText] = useState('');
 
@@ -22,19 +22,34 @@ const SignIn = ({ user, room, setUser, addNewUser, addNewQueueUser }) => {
     e.preventDefault();
 
     if (newName.trim() !== '') {
-      emitJoin({ name: newName, type: user.type, roomId: room.id }, (resData) => {
-        const { user, usersInRoom, usersInQueue, error } = resData;
-        logger.info('acknowledged from JOIN event', user);
+      setUser({
+        ...user,
+        name: newName
+      });
 
+      emitJoin({ roomId: room.id }, (resData) => {
+        logger.info('acknowledged from JOIN event', resData);
+        const { queuedUsers, error } = resData;
         if (!error) {
-          setUser(user);
-          addNewUser([...usersInRoom, user]);
-          addNewQueueUser(usersInQueue);
+          addQueueMember(queuedUsers);
         } else {
           logger.error(error);
-          setAlertText('Name is already taken, please try something else.');
         }
       });
+
+      // emitJoin({ name: newName, type: user.type, roomId: room.id }, (resData) => {
+      //   const { user, usersInRoom, usersInQueue, error } = resData;
+      //   logger.info('acknowledged from JOIN event', user);
+
+      //   if (!error) {
+      //     setUser(user);
+      //     addNewUser([...usersInRoom, user]);
+      //     addNewQueueUser(usersInQueue);
+      //   } else {
+      //     logger.error(error);
+      //     setAlertText('Name is already taken, please try something else.');
+      //   }
+      // });
     } else {
       setAlertText('Your name can\'t be empty!');
     }

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { NewRoom, Room, User, NewUser, CleanRoom, CleanUser } from '../types';
+import { NewRoom, Room, NewUser, CleanRoom } from '../types';
 
 const rooms = new Map<string, Room>();
 
@@ -7,7 +7,7 @@ const addRoom = (newRoom: NewRoom): Room => {
   const room: Room = {
     id: uuidv4(), // generate random id
     name: newRoom.name,
-    users: [],
+    // users: [],
     queue: []
   };
 
@@ -52,96 +52,94 @@ const cleanRoom = (room: Room): CleanRoom  => {
   };
 };
 
-const addUserToRoom = (socketId: string, newUser: NewUser): User => {
-  const users = getRoom(newUser.roomId).users;
+// const addUserToRoom = (socketId: string, newUser: NewUser): User => {
+//   const users = getRoom(newUser.roomId).users;
 
-  const user: User = {
-    ...newUser,
-    id: uuidv4(), // randomly generate id
-    socketId
-  };
+//   const user: User = {
+//     ...newUser,
+//     id: uuidv4(), // randomly generate id
+//     socketId
+//   };
 
-  // note: we aren't storing the bare name, just using it for duplication checks
-  const bareName = user.name.trim().toLowerCase();
+//   // note: we aren't storing the bare name, just using it for duplication checks
+//   const bareName = user.name.trim().toLowerCase();
 
-  const existingUser = users.find(u => {
-    return u.id === user.id
-      || u.name.trim().toLowerCase() === bareName;
-  });
-  if (existingUser) {
-    throw new Error(`user ${user.name} already exists in room ${user.roomId}; didn't add.`);
-  }
+//   const existingUser = users.find(u => {
+//     return u.id === user.id
+//       || u.name.trim().toLowerCase() === bareName;
+//   });
+//   if (existingUser) {
+//     throw new Error(`user ${user.name} already exists in room ${user.roomId}; didn't add.`);
+//   }
 
-  users.push(user);
+//   users.push(user);
 
-  return user;
-};
+//   return user;
+// };
 
-const removeUserFromRoom = (socketId: string, roomId: string): User => {
-  const users = getRoom(roomId).users;
+// const removeUserFromRoom = (socketId: string, roomId: string): User => {
+//   const users = getRoom(roomId).users;
 
-  const index = users.findIndex(u => u.socketId === socketId);
-  if (index === -1) {
-    throw new Error(`user with socket id ${socketId} doesn't exist in room ${roomId}; couldn't remove.`);
-  }
+//   const index = users.findIndex(u => u.socketId === socketId);
+//   if (index === -1) {
+//     throw new Error(`user with socket id ${socketId} doesn't exist in room ${roomId}; couldn't remove.`);
+//   }
 
-  return users.splice(index, 1)[0];
-};
+//   return users.splice(index, 1)[0];
+// };
 
-const updateUserInRoom = (cleanUser: CleanUser): User => {
-  const users = getRoom(cleanUser.roomId).users;
+// const updateUserInRoom = (cleanUser: CleanUser): User => {
+//   const users = getRoom(cleanUser.roomId).users;
 
-  const index = users.findIndex(u => u.id === cleanUser.id);
-  if (index === -1) {
-    throw new Error(`user ${cleanUser.name} doesn't exists in room ${cleanUser.roomId}; couldn't update.`);
-  }
+//   const index = users.findIndex(u => u.id === cleanUser.id);
+//   if (index === -1) {
+//     throw new Error(`user ${cleanUser.name} doesn't exists in room ${cleanUser.roomId}; couldn't update.`);
+//   }
 
-  // get user in room
-  const existingUser = users[index];
+//   // get user in room
+//   const existingUser = users[index];
 
-  // init an updated version of user
-  const updatedUser = {
-    ...cleanUser,
-    socketId: existingUser.socketId
-  };
+//   // init an updated version of user
+//   const updatedUser = {
+//     ...cleanUser,
+//     socketId: existingUser.socketId
+//   };
 
-  // replace existing user with updated user
-  users[index] = updatedUser;
+//   // replace existing user with updated user
+//   users[index] = updatedUser;
 
-  return updatedUser;
-};
+//   return updatedUser;
+// };
+
+// // returns a ref to a new User array (not array linked to room!)
+// const getUsersInRoom = (roomId: string): User[] => {
+//   return [...getRoom(roomId).users];
+// };
 
 // returns a ref to a new User array (not array linked to room!)
-const getUsersInRoom = (roomId: string): User[] => {
-  return [...getRoom(roomId).users];
-};
-
-// returns a ref to a new User array (not array linked to room!)
-const getQueuedUsersInRoom = (roomId: string): User[] => {
+const getQueuedUsersInRoom = (roomId: string): NewUser[] => {
   return [...getRoom(roomId).queue];
 };
 
-const enqueueUser = (id: string, roomId: string): User => {
-  const users = getRoom(roomId).users;
+const enqueueUser = (user: NewUser, roomId: string): void => {
+  console.log('ogogogogo', user);
+  const queue = getRoom(roomId).queue;
 
-  const existingUser = users.find(u => u.id === id);
-  if (!existingUser) {
-    throw new Error(`user ${id} doesn't exist in user list in room ${roomId}; couldn't be enqueued`);
+  const existingQueuedUser = queue.find(u => u.name === user.name);
+  if (existingQueuedUser) {
+    throw new Error(`user ${user.name} already exists in queue in room ${roomId}; couldn't be enqueued`);
   }
 
-  const queue = getRoom(roomId).queue;
-  queue.push(existingUser);
-
-  return existingUser;
+  queue.push(user);
 };
 
 // TODO rename id param to userId
-const dequeueUser = (id: string, roomId: string): User => {
+const dequeueUser = (name: string, roomId: string): NewUser => {
   const queue = getRoom(roomId).queue;
 
-  const index = queue.findIndex(u => u.id === id);
+  const index = queue.findIndex(u => u.name === name);
   if (index === -1) {
-    throw new Error(`user ${id} doesn't exist in queue in room ${roomId}; couldn't be dequeued`);
+    throw new Error(`user ${name} doesn't exist in queue in room ${roomId}; couldn't be dequeued`);
   }
 
   return queue.splice(index, 1)[0];
@@ -154,11 +152,11 @@ export default {
   getRoom,
   getAllRooms,
   cleanRoom,
-  addUserToRoom,
-  removeUserFromRoom,
-  getUsersInRoom,
+  // addUserToRoom,
+  // removeUserFromRoom,
+  // getUsersInRoom,
   getQueuedUsersInRoom,
   enqueueUser,
   dequeueUser,
-  updateUserInRoom
+  // updateUserInRoom
 };

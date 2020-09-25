@@ -3,19 +3,11 @@ import { Row, Col, Container, ListGroup } from 'react-bootstrap';
 import { UserTypes } from '../types';
 import User from './User';
 import { emitDequeue } from '../socket';
-import logger from '../utils/logger';
 
-const Queue = ({ room, user, queueUsers, removeQueueUser, setInQueue }) => {
+const Queue = ({ room, user, queueUsers }) => {
 
-  const removeUserFromQueue = (e, userId) => {
-    emitDequeue({ userId, roomId: room.id }, (data) => {
-      logger.info('acknowledged from DEQUEUE event', data.dequeuedUser);
-      removeQueueUser(data.dequeuedUser.id);
-
-      if (data.dequeuedUser.id === user.id) {
-        setInQueue(false);
-      }
-    });
+  const removeUserFromQueue = (e, username) => {
+    emitDequeue({ name: username, roomId: room.id });
   };
 
   return (
@@ -29,11 +21,11 @@ const Queue = ({ room, user, queueUsers, removeQueueUser, setInQueue }) => {
           const listItemProps = {
             // variant: isCurrentUser ? 'secondary' : null,
             action: isAdmin ? true : false,
-            onClick: isAdmin ? (e) => removeUserFromQueue(e, qu.id) : null
+            onClick: isAdmin ? (e) => removeUserFromQueue(e, qu.name) : null
           };
 
           return (
-            <Container key={qu.id}>
+            <Container key={qu.name}>
               <Row className="align-items-center">
                 <Col xs="auto">
                   <b>{i + 1}</b>

@@ -50,7 +50,7 @@ function App() {
       <NavHeader />
       <Switch className="mt-4">
         <Route path="/room/:id">
-          {!roomError ?
+          {!roomError && room ?
             <Room room={room} user={currentUser} setUser={setCurrentUser}/>
             :
           // would be nice to put a spinner or sth here

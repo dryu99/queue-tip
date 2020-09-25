@@ -5,109 +5,91 @@ import logger from '../utils/logger';
 
 import SignIn from './SignIn';
 import Queue from './Queue';
-import Users from './Users';
 import { UserTypes } from '../types';
 
 const Room = ({ room, user, setUser }) => {
-  const [users, setUsers] = useState([]);
-  const [queueUsers, setQueueUsers] = useState([]);
+  // const [users, setUsers] = useState([]);
+  // const [queueUsers, setQueueUsers] = useState([]);
+  const [queueMembers, setQueueMembers] = useState([]);
   const [inQueue, setInQueue] = useState(false);
+  // const [name, setName] = useState('');
 
   // subscribe to relevant socket events
   useEffect(() => {
-    // when another user joins, add them to user list
-    socket.on(SocketEvents.NEW_USER_JOIN, ({ newUser }) => {
-      logger.info('received JOIN event', newUser);
-      addNewUser(newUser);
-    });
+    // // when another user joins, add them to user list
+    // socket.on(SocketEvents.NEW_USER_JOIN, ({ newUser }) => {
+    //   logger.info('received JOIN event', newUser);
+    //   addNewUser(newUser);
+    // });
 
-    // when another user leaves, remove them from user list
-    socket.on(SocketEvents.LEAVE, ({ leftUser }) => {
-      logger.info('received LEAVE event', leftUser);
-      removeUser(leftUser.id);
-      removeQueueUser(leftUser.id);
-    });
+    // // when another user leaves, remove them from user list
+    // socket.on(SocketEvents.LEAVE, ({ leftUser }) => {
+    //   logger.info('received LEAVE event', leftUser);
+    //   removeUser(leftUser.id);
+    //   removeQueueUser(leftUser.id);
+    // });
 
     // when another user joins queue, add them to queue list
     socket.on(SocketEvents.ENQUEUE, ({ enqueuedUser }) => {
       logger.info('received ENQUEUE event', enqueuedUser);
-      addNewQueueUser(enqueuedUser);
+      addQueueMember(enqueuedUser);
+
+      if (enqueuedUser.name === user.name) {
+        setInQueue(true);
+      }
     });
 
-    // when another user joins queue, add them to queue list
+    // when another user leaves queue, remove from to queue list
     socket.on(SocketEvents.DEQUEUE, ({ dequeuedUser }) => {
       logger.info('received DEQUEUE event', dequeuedUser);
-      removeQueueUser(dequeuedUser.id);
+      removeQueueMember(dequeuedUser.name);
 
-      if (dequeuedUser.id === user.id) {
+      if (dequeuedUser.name === user.name) {
         setInQueue(false);
       }
     });
 
-    // when another user gets updated, replace their status in your list.
-    socket.on(SocketEvents.UPDATE_USER, ({ updatedUser }) => {
-      logger.info('received UPDATE_USER event', updatedUser);
-      replaceUser(updatedUser);
+    // // when another user gets updated, replace their status in your list.
+    // socket.on(SocketEvents.UPDATE_USER, ({ updatedUser }) => {
+    //   logger.info('received UPDATE_USER event', updatedUser);
+    //   replaceUser(updatedUser);
 
-      // If current user is the one who got updated, update that state too.
-      if (updatedUser.id === user.id) {
-        setUser(updatedUser);
-      }
-    });
+    //   // If current user is the one who got updated, update that state too.
+    //   if (updatedUser.id === user.id) {
+    //     setUser(updatedUser);
+    //   }
+    // });
 
     // on component unmount, disconnect and turn off socket
     return () => {
       socket.emit(SocketEvents.DISCONNECT);
       socket.off();
     };
-  }, [users, queueUsers]);
+  }, [queueMembers]);
 
-  const addNewUser = (newUser) => {
-    setUsers(users.concat(newUser));
+  const addQueueMember = (queueMember) => {
+    setQueueMembers(queueMembers.concat(queueMember));
   };
 
-  const removeUser = (id) => {
-    setUsers(users.filter(u => u.id !== id));
+  const removeQueueMember = (name) => {
+    setQueueMembers(queueMembers.filter(m => m.name !== name));
   };
 
-  const addNewQueueUser = (newQueueUser) => {
-    setQueueUsers(queueUsers.concat(newQueueUser));
-  };
+  // const makeAdmin = (userToUpdate) => {
+  //   const reqData = {
+  //     ...userToUpdate,
+  //     type: UserTypes.ADMIN
+  //   };
 
-  const removeQueueUser = (id) => {
-    setQueueUsers(queueUsers.filter(u => u.id !== id));
-  };
+  //   socket.emit(SocketEvents.UPDATE_USER, reqData, (resData) => {
+  //     logger.info('acknowledged from UPDATE_USER event', resData);
+  //     const { updatedUser, error } = resData;
 
-  const replaceUser = (updatedUser) => {
-    const index = users.findIndex(u => u.id === updatedUser.id);
-    if (index !== -1) {
-      const usersCopy = [...users];
-
-      // replace updated user at specified index
-      usersCopy.splice(index, 1, updatedUser);
-
-      setUsers(usersCopy);
-    } else {
-      logger.error(`couldn't find user ${updatedUser.name} so couldn't update them`);
-    }
-  };
-
-  const makeAdmin = (userToUpdate) => {
-    const reqData = {
-      ...userToUpdate,
-      type: UserTypes.ADMIN
-    };
-
-    socket.emit(SocketEvents.UPDATE_USER, reqData, (resData) => {
-      logger.info('acknowledged from UPDATE_USER event', resData);
-      const { updatedUser, error } = resData;
-
-      if (!error) {
-        replaceUser(updatedUser);
-      }
-    });
-  };
-
+  //     if (!error) {
+  //       replaceUser(updatedUser);
+  //     }
+  //   });
+  // };
 
   const copyLinkToClipboard = () => {
     // TODO manipulating DOM here directly feels sketchy, doing it the react way doesn't work see comments below
@@ -119,44 +101,41 @@ const Room = ({ room, user, setUser }) => {
     document.body.removeChild(dummy);
   };
 
+  const errorAcknowledgementCallback = (event) => {
+    return (resData) => {
+      logger.info(`acknowledged from ${event} event`, resData);
+      logger.error(resData.error);
+    };
+  };
+
   const handleQueueToggle = () => {
     if (inQueue) {
-      emitDequeue({ userId: user.id, roomId: room.id }, (resData) => {
-        logger.info('acknowledged from DEQUEUE event', resData);
-        const { dequeuedUser, error } = resData;
-
-        if (!error) {
-          removeQueueUser(dequeuedUser.id);
-          setInQueue(false);
-        } else {
-          logger.error(error);
-        }
-      });
+      emitDequeue(
+        { name: user.name, roomId: room.id },
+        errorAcknowledgementCallback(SocketEvents.DEQUEUE)
+      );
     } else {
-      emitEnqueue({ userId: user.id, roomId: room.id }, (resData) => {
-        logger.info('acknowledged from ENQUEUE event', resData);
-        const { enqueuedUser, error } = resData;
-
-        if (!error) {
-          addNewQueueUser(enqueuedUser);
-          setInQueue(true);
-        } else {
-          logger.error(error);
-        }
-      });
+      emitEnqueue(
+        { name: user.name, roomId: room.id, type: UserTypes.BASIC },
+        errorAcknowledgementCallback(SocketEvents.ENQUEUE)
+      );
     }
   };
 
   // user is considered signed in when name and id exist
-  const isUserSignedIn = user && user.name && user.id;
+  const isUserSignedIn = user && user.name && user.name.trim().length !== 0;
+  // const isNameEmpty = user.name.trim().length === 0;
 
   return (
     <Container className="mt-4">
-      {room && isUserSignedIn ?
+      {isUserSignedIn ?
         <React.Fragment>
           <Row>
             <Col>
               <h1>{room.name}</h1>
+            </Col>
+            <Col xs="auto">
+              <h3>Welcome, <i>{user.name}</i></h3>
             </Col>
             <Col xs="auto">
               <Button onClick={copyLinkToClipboard} size="lg" variant="secondary">
@@ -175,16 +154,9 @@ const Room = ({ room, user, setUser }) => {
               <Queue
                 room={room}
                 user={user}
-                queueUsers={queueUsers}
-                removeQueueUser={removeQueueUser}
+                queueUsers={queueMembers}
+                removeQueueUser={removeQueueMember}
                 setInQueue={setInQueue}
-              />
-            </Col>
-            <Col xs="4">
-              <Users
-                user={user}
-                users={users}
-                makeAdmin={makeAdmin}
               />
             </Col>
           </Row>
@@ -194,8 +166,7 @@ const Room = ({ room, user, setUser }) => {
           room={room}
           user={user}
           setUser={setUser}
-          addNewUser={addNewUser}
-          addNewQueueUser={addNewQueueUser}
+          addQueueMember={addQueueMember}
         />
       }
       {/* strangely enough, doing this doesn't work for copying to clipboard - setting display to none causes the copied value to be "window.location.href" */}

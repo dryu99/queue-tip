@@ -23,7 +23,7 @@ export interface UserBase {
 
 export interface User extends UserBase {
   id: string,
-  socketId: string,
+  // socketId: string,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -42,8 +42,8 @@ export interface RoomBase {
 
 export interface Room extends RoomBase {
   id: string,
-  users: User[],
-  queue: User[]
+  // users: User[],
+  queue: NewUser[]
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
