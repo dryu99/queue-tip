@@ -16,7 +16,11 @@ const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
   const handleCreateRoomClick = (e) => {
     e.preventDefault();
 
-    if (newRoomName && newRoomName.trim().length !== 0) {
+    if (newRoomName.trim().length === 0) {
+      setAlertText('Please type in a room name!');
+    } else if (newAdminPassword.trim().length === 0) {
+      setAlertText('Please type in an admin password!');
+    } else {
       // users who create rooms are admins
       setIsAdmin(true);
 
@@ -35,8 +39,6 @@ const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
           setRoomError('sorry room doesn\'t exist...');
         }
       });
-    } else {
-      setAlertText('Room name can\'t be empty!');
     }
   };
 
@@ -58,6 +60,7 @@ const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
           <Col xs="auto">
             <Form.Label>Admin Password</Form.Label>
             <Form.Control
+              type="password"
               value={newAdminPassword}
               onChange={(e) => setNewAdminPassword(e.target.value)}
             />

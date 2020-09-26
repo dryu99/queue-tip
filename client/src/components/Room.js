@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Button, Form } from 'react-bootstrap';
 import socket, { SocketEvents, emitEnqueue, emitJoin } from '../socket';
 import logger from '../utils/logger';
+import copyLinkIcon from '../assets/copy-link.png';
+import chainLinkIcon from '../assets/chain-link.png';
 
 import Queue from './Queue';
 import { UserTypes } from '../types';
+import './index.css';
+import TooltipWrapper from './TooltipWrapper';
 
 const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
   const [currentName, setCurrentName] = useState('');
@@ -68,22 +72,6 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
     setQueueMembers(queueMembers.filter(m => m.name !== name));
   };
 
-  // const makeAdmin = (userToUpdate) => {
-  //   const reqData = {
-  //     ...userToUpdate,
-  //     type: UserTypes.ADMIN
-  //   };
-
-  //   socket.emit(SocketEvents.UPDATE_USER, reqData, (resData) => {
-  //     logger.info('acknowledged from UPDATE_USER event', resData);
-  //     const { updatedUser, error } = resData;
-
-  //     if (!error) {
-  //       replaceUser(updatedUser);
-  //     }
-  //   });
-  // };
-
   const copyLinkToClipboard = () => {
     // TODO manipulating DOM here directly feels sketchy, doing it the react way doesn't work see comments below
     var dummy = document.createElement('textarea');
@@ -135,7 +123,17 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
     <Container className="mt-4">
       <Row>
         <Col>
-          <h1>{room.name}</h1>
+          <h1 className="d-inline-block">{room.name}</h1>
+          <TooltipWrapper text="Copy Link">
+            <img
+              id="copy-link-icon"
+              className="align-baseline mx-2"
+              src={copyLinkIcon}
+              alt="copy-link-icon"
+              onClick={copyLinkToClipboard}
+            />
+          </TooltipWrapper>
+
         </Col>
         <Col xs="auto">
           {isAdmin ?
@@ -157,11 +155,6 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
             onChange={(e) => setCurrentName(e.target.value)}
             placeholder="Your Name"
           />
-        </Col>
-        <Col xs="auto">
-          <Button onClick={copyLinkToClipboard} size="lg" variant="secondary">
-                Copy Link
-          </Button>
         </Col>
         <Col xs="3">
           <Button onClick={handleQueueToggle} size="lg" block>

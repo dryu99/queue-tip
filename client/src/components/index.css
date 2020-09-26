@@ -1,0 +1,11 @@
+#copy-link-icon {
+  opacity: 0.25
+}
+
+#copy-link-icon:hover {
+  opacity: 0.6;
+}
+
+#copy-link-icon:active {
+  opacity: 0.9;
+}
