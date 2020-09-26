@@ -11,7 +11,7 @@ import {
   useRouteMatch
 } from 'react-router-dom';
 
-import { emitCheckRoom, emitJoin } from './socket';
+import { emitCheckRoom } from './socket';
 import NavHeader from './components/NavHeader';
 
 function App() {
@@ -39,8 +39,6 @@ function App() {
         if (room && !error) {
           setRoom(room);
           setQueuedUsers(queuedUsers);
-
-          // checkLocalStorage();
         } else {
           logger.error(error);
           setRoomError('sorry room doesn\'t exist...');
@@ -48,29 +46,6 @@ function App() {
       });
     }
   }, [match, room]);
-
-  // const checkLocalStorage = () => {
-  //   logger.info('checking local cache for signed in user data...');
-  //   const userJSON = localStorage.getItem('signedInUser');
-
-  //   if (userJSON) {
-  //     logger.info('found data in local cache!');
-  //     const parsedUser = JSON.parse(userJSON);
-  //     logger.info(parsedUser);
-
-  //     // try to join room found in user json
-  //     emitJoin({ roomId: parsedUser.roomId }, (resData) => {
-  //       logger.info('acknowledged from JOIN event', resData);
-  //       const { error } = resData;
-
-  //       if (!error) {
-  //         setCurrentUser(parsedUser);
-  //       } else {
-  //         logger.error(error);
-  //       }
-  //     });
-  //   }
-  // };
 
   return (
     <React.Fragment>
@@ -80,8 +55,8 @@ function App() {
           {!roomError && room ?
             <Room
               room={room}
-              queueMembers={queuedUsers}
-              setQueueMembers={setQueuedUsers}
+              queuedUsers={queuedUsers}
+              setQueuedUsers={setQueuedUsers}
               isAdmin={isAdmin}
               setIsAdmin={setIsAdmin}
             />
@@ -101,7 +76,6 @@ function App() {
           <Error text="404 resource not found"/>
         </Route>
       </Switch>
-      {/* <Notification /> */}
     </React.Fragment>
   );
 }

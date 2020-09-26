@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Container, Form, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
-import { UserTypes } from '../types';
 import logger from '../utils/logger';
 
 import { emitCreateRoom } from '../socket';
@@ -36,7 +35,7 @@ const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
           history.push(`/room/${room.id}`);
         } else {
           logger.error(error);
-          setRoomError('sorry room doesn\'t exist...');
+          setRoomError('Sorry room doesn\'t exist...');
         }
       });
     }
@@ -44,7 +43,6 @@ const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
 
   return (
     <Container className="mt-4">
-      <h1 className="text-center mb-5">queue-tip</h1>
       <Form>
         <Form.Row className="justify-content-center mb-3">
           <Col xs="auto">

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import { Col, Button, Form, Modal } from 'react-bootstrap';
+import { Button, Form, Modal } from 'react-bootstrap';
 import socket, { SocketEvents } from '../socket';
 import logger from '../utils/logger';
 

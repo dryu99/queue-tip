@@ -11,7 +11,7 @@ import copyLinkIcon from '../assets/copy-link.png';
 import crownIcon from '../assets/crown.png';
 import './index.css';
 
-const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
+const Room = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => {
   const [currentName, setCurrentName] = useState('');
   const [adminPopupOpen, setAdminPopupOpen] = useState(false);
 
@@ -25,13 +25,13 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
     // when another user joins queue, add them to queue list
     socket.on(SocketEvents.ENQUEUE, ({ enqueuedUser }) => {
       logger.info('received ENQUEUE event', enqueuedUser);
-      setQueueMembers(queueMembers.concat(enqueuedUser));
+      setQueuedUsers(queuedUsers.concat(enqueuedUser));
     });
 
     // when another user leaves queue, remove from to queue list
     socket.on(SocketEvents.DEQUEUE, ({ dequeuedUser }) => {
       logger.info('received DEQUEUE event', dequeuedUser);
-      removeQueueMember(dequeuedUser.name);
+      removeQueuedUser(dequeuedUser.name);
     });
 
     // on component unmount, disconnect and turn off socket
@@ -39,7 +39,7 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
       socket.emit(SocketEvents.DISCONNECT);
       socket.off();
     };
-  }, [queueMembers, room]);
+  }, [queuedUsers, room]);
 
   // check cache for current name data
   useEffect(() => {
@@ -57,8 +57,8 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
     }
   }, []);
 
-  const removeQueueMember = (name) => {
-    setQueueMembers(queueMembers.filter(m => m.name !== name));
+  const removeQueuedUser = (name) => {
+    setQueuedUsers(queuedUsers.filter(m => m.name !== name));
   };
 
   const copyLinkToClipboard = () => {
@@ -77,7 +77,7 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
     if (currentName.trim().length === 0) {
       alert('Name can\'t be empty if you want to join queue! Please type something in.');
     } else {
-      const exisitingQueueUser = queueMembers.find(u => u.name.toLowerCase() === currentName.toLowerCase());
+      const exisitingQueueUser = queuedUsers.find(u => u.name.toLowerCase() === currentName.toLowerCase());
       if (exisitingQueueUser) {
       // TODO make this a pretty modal
         alert('Chosen name is already in queue! Please choose a different name.');
@@ -109,7 +109,6 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
                 onClick={copyLinkToClipboard}
               />
             </TooltipWrapper>
-
           </Col>
         </Row>
         <hr/>
@@ -155,8 +154,7 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
               room={room}
               isAdmin={isAdmin}
               currentName={currentName}
-              queueUsers={queueMembers}
-              removeQueueUser={removeQueueMember}
+              queuedUsers={queuedUsers}
             />
           </Col>
         </Row>
