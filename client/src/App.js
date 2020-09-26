@@ -48,7 +48,7 @@ function App() {
   }, [match, room]);
 
   return (
-    <React.Fragment>
+    <>
       <NavHeader />
       <Switch className="mt-4">
         <Route path="/room/:id">
@@ -76,7 +76,7 @@ function App() {
           <Error text="404 resource not found"/>
         </Route>
       </Switch>
-    </React.Fragment>
+    </>
   );
 }
 
