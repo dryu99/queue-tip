@@ -1,11 +1,17 @@
-#copy-link-icon {
+#copy-link-icon, #crown-icon {
   opacity: 0.25
 }
 
-#copy-link-icon:hover {
+#copy-link-icon:hover, #crown-icon:hover {
   opacity: 0.6;
 }
 
-#copy-link-icon:active {
+#copy-link-icon:active, #crown-icon:active {
   opacity: 0.9;
+}
+
+#crown-icon {
+  width: 24px;
+  height: 24px;
+  color: red;
 }

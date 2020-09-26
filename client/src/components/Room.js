@@ -6,13 +6,14 @@ import { UserTypes } from '../types';
 
 import Queue from './Queue';
 import TooltipWrapper from './TooltipWrapper';
-import Footer from './Footer';
+import AdminPopup from './AdminPopup';
 import copyLinkIcon from '../assets/copy-link.png';
+import crownIcon from '../assets/crown.png';
 import './index.css';
 
 const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
   const [currentName, setCurrentName] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
+  const [adminPopupOpen, setAdminPopupOpen] = useState(false);
 
   // emit/subscribe to relevant socket events
   useEffect(() => {
@@ -32,17 +33,6 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
       logger.info('received DEQUEUE event', dequeuedUser);
       removeQueueMember(dequeuedUser.name);
     });
-
-    // // when another user gets updated, replace their status in your list.
-    // socket.on(SocketEvents.UPDATE_USER, ({ updatedUser }) => {
-    //   logger.info('received UPDATE_USER event', updatedUser);
-    //   replaceUser(updatedUser);
-
-    //   // If current user is the one who got updated, update that state too.
-    //   if (updatedUser.id === user.id) {
-    //     setUser(updatedUser);
-    //   }
-    // });
 
     // on component unmount, disconnect and turn off socket
     return () => {
@@ -67,7 +57,6 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
     }
   }, []);
 
-
   const removeQueueMember = (name) => {
     setQueueMembers(queueMembers.filter(m => m.name !== name));
   };
@@ -86,12 +75,12 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
     logger.info('join queue toggle clicked');
 
     if (currentName.trim().length === 0) {
-      alert('name can\'t be empty!');
+      alert('Name can\'t be empty if you want to join queue! Please type something in.');
     } else {
       const exisitingQueueUser = queueMembers.find(u => u.name.toLowerCase() === currentName.toLowerCase());
       if (exisitingQueueUser) {
       // TODO make this a pretty modal
-        alert('name is already in queue, please change name');
+        alert('Chosen name is already in queue! Please choose a different name.');
       } else {
         emitEnqueue({ name: currentName, roomId: room.id, type: UserTypes.BASIC }, (resData) => {
           logger.info('acknowledged from ENQUEUE event', resData);
@@ -103,20 +92,6 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
         });
       }
     }
-  };
-
-  const tryAdminStatus = (e) => {
-    e.preventDefault();
-    socket.emit(SocketEvents.TRY_ADMIN_STATUS, { adminPassword, roomId: room.id }, (resData) => {
-      logger.info('acknowledged from TRY ADMIN STATUS event', resData);
-
-      if (!resData.error) {
-        setIsAdmin(true);
-      } else {
-        logger.error(resData.error);
-        alert('Password is incorrect! Please try again.');
-      }
-    });
   };
 
   return (
@@ -150,30 +125,26 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
                   onChange={(e) => setCurrentName(e.target.value)}
                   placeholder="Mr. Recursion"
                 />
+                <TooltipWrapper text={isAdmin ? 'you\'re admin!' : 'make admin'}>
+                  <img
+                    id="crown-icon"
+                    className="align-baseline mx-2 "
+                    style={{ opacity: isAdmin ? 1 : null }}
+                    src={crownIcon}
+                    alt="crown-icon"
+                    onClick={!isAdmin ? () => setAdminPopupOpen(true) : null}
+                  />
+                </TooltipWrapper>
               </InputGroup>
             </Form>
           </Col>
-          {/* <Col>
-            {isAdmin ?
-              <span>YOU ARE ADMIN</span>
-              :
-              <React.Fragment>
-                <InputGroup>
-                  <Form.Control
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    placeholder="Admin Password"
-                  />
-                  <InputGroup.Append>
-                    <Button onClick={tryAdminStatus} variant="outline-secondary">Become Admin</Button>
-                  </InputGroup.Append>
-                </InputGroup>
-              </React.Fragment>
-            }
-          </Col> */}
           <Col xs="auto">
-            <Button onClick={handleQueueToggle} size="lg" block>
-                Join Queue
+            <Button
+              onClick={handleQueueToggle}
+              size="lg"
+              block
+            >
+            Join Queue
             </Button>
           </Col>
         </Row>
@@ -193,6 +164,12 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
         {/* <textarea ref={linkRef} style={{ display: 'none' }} value={window.location.href}/> */}
 
       </Container>
+      <AdminPopup
+        room={room}
+        setIsAdmin={setIsAdmin}
+        show={adminPopupOpen}
+        setAdminPopupOpen={setAdminPopupOpen}
+      />
     </React.Fragment>
   );
 };
