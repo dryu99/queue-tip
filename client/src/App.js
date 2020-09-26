@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Home from './components/Home';
 import Room from './components/Room';
 import Error from './components/Error';
+import Footer from './components/Footer';
 import logger from './utils/logger';
 
 import {

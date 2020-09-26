@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Col, Container, Row, Button, Form } from 'react-bootstrap';
+import { Col, Container, Row, Button, Form, InputGroup } from 'react-bootstrap';
 import socket, { SocketEvents, emitEnqueue, emitJoin } from '../socket';
 import logger from '../utils/logger';
-import copyLinkIcon from '../assets/copy-link.png';
-import chainLinkIcon from '../assets/chain-link.png';
+import { UserTypes } from '../types';
 
 import Queue from './Queue';
-import { UserTypes } from '../types';
-import './index.css';
 import TooltipWrapper from './TooltipWrapper';
+import Footer from './Footer';
+import copyLinkIcon from '../assets/copy-link.png';
+import './index.css';
 
 const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
   const [currentName, setCurrentName] = useState('');
@@ -120,63 +120,80 @@ const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
   };
 
   return (
-    <Container className="mt-4">
-      <Row>
-        <Col>
-          <h1 className="d-inline-block">{room.name}</h1>
-          <TooltipWrapper text="Copy Link">
-            <img
-              id="copy-link-icon"
-              className="align-baseline mx-2"
-              src={copyLinkIcon}
-              alt="copy-link-icon"
-              onClick={copyLinkToClipboard}
-            />
-          </TooltipWrapper>
-
-        </Col>
-        <Col xs="auto">
-          {isAdmin ?
-            <span>YOU ARE ADMIN</span>
-            :
-            <React.Fragment>
-              <Form.Control
-                value={adminPassword}
-                onChange={(e) => setAdminPassword(e.target.value)}
-                placeholder="Admin Password"
+    <React.Fragment>
+      <Container className="mt-4">
+        <Row>
+          <Col>
+            <h1 className="d-inline-block">{room.name}</h1>
+            <TooltipWrapper text="copy url">
+              <img
+                id="copy-link-icon"
+                className="align-baseline mx-2"
+                src={copyLinkIcon}
+                alt="copy-link-icon"
+                onClick={copyLinkToClipboard}
               />
-              <Button onClick={tryAdminStatus}>
-              Become Admin
-              </Button>
-            </React.Fragment>
-          }
-          <Form.Control
-            value={currentName}
-            onChange={(e) => setCurrentName(e.target.value)}
-            placeholder="Your Name"
-          />
-        </Col>
-        <Col xs="3">
-          <Button onClick={handleQueueToggle} size="lg" block>
+            </TooltipWrapper>
+
+          </Col>
+        </Row>
+        <hr/>
+        <Row className="my-4">
+          <Col>
+            <Form inline>
+              <InputGroup className="pt-1">
+                <InputGroup.Prepend>
+                  <InputGroup.Text>Name</InputGroup.Text>
+                </InputGroup.Prepend>
+                <Form.Control
+                  value={currentName}
+                  onChange={(e) => setCurrentName(e.target.value)}
+                  placeholder="Mr. Recursion"
+                />
+              </InputGroup>
+            </Form>
+          </Col>
+          {/* <Col>
+            {isAdmin ?
+              <span>YOU ARE ADMIN</span>
+              :
+              <React.Fragment>
+                <InputGroup>
+                  <Form.Control
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    placeholder="Admin Password"
+                  />
+                  <InputGroup.Append>
+                    <Button onClick={tryAdminStatus} variant="outline-secondary">Become Admin</Button>
+                  </InputGroup.Append>
+                </InputGroup>
+              </React.Fragment>
+            }
+          </Col> */}
+          <Col xs="auto">
+            <Button onClick={handleQueueToggle} size="lg" block>
                 Join Queue
-          </Button>
-        </Col>
-      </Row>
-      <hr/>
-      <Row>
-        <Col>
-          <Queue
-            room={room}
-            isAdmin={isAdmin}
-            currentName={currentName}
-            queueUsers={queueMembers}
-            removeQueueUser={removeQueueMember}
-          />
-        </Col>
-      </Row>
-      {/* strangely enough, doing this doesn't work for copying to clipboard - setting display to none causes the copied value to be "window.location.href" */}
-      {/* <textarea ref={linkRef} style={{ display: 'none' }} value={window.location.href}/> */}
-    </Container>
+            </Button>
+          </Col>
+        </Row>
+        <hr/>
+        <Row>
+          <Col>
+            <Queue
+              room={room}
+              isAdmin={isAdmin}
+              currentName={currentName}
+              queueUsers={queueMembers}
+              removeQueueUser={removeQueueMember}
+            />
+          </Col>
+        </Row>
+        {/* strangely enough, doing this doesn't work for copying to clipboard - setting display to none causes the copied value to be "window.location.href" */}
+        {/* <textarea ref={linkRef} style={{ display: 'none' }} value={window.location.href}/> */}
+
+      </Container>
+    </React.Fragment>
   );
 };
 

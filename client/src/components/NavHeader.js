@@ -3,8 +3,8 @@ import { Navbar } from 'react-bootstrap';
 
 const NavHeader = () => {
   return (
-    <Navbar bg="dark" variant="dark">
-      <Navbar.Brand>Queue-Tip</Navbar.Brand>
+    <Navbar className="" bg="dark" variant="dark">
+      <Navbar.Brand className="mr-auto">Queue-Tip</Navbar.Brand>
     </Navbar>
   );
 };
