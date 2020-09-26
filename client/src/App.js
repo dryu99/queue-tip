@@ -10,29 +10,36 @@ import {
   useRouteMatch
 } from 'react-router-dom';
 
-import { emitCheckRoom } from './socket';
-import { UserTypes } from './types';
+import { emitCheckRoom, emitJoin } from './socket';
 import NavHeader from './components/NavHeader';
 
 function App() {
-  const [currentUser, setCurrentUser] = useState({ type: UserTypes.BASIC });
   const [room, setRoom] = useState(null);
+  const [queuedUsers, setQueuedUsers] = useState([]);
   const [roomError, setRoomError] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const match = useRouteMatch('/room/:id');
 
-  // if user entered via link, check to see if specified room id exists and init room
+  /**
+   * If user entered via link:
+   *   1) check to see if specified room id exists, if so init room and queue.
+   *   2) if room exists, check local storage for cached user data and try to join room
+   */
   useEffect(() => {
     if (match && !room) {
       logger.info('emitting room check event');
 
-      // check to see if room exists on server, set room on client if it does
+      // check to see if room exists on server, if so set room and queued users on client
       emitCheckRoom(match.params.id, (resData) => {
-        const { room, error } = resData;
+        logger.info('acknowledged from CHECK ROOM event', resData);
+        const { room, queuedUsers, error } = resData;
 
-        logger.info('room event acknowledged', room);
         if (room && !error) {
           setRoom(room);
+          setQueuedUsers(queuedUsers);
+
+          // checkLocalStorage();
         } else {
           logger.error(error);
           setRoomError('sorry room doesn\'t exist...');
@@ -41,9 +48,28 @@ function App() {
     }
   }, [match, room]);
 
-  const setCurrentUserType = (type) => {
-    setCurrentUser({ ...currentUser, type });
-  };
+  // const checkLocalStorage = () => {
+  //   logger.info('checking local cache for signed in user data...');
+  //   const userJSON = localStorage.getItem('signedInUser');
+
+  //   if (userJSON) {
+  //     logger.info('found data in local cache!');
+  //     const parsedUser = JSON.parse(userJSON);
+  //     logger.info(parsedUser);
+
+  //     // try to join room found in user json
+  //     emitJoin({ roomId: parsedUser.roomId }, (resData) => {
+  //       logger.info('acknowledged from JOIN event', resData);
+  //       const { error } = resData;
+
+  //       if (!error) {
+  //         setCurrentUser(parsedUser);
+  //       } else {
+  //         logger.error(error);
+  //       }
+  //     });
+  //   }
+  // };
 
   return (
     <React.Fragment>
@@ -51,7 +77,13 @@ function App() {
       <Switch className="mt-4">
         <Route path="/room/:id">
           {!roomError && room ?
-            <Room room={room} user={currentUser} setUser={setCurrentUser}/>
+            <Room
+              room={room}
+              queueMembers={queuedUsers}
+              setQueueMembers={setQueuedUsers}
+              isAdmin={isAdmin}
+              setIsAdmin={setIsAdmin}
+            />
             :
           // would be nice to put a spinner or sth here
             <Error text={roomError}/>
@@ -59,7 +91,7 @@ function App() {
         </Route>
         <Route exact path="/">
           <Home
-            setCurrentUserType={setCurrentUserType}
+            setIsAdmin={setIsAdmin}
             setRoom={setRoom}
             setRoomError={setRoomError}
           />

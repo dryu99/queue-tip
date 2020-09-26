@@ -1,52 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Col, Container, Row, Button } from 'react-bootstrap';
+import { Col, Container, Row, Button, Form } from 'react-bootstrap';
 import socket, { SocketEvents, emitEnqueue, emitDequeue } from '../socket';
 import logger from '../utils/logger';
+import { emitJoin } from '../socket';
 
-import SignIn from './SignIn';
 import Queue from './Queue';
 import { UserTypes } from '../types';
 
-const Room = ({ room, user, setUser }) => {
-  // const [users, setUsers] = useState([]);
-  // const [queueUsers, setQueueUsers] = useState([]);
-  const [queueMembers, setQueueMembers] = useState([]);
-  const [inQueue, setInQueue] = useState(false);
-  // const [name, setName] = useState('');
+const Room = ({ room, queueMembers, setQueueMembers }) => {
+  const [currentName, setCurrentName] = useState('');
 
-  // subscribe to relevant socket events
+  // emit/subscribe to relevant socket events
   useEffect(() => {
-    // // when another user joins, add them to user list
-    // socket.on(SocketEvents.NEW_USER_JOIN, ({ newUser }) => {
-    //   logger.info('received JOIN event', newUser);
-    //   addNewUser(newUser);
-    // });
-
-    // // when another user leaves, remove them from user list
-    // socket.on(SocketEvents.LEAVE, ({ leftUser }) => {
-    //   logger.info('received LEAVE event', leftUser);
-    //   removeUser(leftUser.id);
-    //   removeQueueUser(leftUser.id);
-    // });
+    // let server know that new connection has joined this room
+    emitJoin({ roomId: room.id }, (resData) => {
+      logger.info('acknowledged from JOIN event', resData);
+      // cache used name data
+      // logger.info('caching current user data...');
+      // const userJSON = JSON.stringify(currentUser);
+      // localStorage.setItem('signedInUser', userJSON);
+    });
 
     // when another user joins queue, add them to queue list
     socket.on(SocketEvents.ENQUEUE, ({ enqueuedUser }) => {
       logger.info('received ENQUEUE event', enqueuedUser);
       addQueueMember(enqueuedUser);
-
-      if (enqueuedUser.name === user.name) {
-        setInQueue(true);
-      }
     });
 
     // when another user leaves queue, remove from to queue list
     socket.on(SocketEvents.DEQUEUE, ({ dequeuedUser }) => {
       logger.info('received DEQUEUE event', dequeuedUser);
       removeQueueMember(dequeuedUser.name);
-
-      if (dequeuedUser.name === user.name) {
-        setInQueue(false);
-      }
     });
 
     // // when another user gets updated, replace their status in your list.
@@ -65,7 +49,7 @@ const Room = ({ room, user, setUser }) => {
       socket.emit(SocketEvents.DISCONNECT);
       socket.off();
     };
-  }, [queueMembers]);
+  }, [queueMembers, room]);
 
   const addQueueMember = (queueMember) => {
     setQueueMembers(queueMembers.concat(queueMember));
@@ -101,74 +85,60 @@ const Room = ({ room, user, setUser }) => {
     document.body.removeChild(dummy);
   };
 
-  const errorAcknowledgementCallback = (event) => {
-    return (resData) => {
-      logger.info(`acknowledged from ${event} event`, resData);
-      logger.error(resData.error);
-    };
-  };
-
   const handleQueueToggle = () => {
-    if (inQueue) {
-      emitDequeue(
-        { name: user.name, roomId: room.id },
-        errorAcknowledgementCallback(SocketEvents.DEQUEUE)
-      );
+    logger.info('join queue toggle clicked');
+
+    if (currentName.trim().length === 0) {
+      alert('name can\'t be empty!');
     } else {
-      emitEnqueue(
-        { name: user.name, roomId: room.id, type: UserTypes.BASIC },
-        errorAcknowledgementCallback(SocketEvents.ENQUEUE)
-      );
+      const exisitingQueueUser = queueMembers.find(u => u.name.toLowerCase() === currentName.toLowerCase());
+      if (exisitingQueueUser) {
+      // TODO make this a pretty modal
+        alert('name is already in queue, please change name');
+      } else {
+        emitEnqueue({ name: currentName, roomId: room.id, type: UserTypes.BASIC }, (resData) => {
+          logger.info('acknowledged from ENQUEUE event', resData);
+        });
+      }
     }
   };
 
-  // user is considered signed in when name and id exist
-  const isUserSignedIn = user && user.name && user.name.trim().length !== 0;
-  // const isNameEmpty = user.name.trim().length === 0;
-
   return (
     <Container className="mt-4">
-      {isUserSignedIn ?
-        <React.Fragment>
-          <Row>
-            <Col>
-              <h1>{room.name}</h1>
-            </Col>
-            <Col xs="auto">
-              <h3>Welcome, <i>{user.name}</i></h3>
-            </Col>
-            <Col xs="auto">
-              <Button onClick={copyLinkToClipboard} size="lg" variant="secondary">
+      <Row>
+        <Col>
+          <h1>{room.name}</h1>
+        </Col>
+        <Col xs="auto">
+          <Form.Control
+            value={currentName}
+            onChange={(e) => setCurrentName(e.target.value)}
+            placeholder="Your Name"
+          />
+        </Col>
+        <Col xs="auto">
+          <Button onClick={copyLinkToClipboard} size="lg" variant="secondary">
                 Copy Link
-              </Button>
-            </Col>
-            <Col xs="3">
-              <Button onClick={handleQueueToggle} size="lg" block>
-                {inQueue ? 'Leave Queue' : 'Join Queue'}
-              </Button>
-            </Col>
-          </Row>
-          <hr/>
-          <Row>
-            <Col>
-              <Queue
-                room={room}
-                user={user}
-                queueUsers={queueMembers}
-                removeQueueUser={removeQueueMember}
-                setInQueue={setInQueue}
-              />
-            </Col>
-          </Row>
-        </React.Fragment>
-        :
-        <SignIn
-          room={room}
-          user={user}
-          setUser={setUser}
-          addQueueMember={addQueueMember}
-        />
-      }
+          </Button>
+        </Col>
+        <Col xs="3">
+          <Button onClick={handleQueueToggle} size="lg" block>
+                Join Queue
+          </Button>
+        </Col>
+      </Row>
+      <hr/>
+      <Row>
+        <Col>
+          <Queue
+            room={room}
+            isAdmin={true}
+            currentName={currentName}
+            queueUsers={queueMembers}
+            removeQueueUser={removeQueueMember}
+          />
+        </Col>
+      </Row>
       {/* strangely enough, doing this doesn't work for copying to clipboard - setting display to none causes the copied value to be "window.location.href" */}
       {/* <textarea ref={linkRef} style={{ display: 'none' }} value={window.location.href}/> */}
     </Container>

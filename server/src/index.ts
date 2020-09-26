@@ -60,44 +60,25 @@ io.on('connection', (socket) => {
       const room = roomService.getRoom(roomId);
       const cleanRoom = toCleanRoom(room);
 
-      callback({ room: cleanRoom });
+      callback({
+        room: cleanRoom,
+        queuedUsers: room.queue
+      });
     } catch (e) {
       const error = e as Error;
       logger.error(error.message);
       callback({ error: error.message });
     }
+    printAppState();
   });
 
   socket.on(SocketEvents.JOIN, ({ roomId }, callback: AckCallback) => {
     logger.event(`${SocketEvents.JOIN} event received`, roomId);
 
     try {
-      // const newUser = toNewUser(data);
-
-      // get users + queue first, we don't want them to contain the new user
-      // const usersInRoom = roomService.getUsersInRoom(newUser.roomId);
-      const queuedUsers  = roomService.getQueuedUsersInRoom(roomId);
-
-      // add user to user map + room
-      // userService.addUser(socket.id, newUser);
-      // const user = roomService.addUserToRoom(socket.id, newUser);
-
-      // clean data before returning to client
-      // const cleanUser = userService.cleanUser(user);
-
-      // broadcast new user to all clients (not including sender) in current room
-      // socket.broadcast.to(cleanUser.roomId).emit(SocketEvents.NEW_USER_JOIN, {
-      //   newUser: cleanUser
-      // });
-
-      // add user to current room
       socket.join(roomId);
 
-      callback({
-        // user: cleanUser,
-        // usersInRoom,
-        queuedUsers,
-      });
+      callback({});
     } catch (e) {
       const error = e as Error;
       logger.error(error.message);
@@ -123,9 +104,7 @@ io.on('connection', (socket) => {
         enqueuedUser: newUser
       });
 
-      // callback({
-      //   enqueuedUser: newUser // TODO rename to newqueue user, have to change in client side too
-      // });
+      callback({});
     } catch (e) {
       const error = e as Error;
       logger.error(error);

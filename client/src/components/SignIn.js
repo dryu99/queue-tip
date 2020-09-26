@@ -4,7 +4,7 @@ import { Button, Container, Form, Col } from 'react-bootstrap';
 import { emitJoin } from '../socket';
 import logger from '../utils/logger';
 
-const SignIn = ({ room, user, setUser, addQueueMember }) => {
+const SignIn = ({ room, user, setUser, queueMembers }) => {
   const [newName, setNewName] = useState('');
   const [alertText, setAlertText] = useState('');
 
@@ -21,37 +21,38 @@ const SignIn = ({ room, user, setUser, addQueueMember }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (newName.trim() !== '') {
-      setUser({
-        ...user,
-        name: newName
-      });
-
-      emitJoin({ roomId: room.id }, (resData) => {
-        logger.info('acknowledged from JOIN event', resData);
-        const { queuedUsers, error } = resData;
-        if (!error) {
-          addQueueMember(queuedUsers);
-        } else {
-          logger.error(error);
-        }
-      });
-
-      // emitJoin({ name: newName, type: user.type, roomId: room.id }, (resData) => {
-      //   const { user, usersInRoom, usersInQueue, error } = resData;
-      //   logger.info('acknowledged from JOIN event', user);
-
-      //   if (!error) {
-      //     setUser(user);
-      //     addNewUser([...usersInRoom, user]);
-      //     addNewQueueUser(usersInQueue);
-      //   } else {
-      //     logger.error(error);
-      //     setAlertText('Name is already taken, please try something else.');
-      //   }
-      // });
+    if (newName.trim() === '') {
+      setAlertText('Your name can\'t be empty! Please type something in.');
     } else {
-      setAlertText('Your name can\'t be empty!');
+      const existingQueueMember = queueMembers.find(u => u.name === newName);
+
+      if (existingQueueMember) {
+        setAlertText('Name is already taken, please try something else.');
+      } else {
+        // join the room and set existing queue
+        emitJoin({ roomId: room.id }, (resData) => {
+          logger.info('acknowledged from JOIN event', resData);
+          const { error } = resData;
+
+          if (!error) {
+            // can also process and return current user from server
+            const currentUser = {
+              ...user,
+              name: newName,
+              roomId: room.id
+            };
+
+            setUser(currentUser);
+
+            // cache user data
+            logger.info('caching current user data...');
+            const userJSON = JSON.stringify(currentUser);
+            localStorage.setItem('signedInUser', userJSON);
+          } else {
+            logger.error(error);
+          }
+        });
+      }
     }
   };
 

@@ -122,7 +122,6 @@ const getQueuedUsersInRoom = (roomId: string): NewUser[] => {
 };
 
 const enqueueUser = (user: NewUser, roomId: string): void => {
-  console.log('ogogogogo', user);
   const queue = getRoom(roomId).queue;
 
   const existingQueuedUser = queue.find(u => u.name === user.name);

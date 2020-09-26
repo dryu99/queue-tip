@@ -4,7 +4,7 @@ import { UserTypes } from '../types';
 import User from './User';
 import { emitDequeue } from '../socket';
 
-const Queue = ({ room, user, queueUsers }) => {
+const Queue = ({ room, isAdmin, queueUsers, currentName }) => {
 
   const removeUserFromQueue = (e, username) => {
     emitDequeue({ name: username, roomId: room.id });
@@ -14,25 +14,25 @@ const Queue = ({ room, user, queueUsers }) => {
     <div >
       <h4>Queue</h4>
       <ListGroup>
-        {queueUsers.map((qu, i) => {
-          const isCurrentUser = user.name === qu.name;
-          const isAdmin = user.type === UserTypes.ADMIN;
+        {queueUsers.map((u, i) => {
+          const isCurrentUser = currentName === u.name;
+          // const isAdmin = user.type === UserTypes.ADMIN;
 
           const listItemProps = {
-            // variant: isCurrentUser ? 'secondary' : null,
+            variant: isCurrentUser ? 'primary' : null,
             action: isAdmin ? true : false,
-            onClick: isAdmin ? (e) => removeUserFromQueue(e, qu.name) : null
+            onClick: isAdmin ? (e) => removeUserFromQueue(e, u.name) : null
           };
 
           return (
-            <Container key={qu.name}>
+            <Container key={u.name}>
               <Row className="align-items-center">
                 <Col xs="auto">
                   <b>{i + 1}</b>
                 </Col>
                 <Col>
                   <ListGroup.Item {...listItemProps}>
-                    <User user={qu} isCurrentUser={isCurrentUser}/>
+                    <User user={u} />
                   </ListGroup.Item>
                 </Col>
               </Row>

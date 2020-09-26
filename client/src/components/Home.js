@@ -6,7 +6,7 @@ import logger from '../utils/logger';
 
 import { emitCreateRoom } from '../socket';
 
-const Home = ({ setCurrentUserType, setRoom, setRoomError }) => {
+const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
   const [newRoomName, setNewRoomName] = useState('');
   const [alertText, setAlertText] = useState('');
 
@@ -15,9 +15,9 @@ const Home = ({ setCurrentUserType, setRoom, setRoomError }) => {
   const handleCreateRoomClick = (e) => {
     e.preventDefault();
 
-    if (newRoomName && newRoomName.trim() !== '') {
+    if (newRoomName && newRoomName.trim().length === 0) {
       // users who create rooms are admins
-      setCurrentUserType(UserTypes.ADMIN);
+      setIsAdmin(true);
 
       // create room on server, set room on client and enter room if it does
       logger.info('emitting room creation event');
