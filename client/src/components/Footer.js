@@ -3,16 +3,13 @@ import { Container, Navbar, Button } from 'react-bootstrap';
 
 const Footer = () => {
   return(
-    <div className="fixed-bottom">
-      <Navbar>
-        <Container>
-
-          <Button size="lg" block>Join Queue</Button>
-
-
-        </Container>
-      </Navbar>
-    </div>
+    <Navbar sticky="bottom">
+      <Container className="mt-5 mb-2 justify-content-center">
+        <small className="text-muted">
+          <i><a href={'https://github.com/dryu99'}>Daniel Ryu</a> 2020</i>
+        </small>
+      </Container>
+    </Navbar>
   );
 };
 

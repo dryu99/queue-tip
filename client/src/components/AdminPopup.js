@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import socket, { SocketEvents } from '../socket';
+import { emitTryAdminStatus } from '../socket';
 import logger from '../utils/logger';
 
 
@@ -27,7 +27,7 @@ const AdminPopup = ({ show, setAdminPopupOpen, setIsAdmin, room }) => {
 
   const submitAdminPassword = (e) => {
     e.preventDefault();
-    socket.emit(SocketEvents.TRY_ADMIN_STATUS, { adminPassword, roomId: room.id }, (resData) => {
+    emitTryAdminStatus({ adminPassword, roomId: room.id }, (resData) => {
       logger.info('acknowledged from TRY ADMIN STATUS event', resData);
 
       if (!resData.error) {

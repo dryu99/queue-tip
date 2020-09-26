@@ -76,6 +76,7 @@ function App() {
           <Error text="404 resource not found"/>
         </Route>
       </Switch>
+      <Footer />
     </>
   );
 }

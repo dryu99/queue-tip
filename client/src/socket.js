@@ -22,6 +22,10 @@ export const emitJoin = (data, callback) => {
   socket.emit(SocketEvents.JOIN, data, callback);
 };
 
+export const emitTryAdminStatus = (data, callback) => {
+  socket.emit(SocketEvents.TRY_ADMIN_STATUS, data, callback);
+};
+
 export const SocketEvents = Object.freeze({
   JOIN: 'join',
   CREATE_ROOM: 'create_room',
