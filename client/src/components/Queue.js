@@ -3,11 +3,14 @@ import { Row, Col, Container, ListGroup } from 'react-bootstrap';
 import { UserTypes } from '../types';
 import User from './User';
 import { emitDequeue } from '../socket';
+import logger from '../utils/logger';
 
 const Queue = ({ room, isAdmin, queueUsers, currentName }) => {
 
   const removeUserFromQueue = (e, username) => {
-    emitDequeue({ name: username, roomId: room.id });
+    emitDequeue({ name: username, roomId: room.id }, (resData) => {
+      logger.info('DEQUEUE event acknowledged', resData);
+    });
   };
 
   return (

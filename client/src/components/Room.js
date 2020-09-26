@@ -1,30 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Button, Form } from 'react-bootstrap';
-import socket, { SocketEvents, emitEnqueue, emitDequeue } from '../socket';
+import socket, { SocketEvents, emitEnqueue, emitJoin } from '../socket';
 import logger from '../utils/logger';
-import { emitJoin } from '../socket';
 
 import Queue from './Queue';
 import { UserTypes } from '../types';
 
-const Room = ({ room, queueMembers, setQueueMembers }) => {
+const Room = ({ isAdmin, setIsAdmin, room, queueMembers, setQueueMembers }) => {
   const [currentName, setCurrentName] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
 
   // emit/subscribe to relevant socket events
   useEffect(() => {
     // let server know that new connection has joined this room
     emitJoin({ roomId: room.id }, (resData) => {
       logger.info('acknowledged from JOIN event', resData);
-      // cache used name data
-      // logger.info('caching current user data...');
-      // const userJSON = JSON.stringify(currentUser);
-      // localStorage.setItem('signedInUser', userJSON);
     });
 
     // when another user joins queue, add them to queue list
     socket.on(SocketEvents.ENQUEUE, ({ enqueuedUser }) => {
       logger.info('received ENQUEUE event', enqueuedUser);
-      addQueueMember(enqueuedUser);
+      setQueueMembers(queueMembers.concat(enqueuedUser));
     });
 
     // when another user leaves queue, remove from to queue list
@@ -51,9 +47,22 @@ const Room = ({ room, queueMembers, setQueueMembers }) => {
     };
   }, [queueMembers, room]);
 
-  const addQueueMember = (queueMember) => {
-    setQueueMembers(queueMembers.concat(queueMember));
-  };
+  // check cache for current name data
+  useEffect(() => {
+    logger.info('checking local cache for signed in user data...');
+    const userJSON = localStorage.getItem('currentNameData');
+
+    if (userJSON) {
+      logger.info('found data in local cache!');
+      const currentNameData = JSON.parse(userJSON);
+      logger.info(currentNameData);
+
+      if (currentNameData.value) {
+        setCurrentName(currentNameData.value);
+      }
+    }
+  }, []);
+
 
   const removeQueueMember = (name) => {
     setQueueMembers(queueMembers.filter(m => m.name !== name));
@@ -98,9 +107,28 @@ const Room = ({ room, queueMembers, setQueueMembers }) => {
       } else {
         emitEnqueue({ name: currentName, roomId: room.id, type: UserTypes.BASIC }, (resData) => {
           logger.info('acknowledged from ENQUEUE event', resData);
+
+          // cache current name data
+          logger.info('caching current user data...');
+          const currentNameJSON = JSON.stringify({ value: currentName });
+          localStorage.setItem('currentNameData', currentNameJSON);
         });
       }
     }
+  };
+
+  const tryAdminStatus = (e) => {
+    e.preventDefault();
+    socket.emit(SocketEvents.TRY_ADMIN_STATUS, { adminPassword, roomId: room.id }, (resData) => {
+      logger.info('acknowledged from TRY ADMIN STATUS event', resData);
+
+      if (!resData.error) {
+        setIsAdmin(true);
+      } else {
+        logger.error(resData.error);
+        alert('Password is incorrect! Please try again.');
+      }
+    });
   };
 
   return (
@@ -110,6 +138,20 @@ const Room = ({ room, queueMembers, setQueueMembers }) => {
           <h1>{room.name}</h1>
         </Col>
         <Col xs="auto">
+          {isAdmin ?
+            <span>YOU ARE ADMIN</span>
+            :
+            <React.Fragment>
+              <Form.Control
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                placeholder="Admin Password"
+              />
+              <Button onClick={tryAdminStatus}>
+              Become Admin
+              </Button>
+            </React.Fragment>
+          }
           <Form.Control
             value={currentName}
             onChange={(e) => setCurrentName(e.target.value)}
@@ -132,7 +174,7 @@ const Room = ({ room, queueMembers, setQueueMembers }) => {
         <Col>
           <Queue
             room={room}
-            isAdmin={true}
+            isAdmin={isAdmin}
             currentName={currentName}
             queueUsers={queueMembers}
             removeQueueUser={removeQueueMember}

@@ -17,7 +17,7 @@ const printAppState = () => {
   logger.info('ROOMS: ', roomService.getAllRooms().map(r => ({
     id: r.id,
     name: r.name,
-    // users: r.users.map(u => `${u.name}: ${u.id}`),
+    adminPassword: r.adminPassword,
     queue: r.queue.map(u => `${u.name}`),
   })));
   logger.info('--------------------');
@@ -30,8 +30,6 @@ io.on('connection', (socket) => {
   logger.event('a user has connected!');
   console.log(`current number of users connected: ${++connectCounter}`);
   printAppState();
-
-  // TODO should generate uuid on server not client
 
   // Create a new room and send back room data on completion. Return error message on failure.
   socket.on(SocketEvents.CREATE_ROOM, (data, callback: AckCallback) => {
@@ -94,11 +92,6 @@ io.on('connection', (socket) => {
 
       roomService.enqueueUser(newUser, newUser.roomId);
 
-      // broadcast new queue user to all clients (not including sender) in current room
-      // socket.broadcast.to(newUser.roomId).emit(SocketEvents.ENQUEUE, {
-      //   enqueuedUser: newUser
-      // });
-
       // broadcast new enqueued user to all clients including sender
       io.in(newUser.roomId).emit(SocketEvents.ENQUEUE, {
         enqueuedUser: newUser
@@ -126,9 +119,7 @@ io.on('connection', (socket) => {
         dequeuedUser
       });
 
-      // callback({
-      //   dequeuedUser
-      // });
+      callback({});
     } catch (e) {
       const error = e as Error;
       logger.error(error.message);
@@ -137,28 +128,19 @@ io.on('connection', (socket) => {
     printAppState();
   });
 
-  socket.on(SocketEvents.UPDATE_USER, (data, _callback: AckCallback) => {
-    logger.event(`${SocketEvents.UPDATE_USER} event received`, data);
-    // try {
-    //   const cleanUser = toCleanUser(data);
+  socket.on(SocketEvents.TRY_ADMIN_STATUS, ({ adminPassword, roomId }, callback: AckCallback) => {
+    logger.event(`${SocketEvents.TRY_ADMIN_STATUS} event received`, adminPassword, roomId);
 
-    //   // TODO we only update user in room and not in user map b/c user map is just needed for deletion. feels iffy tho prob will introduce bugs eventually
-    //   const updatedUser = roomService.updateUserInRoom(cleanUser);
-    //   const cleanUpdatedUser = toCleanUser(updatedUser); // TODO redundant? just return cleanUser?
+    const isPasswordCorrect = roomService.verifyAdminPassword(adminPassword, roomId);
 
-    //   // broadcast updated user to all clients (not including sender) in current room
-    //   socket.broadcast.to(updatedUser.roomId).emit(SocketEvents.UPDATE_USER, {
-    //     updatedUser: cleanUpdatedUser
-    //   });
+    if (isPasswordCorrect) {
+      callback({}); // empty callback means success
+    } else {
+      const erorrMessage = 'given admin password was incorrect';
+      logger.error(erorrMessage);
+      callback({ error: erorrMessage });
+    }
 
-    //   callback({
-    //     updatedUser: cleanUpdatedUser
-    //   });
-    // } catch (e) {
-    //   const error = e as Error;
-    //   logger.error(error.message);
-    //   callback({ error: error.message });
-    // }
     printAppState();
   });
 
@@ -172,23 +154,11 @@ io.on('connection', (socket) => {
     //  user map should also be <string, CleanUser> so we can keep track of ids. youll have to adjust userservice
     //  rooms should be deleted when there are no more online admins in the room
     try {
-      // remove user from user map + room
-      // const minUser = userService.removeUser(socket.id);
-      // const user = roomService.removeUserFromRoom(socket.id, minUser.roomId);
-
-      // clean data before returning to client TODO this is redundant?
-      // const cleanUser = userService.cleanUser(user);
-
       // delete room from memory if its empty
       // we check for development env b/c it's annoying to have rooms be deleted everytime client refreshes after changes
       // if (process.env.NODE_ENV !== 'development' && roomService.getUsersInRoom(cleanUser.roomId).length === 0) {
       //   roomService.removeRoom(cleanUser.roomId);
       // }
-
-      // broadcast user left to all clients (not including sender) in current room
-      // io.in(cleanUser.roomId).emit(SocketEvents.LEAVE, {
-      //   leftUser: cleanUser
-      // });
     } catch (e) {
       // TODO this line will usually hit when a user who hasn't signed up disconnects, maybe emit LEAVE from client side?
       const error = e as Error;

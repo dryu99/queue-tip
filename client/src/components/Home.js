@@ -8,6 +8,7 @@ import { emitCreateRoom } from '../socket';
 
 const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
   const [newRoomName, setNewRoomName] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
   const [alertText, setAlertText] = useState('');
 
   const history = useHistory();
@@ -15,20 +16,20 @@ const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
   const handleCreateRoomClick = (e) => {
     e.preventDefault();
 
-    if (newRoomName && newRoomName.trim().length === 0) {
+    if (newRoomName && newRoomName.trim().length !== 0) {
       // users who create rooms are admins
       setIsAdmin(true);
 
       // create room on server, set room on client and enter room if it does
       logger.info('emitting room creation event');
-      emitCreateRoom({ name: newRoomName }, (resData) => {
+      emitCreateRoom({ name: newRoomName, adminPassword: newAdminPassword }, (resData) => {
         const { room, error } = resData;
 
         if (room && !error) {
           setRoom(room);
 
           // go to room url
-          history.push(`/room/${resData.room.id}`);
+          history.push(`/room/${room.id}`);
         } else {
           logger.error(error);
           setRoomError('sorry room doesn\'t exist...');
@@ -50,6 +51,15 @@ const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
               value={newRoomName}
               onChange={(e) => setNewRoomName(e.target.value)}
               placeholder="CPSC 110 Office Hours"
+            />
+          </Col>
+        </Form.Row>
+        <Form.Row className="justify-content-center mb-3">
+          <Col xs="auto">
+            <Form.Label>Admin Password</Form.Label>
+            <Form.Control
+              value={newAdminPassword}
+              onChange={(e) => setNewAdminPassword(e.target.value)}
             />
           </Col>
         </Form.Row>

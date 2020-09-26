@@ -7,7 +7,8 @@ export enum SocketEvents {
   ROOM_CHECK = 'room_check',
   ENQUEUE = 'enqueue',
   DEQUEUE = 'dequeue',
-  UPDATE_USER = 'update_user'
+  UPDATE_USER = 'update_user',
+  TRY_ADMIN_STATUS = 'try_admin_status'
 }
 
 export enum UserType {
@@ -37,13 +38,13 @@ export interface CleanUser extends UserBase {
 }
 
 export interface RoomBase {
-  name: string
+  name: string,
+  adminPassword: string
 }
 
 export interface Room extends RoomBase {
   id: string,
-  // users: User[],
-  queue: NewUser[]
+  queue: NewUser[],
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

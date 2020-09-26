@@ -8,6 +8,7 @@ export const toNewRoom = (object: any): NewRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
     name: parseString(object.name, 'NewRoom', 'name'),
+    adminPassword: parseString(object.adminPassword, 'NewRoom', 'adminPassword'),
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
@@ -17,6 +18,7 @@ export const toCleanRoom = (object: any): CleanRoom  => {
   return {
     id: parseString(object.id, 'CleanRoom', 'id'),
     name: parseString(object.name, 'CleanRoom', 'name'),
+    adminPassword: parseString(object.adminPassword, 'CleanRoom', 'adminPassword'),
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };

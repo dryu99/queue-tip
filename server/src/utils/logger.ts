@@ -10,7 +10,7 @@ const event = (...params: any[]): void => {
 };
 
 const error = (...params: any[]): void => {
-  console.error(...params);
+  console.error('<ER>', ...params);
 };
 
 export default { info, event, error };
