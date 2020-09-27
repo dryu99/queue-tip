@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { NewRoom, NewUser, SocketData, SocketRoomData, CleanRoom, User } from '../types';
+import { NewRoom, NewUser, SocketData, CleanRoom, User } from '../types';
+import logger from './logger';
 
 export const toNewRoom = (object: any): NewRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -17,8 +18,7 @@ export const toCleanRoom = (object: any): CleanRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
     id: parseString(object.id, 'CleanRoom', 'id'),
-    name: parseString(object.name, 'CleanRoom', 'name'),
-    adminPassword: parseString(object.adminPassword, 'CleanRoom', 'adminPassword'),
+    name: parseString(object.name, 'CleanRoom', 'name')
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
@@ -40,21 +40,22 @@ export const toNewUser = (object: any): NewUser  => {
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
 
-export const toSocketRoomData = (object: any): SocketRoomData  => {
+export const toSocketData = (object: any): SocketData  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
-    roomId: parseString(object.roomId, 'SocketRoomData', 'roomId'),
+    username: unstrictParseString(object.username, 'SocketData', 'username'),
+    roomId: unstrictParseString(object.roomId, 'SocketData', 'roomId'),
+    adminPassword: unstrictParseString(object.adminPassword, 'SocketData', 'adminPassword'),
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
 
-export const toSocketData = (object: any): SocketData  => {
-  /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-  return {
-    roomId: parseString(object.roomId, 'SocketData', 'roomId'),
-    userId: parseString(object.userId, 'SocketData', 'userId')
-  };
-  /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+const unstrictParseString = (str: any, modelName: string, propName: string): string | undefined => {
+  if (!str || !isString(str)) {
+    logger.info(`(unstrict parse) ${modelName} ${propName} is missing or invalid: ${str}`);
+    return undefined;
+  }
+  return str;
 };
 
 const parseString = (str: any, modelName: string, propName: string): string => {

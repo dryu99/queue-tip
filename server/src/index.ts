@@ -7,7 +7,7 @@ import logger from './utils/logger';
 import { AcknowledgementCallback as AckCallback, SocketEvents } from './types';
 import roomService from './services/roomService';
 import userService from './services/userService';
-import { toNewRoom, toNewUser, toSocketRoomData, toCleanRoom, toUser } from './utils';
+import { toNewRoom, toNewUser, toCleanRoom, toUser, toSocketData } from './utils';
 
 const server = http.createServer(app);
 const io = socketio(server);
@@ -57,15 +57,19 @@ io.on('connection', (socket) => {
   // Check if room exists and send back room data on success. Return error message on failure.
   socket.on(SocketEvents.ROOM_CHECK, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.ROOM_CHECK, data, callback, () => {
-      const { roomId } = toSocketRoomData(data);
+      const { roomId } = toSocketData(data); // TODO toSocketData could be better if we had multiple types of SocketData and toSocketData util fns, but that didn't feel scalable.
 
-      const room = roomService.getRoom(roomId);
-      const cleanRoom = toCleanRoom(room);
+      if (roomId) {
+        const room = roomService.getRoom(roomId);
+        const cleanRoom = toCleanRoom(room);
 
-      callback({
-        room: cleanRoom,
-        queuedUsers: room.queue
-      });
+        callback({
+          room: cleanRoom,
+          queuedUsers: room.queue
+        });
+      } else {
+        throw new Error('roomId is missing or invalid');
+      }
     });
   });
 
@@ -103,36 +107,38 @@ io.on('connection', (socket) => {
   // Dequeues user in specfied room. Return error message on failure.
   socket.on(SocketEvents.DEQUEUE, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.DEQUEUE, data, callback, () => {
-      // const { name, roomId } = toSocketData(data);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const { name, roomId } = data;
+      const { username, roomId } = toSocketData(data);
 
-      const dequeuedUser = roomService.dequeueUser(name, roomId);
-      // const cleanUser = userService.cleanUser(dequeuedUser);
+      if (username && roomId) {
+        const dequeuedUser = roomService.dequeueUser(username, roomId);
 
-      // broadcast dequeued user to all clients in room including sender
-      io.in(roomId).emit(SocketEvents.DEQUEUE, {
-        dequeuedUser
-      });
+        // broadcast dequeued user to all clients in room including sender
+        io.in(roomId).emit(SocketEvents.DEQUEUE, {
+          dequeuedUser
+        });
 
-      callback({});
+        callback({});
+      } else {
+        throw new Error('username or roomId are missing or invalid');
+      }
     });
   });
 
   // Verifies given password and returns success/failure result. Return error message on failure.
   socket.on(SocketEvents.TRY_ADMIN_STATUS, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, data, callback, () => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const { adminPassword, roomId } = data;
+      const { adminPassword, roomId } = toSocketData(data);
 
-      const isPasswordCorrect = roomService.verifyAdminPassword(adminPassword, roomId);
+      if (adminPassword && roomId) {
+        const isPasswordCorrect = roomService.verifyAdminPassword(adminPassword, roomId);
 
-      if (isPasswordCorrect) {
-        callback({}); // empty callback means success
+        if (isPasswordCorrect) {
+          callback({}); // empty callback means success
+        } else {
+          throw new Error('given admin password was incorrect');
+        }
       } else {
-        const erorrMessage = 'given admin password was incorrect';
-        logger.error(erorrMessage);
-        callback({ error: erorrMessage });
+        throw new Error('adminPassword or roomId are missing or invalid');
       }
     });
   });
@@ -152,8 +158,7 @@ io.on('connection', (socket) => {
 
         // delete room from memory if its empty (empty rooms are undefined)
         // we check for dev env b/c it's annoying to have rooms being deleted everytime client refreshes after hot change
-        // process.env.NODE_ENV !== 'development' &&
-        if (!room || room.length === 0) {
+        if (process.env.NODE_ENV !== 'development' && (!room || room.length === 0)) {
           logger.info(`Room ${removedUser.roomId} is empty now, deleting from memory...`);
           roomService.removeRoom(removedUser.roomId);
 

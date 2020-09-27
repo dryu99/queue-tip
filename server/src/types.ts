@@ -11,11 +11,6 @@ export enum SocketEvents {
   TRY_ADMIN_STATUS = 'try_admin_status'
 }
 
-export enum UserType {
-  ADMIN = 'admin',
-  BASIC = 'basic'
-}
-
 export interface UserBase {
   roomId: string,
 }
@@ -31,19 +26,19 @@ export interface NewUser extends UserBase {
 
 export interface RoomBase {
   name: string,
-  adminPassword: string
 }
 
 export interface Room extends RoomBase {
   id: string,
   queue: User[],
+  adminPassword: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface NewRoom extends RoomBase {
-// TODO new room shouldnt have id
+  adminPassword: string
 }
 
+// Room that is safe to send back to client
 export interface CleanRoom extends RoomBase {
   id: string
 }
@@ -51,10 +46,9 @@ export interface CleanRoom extends RoomBase {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AcknowledgementCallback = (object: any) => void;
 
-export interface SocketRoomData {
-  roomId: string,
-}
-
-export interface SocketData extends SocketRoomData {
-  userId: string
+// client data that may or may not contain specified fields
+export interface SocketData {
+  username?: string,
+  roomId?: string,
+  adminPassword?: string
 }
