@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { NewRoom, NewUser, SocketData, CleanUser, SocketRoomData, UserType, CleanRoom } from '../types';
+import { NewRoom, NewUser, SocketData, SocketRoomData, CleanRoom, User } from '../types';
 
 export const toNewRoom = (object: any): NewRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -23,24 +23,19 @@ export const toCleanRoom = (object: any): CleanRoom  => {
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
 
-export const toNewUser = (object: any): NewUser  => {
+export const toUser = (object: any): User  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
-    // id: parseString(object.id, 'NewUser', 'id'),
-    name: parseString(object.name, 'NewUser', 'name'),
-    roomId: parseString(object.roomId, 'NewUser', 'roomId'),
-    type: parseUserType(object.type)
+    name: parseString(object.name, 'User', 'name'),
+    roomId: parseString(object.roomId, 'User', 'roomId'),
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
 
-export const toCleanUser = (object: any): CleanUser  => {
+export const toNewUser = (object: any): NewUser  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
-    id: parseString(object.id, 'CleanUser', 'id'),
-    roomId: parseString(object.roomId, 'CleanUser', 'roomId'),
-    name: parseString(object.name, 'CleanUser', 'name'),
-    type: parseUserType(object.type)
+    roomId: parseString(object.roomId, 'NewUser', 'roomId'),
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
@@ -67,17 +62,6 @@ const parseString = (str: any, modelName: string, propName: string): string => {
     throw new Error(`${modelName} ${propName} is missing or invalid: ${str}`);
   }
   return str;
-};
-
-const parseUserType = (userType: any): UserType => {
-  if (!userType || !isUserType(userType)) {
-    throw new Error('NewUser is missing or invalid: type');
-  }
-  return userType;
-};
-
-const isUserType = (val: any): val is UserType => {
-  return Object.values(UserType).includes(val);
 };
 
 const isString = (val: any): val is string => {

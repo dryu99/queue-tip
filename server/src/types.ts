@@ -17,24 +17,16 @@ export enum UserType {
 }
 
 export interface UserBase {
-  name: string,
   roomId: string,
-  type: UserType
 }
 
 export interface User extends UserBase {
-  id: string,
-  // socketId: string,
+  name: string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface NewUser extends UserBase {
-  // TODO new user shouldnt have id
-}
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface CleanUser extends UserBase {
-  id: string
 }
 
 export interface RoomBase {
@@ -44,7 +36,7 @@ export interface RoomBase {
 
 export interface Room extends RoomBase {
   id: string,
-  queue: NewUser[],
+  queue: User[],
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

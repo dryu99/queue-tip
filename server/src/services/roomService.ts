@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { NewRoom, Room, NewUser } from '../types';
+import { NewRoom, Room, User } from '../types';
 
 const rooms = new Map<string, Room>();
 
@@ -45,11 +45,11 @@ const getAllRooms = (): Room[] => {
 };
 
 // returns a ref to a new User array (not array linked to room!)
-const getQueuedUsersInRoom = (roomId: string): NewUser[] => {
+const getQueuedUsersInRoom = (roomId: string): User[] => {
   return [...getRoom(roomId).queue];
 };
 
-const enqueueUser = (user: NewUser, roomId: string): void => {
+const enqueueUser = (user: User, roomId: string): void => {
   const queue = getRoom(roomId).queue;
 
   const existingQueuedUser = queue.find(u => u.name === user.name);
@@ -61,7 +61,7 @@ const enqueueUser = (user: NewUser, roomId: string): void => {
 };
 
 // TODO rename id param to userId
-const dequeueUser = (name: string, roomId: string): NewUser => {
+const dequeueUser = (name: string, roomId: string): User => {
   const queue = getRoom(roomId).queue;
 
   const index = queue.findIndex(u => u.name === name);

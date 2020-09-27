@@ -1,10 +1,11 @@
-import { CleanUser, NewUser, User } from '../types';
+import { NewUser } from '../types';
 import logger from '../utils/logger';
 
 // TODO might be good to change this map to CleanUser but eh
 /**
- * Map that keeps track of minimal user data. Mostly needed for handling removals on disconnects (only have socket ids to find users).
- * key = socket.id, value = NewUser
+ * Map that keeps track of all users that have joined a room.
+ * Mostly needed for handling removals on disconnects (only have socket ids to find users).
+ *    key = socket.id, value = NewUser
  */
 const users = new Map<string, NewUser>();
 
@@ -27,18 +28,17 @@ const removeUser = (socketId: string): NewUser => {
   return user as NewUser;
 };
 
-// TODO shouldn't need this fn, can use the utils toCleanUser fn
-const cleanUser = (user: User): CleanUser => {
-  return {
-    id: user.id,
-    name: user.name,
-    roomId: user.roomId,
-    type: user.type,
-  };
+const getUsers = (): NewUser[] => {
+  return Array.from(users.values());
+};
+
+const hasUser = (socketId: string): boolean => {
+  return users.has(socketId);
 };
 
 export default {
   addUser,
   removeUser,
-  cleanUser
+  getUsers,
+  hasUser
 };
