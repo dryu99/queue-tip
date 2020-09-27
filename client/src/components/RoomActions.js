@@ -4,7 +4,6 @@ import TooltipWrapper from './TooltipWrapper';
 
 import logger from '../utils/logger';
 import { emitEnqueue } from '../socket';
-import { UserTypes } from '../types';
 
 import crownIcon from '../assets/crown.png';
 
@@ -21,7 +20,7 @@ const RoomActions = ({ currentName, setCurrentName, isAdmin, setAdminPopupOpen, 
       // TODO make this a pretty modal
         alert('You\'re already in queue! Can\'t join again.');
       } else {
-        emitEnqueue({ name: currentName, roomId: room.id, type: UserTypes.BASIC }, (resData) => {
+        emitEnqueue({ name: currentName, roomId: room.id }, (resData) => {
           logger.info('acknowledged from ENQUEUE event', resData);
 
           // cache current name data
