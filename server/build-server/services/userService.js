@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = __importDefault(require("../utils/logger"));
-// TODO might be good to change this map to CleanUser but eh
 /**
- * Map that keeps track of minimal user data. Mostly needed for handling removals on disconnects (only have socket ids to find users).
- * key = socket.id, value = NewUser
+ * Map that keeps track of all users that have joined a room.
+ * Mostly needed for handling removals on disconnects (only have socket ids to find users).
+ *    key = socket.id, value = NewUser
  */
 const users = new Map();
 const addUser = (socketId, newUser) => {
@@ -24,17 +24,15 @@ const removeUser = (socketId) => {
     users.delete(socketId);
     return user;
 };
-// TODO shouldn't need this fn, can use the utils toCleanUser fn
-const cleanUser = (user) => {
-    return {
-        id: user.id,
-        name: user.name,
-        roomId: user.roomId,
-        type: user.type,
-    };
+const getUsers = () => {
+    return Array.from(users.values());
+};
+const hasUser = (socketId) => {
+    return users.has(socketId);
 };
 exports.default = {
     addUser,
     removeUser,
-    cleanUser
+    getUsers,
+    hasUser
 };
