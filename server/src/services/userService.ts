@@ -1,7 +1,6 @@
 import { NewUser } from '../types';
 import logger from '../utils/logger';
 
-// TODO might be good to change this map to CleanUser but eh
 /**
  * Map that keeps track of all users that have joined a room.
  * Mostly needed for handling removals on disconnects (only have socket ids to find users).

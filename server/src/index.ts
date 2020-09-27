@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
   // Check if room exists and send back room data on success. Return error message on failure.
   socket.on(SocketEvents.ROOM_CHECK, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.ROOM_CHECK, data, callback, () => {
-      const { roomId } = toSocketData(data); // TODO toSocketData could be better if we had multiple types of SocketData and toSocketData util fns, but that didn't feel scalable.
+      const { roomId } = toSocketData(data);
 
       if (roomId) {
         const room = roomService.getRoom(roomId);
