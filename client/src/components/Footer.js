@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Navbar } from 'react-bootstrap';
 
+// TODO would love to link my details on bottom, but for now it's okay to have in header
 const Footer = () => {
   return(
     <Navbar sticky="bottom">

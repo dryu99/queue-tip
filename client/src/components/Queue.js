@@ -7,7 +7,7 @@ import logger from '../utils/logger';
 const Queue = ({ room, isAdmin, queuedUsers, currentName }) => {
 
   const removeUserFromQueue = (e, username) => {
-    emitDequeue({ name: username, roomId: room.id }, (resData) => {
+    emitDequeue({ username, roomId: room.id }, (resData) => {
       logger.info('DEQUEUE event acknowledged', resData);
     });
   };

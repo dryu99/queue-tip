@@ -10,8 +10,8 @@ import crownIcon from '../assets/crown.png';
 
 const RoomActions = ({ currentName, setCurrentName, isAdmin, setAdminPopupOpen, queuedUsers, room }) => {
 
-  const joinQueue = () => {
-    logger.info('join queue clicked');
+  const joinQueue = (e) => {
+    e.preventDefault();
 
     if (currentName.trim().length === 0) {
       alert('Name can\'t be empty if you want to join queue! Please type something in.');
@@ -37,7 +37,7 @@ const RoomActions = ({ currentName, setCurrentName, isAdmin, setAdminPopupOpen, 
     <Container className="my-4">
       <Row>
         <Col>
-          <Form inline>
+          <Form onSubmit={joinQueue}>
             <InputGroup className="pt-1">
               <InputGroup.Prepend>
                 <InputGroup.Text>Name</InputGroup.Text>

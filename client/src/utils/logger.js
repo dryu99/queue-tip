@@ -5,12 +5,8 @@ const info = (...params) => {
   }
 };
 
-const event = (...params) => {
-  info('<EV> ', params);
-};
-
 const error = (...params) => {
   console.error(...params);
 };
 
-export default { info, event, error };
+export default { info, error };

@@ -73,7 +73,13 @@ const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
         </Form.Row>
         <Form.Row className="justify-content-center">
           <Col xs="auto">
-            <Button onClick={handleCreateRoomClick} variant="primary" type="submit">Create Room</Button>
+            <Button
+              onClick={handleCreateRoomClick}
+              variant="primary"
+              type="submit"
+            >
+              Create Room
+            </Button>
           </Col>
         </Form.Row>
       </Form>

@@ -14,13 +14,8 @@ const Room = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => {
   const [currentName, setCurrentName] = useState('');
   const [adminPopupOpen, setAdminPopupOpen] = useState(false);
 
-  // emit/subscribe to relevant socket events
+  // subscribe to relevant socket events
   useEffect(() => {
-    // let server know that new connection has joined this room
-    emitJoin({ roomId: room.id }, (resData) => {
-      logger.info('acknowledged from JOIN event', resData);
-    });
-
     // when another user joins queue, add them to queue list
     socket.on(SocketEvents.ENQUEUE, ({ enqueuedUser }) => {
       logger.info('received ENQUEUE event', enqueuedUser);
@@ -39,6 +34,14 @@ const Room = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => {
       socket.off();
     };
   }, [queuedUsers, room]);
+
+  // emit relevant socket events
+  useEffect(() => {
+    // let server know that new connection has joined this room
+    emitJoin({ roomId: room.id }, (resData) => {
+      logger.info('acknowledged from JOIN event', resData);
+    });
+  }, [room]);
 
   // check cache for current name data
   useEffect(() => {

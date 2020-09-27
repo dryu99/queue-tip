@@ -9,7 +9,6 @@ import {
 import Home from './components/Home';
 import Room from './components/Room';
 import Error from './components/Error';
-import Footer from './components/Footer';
 import NavHeader from './components/NavHeader';
 
 import { emitCheckRoom } from './socket';
@@ -82,7 +81,6 @@ function App() {
           <Error text="404 resource not found"/>
         </Route>
       </Switch>
-      <Footer />
     </>
   );
 }
