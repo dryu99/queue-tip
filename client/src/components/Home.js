@@ -58,7 +58,6 @@ const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
           <Col xs="auto">
             <Form.Label>Admin Password</Form.Label>
             <Form.Control
-              type="password"
               value={newAdminPassword}
               onChange={(e) => setNewAdminPassword(e.target.value)}
             />
