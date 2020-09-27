@@ -36,7 +36,7 @@ const RoomActions = ({ currentName, setCurrentName, isAdmin, setAdminPopupOpen, 
     <Container className="my-4">
       <Row>
         <Col>
-          <Form onSubmit={joinQueue}>
+          <Form onSubmit={joinQueue} inline>
             <InputGroup className="pt-1">
               <InputGroup.Prepend>
                 <InputGroup.Text>Name</InputGroup.Text>
