@@ -16,16 +16,33 @@ const io = socketio(server);
 let connectCounter = 0;
 let roomCounter = 0;
 
+// executes given event handler and uses acknowledgement callback to send error back to client on failure
+// this is what every socket handler should call to keep consistency.
+const handleSocketEvent = (
+  event: string, data: any,
+  ackCallback: AckCallback, eventHandler: () => void
+) => {
+  logger.event(`${event} event received`, data);
+
+  try {
+    eventHandler();
+  } catch (e) {
+    const error = e as Error;
+    logger.error(error);
+    ackCallback({ error: error.message });
+  }
+
+  logger.printAppState();
+};
+
 io.on('connection', (socket) => {
   logger.event('a user has connected!');
   console.log(`current number of users connected: ${++connectCounter}`);
   logger.printAppState();
 
-  // Create a new room and send back room data on completion. Return error message on failure.
+  // Create a new room and send back room data on success. Return error message on failure.
   socket.on(SocketEvents.CREATE_ROOM, (data, callback: AckCallback) => {
-    logger.event(`${SocketEvents.CREATE_ROOM} event received`, data);
-
-    try {
+    handleSocketEvent(SocketEvents.CREATE_ROOM, data, callback, () => {
       const newRoom = toNewRoom(data);
       const room = roomService.addRoom(newRoom);
       const cleanRoom = toCleanRoom(room);
@@ -34,18 +51,12 @@ io.on('connection', (socket) => {
       roomCounter++;
 
       callback({ room: cleanRoom });
-    } catch (e) {
-      const error = e as Error;
-      logger.error(error);
-      callback({ error: error.message });
-    }
-    logger.printAppState();
+    });
   });
 
+  // Check if room exists and send back room data on success. Return error message on failure.
   socket.on(SocketEvents.ROOM_CHECK, (data, callback: AckCallback) => {
-    logger.event(`${SocketEvents.ROOM_CHECK} event received`, data);
-
-    try {
+    handleSocketEvent(SocketEvents.ROOM_CHECK, data, callback, () => {
       const { roomId } = toSocketRoomData(data);
 
       const room = roomService.getRoom(roomId);
@@ -55,18 +66,12 @@ io.on('connection', (socket) => {
         room: cleanRoom,
         queuedUsers: room.queue
       });
-    } catch (e) {
-      const error = e as Error;
-      logger.error(error);
-      callback({ error: error.message });
-    }
-    logger.printAppState();
+    });
   });
 
+  // Caches user and adds them to specified room. Return error message on failure.
   socket.on(SocketEvents.JOIN, (data, callback: AckCallback) => {
-    logger.event(`${SocketEvents.JOIN} event received`, data);
-
-    try {
+    handleSocketEvent(SocketEvents.JOIN, data, callback, () => {
       const newUser = toNewUser(data);
 
       // store user in memory
@@ -76,17 +81,12 @@ io.on('connection', (socket) => {
       socket.join(newUser.roomId);
 
       callback({});
-    } catch (e) {
-      const error = e as Error;
-      logger.error(error);
-      callback({ error: error.message });
-    }
-    logger.printAppState();
+    });
   });
 
+  // Enqueues user in specfied room. Return error message on failure.
   socket.on(SocketEvents.ENQUEUE, (data, callback: AckCallback) => {
-    logger.event(`${SocketEvents.ENQUEUE} event received`, data);
-    try {
+    handleSocketEvent(SocketEvents.ENQUEUE, data, callback, () => {
       const user = toUser(data);
 
       roomService.enqueueUser(user, user.roomId);
@@ -97,18 +97,15 @@ io.on('connection', (socket) => {
       });
 
       callback({});
-    } catch (e) {
-      const error = e as Error;
-      logger.error(error);
-      callback({ error: error.message });
-    }
-    logger.printAppState();
+    });
   });
 
-  socket.on(SocketEvents.DEQUEUE, ({ name, roomId }, callback: AckCallback) => {
-    logger.event(`${SocketEvents.DEQUEUE} event received`, name, roomId);
-    try {
-      // const { userId, roomId } = toSocketData(data);
+  // Dequeues user in specfied room. Return error message on failure.
+  socket.on(SocketEvents.DEQUEUE, (data, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.DEQUEUE, data, callback, () => {
+      // const { name, roomId } = toSocketData(data);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const { name, roomId } = data;
 
       const dequeuedUser = roomService.dequeueUser(name, roomId);
       // const cleanUser = userService.cleanUser(dequeuedUser);
@@ -119,19 +116,15 @@ io.on('connection', (socket) => {
       });
 
       callback({});
-    } catch (e) {
-      const error = e as Error;
-      logger.error(error);
-      callback({ error: error.message });
-    }
-
-    logger.printAppState();
+    });
   });
 
-  socket.on(SocketEvents.TRY_ADMIN_STATUS, ({ adminPassword, roomId }, callback: AckCallback) => {
-    logger.event(`${SocketEvents.TRY_ADMIN_STATUS} event received`, adminPassword, roomId);
+  // Verifies given password and returns success/failure result. Return error message on failure.
+  socket.on(SocketEvents.TRY_ADMIN_STATUS, (data, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, data, callback, () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const { adminPassword, roomId } = data;
 
-    try {
       const isPasswordCorrect = roomService.verifyAdminPassword(adminPassword, roomId);
 
       if (isPasswordCorrect) {
@@ -141,15 +134,10 @@ io.on('connection', (socket) => {
         logger.error(erorrMessage);
         callback({ error: erorrMessage });
       }
-    } catch (e) {
-      const error = e as Error;
-      logger.error(error);
-      callback({ error: error.message });
-    }
-
-    logger.printAppState();
+    });
   });
 
+  // Deletes user from user cache and deletes room if room is empty.
   socket.on(SocketEvents.DISCONNECT, () => {
     logger.event(`${SocketEvents.DISCONNECT} event received`);
 
