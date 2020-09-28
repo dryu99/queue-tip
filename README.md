@@ -1,5 +1,5 @@
 # queue-tip
-Simple web app that allows users to facilitate online queues in private rooms. Very exciting.
+Simple web app that allows users to facilitate online queues in private rooms wooo
 
 You can check it out here: https://queue-tip.herokuapp.com/
 
