@@ -16,6 +16,8 @@ import logger from './utils/logger';
 import ThemeProvider from './styles/ThemeProvider';
 import GlobalStyle from './styles/GlobalStyle';
 import styled from 'styled-components';
+import { NotificationProvider } from './context/NotificationContext';
+import Notification from './components/Notification';
 
 // function App() {
 //   const [room, setRoom] = useState(null);
@@ -97,21 +99,24 @@ const App = () => {
 
   return (
     <ThemeProvider>
-      <GlobalStyle />
-      <Content>
-        <h1>queue-tip</h1>
-        <Switch>
-          <Route path="/room/:id">
-            {/* room container, either admin view or student view */}
-          </Route>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route>
-            {/* <Error text="404 resource not found"/> */}
-          </Route>
-        </Switch>
-      </Content>
+      <NotificationProvider>
+        <GlobalStyle />
+        <Notification />
+        <Content>
+          <h1>queue-tip</h1>
+          <Switch>
+            <Route path="/room/:id">
+              {/* room container, either admin view or student view */}
+            </Route>
+            <Route exact path="/">
+              <Home />
+            </Route>
+            <Route>
+              {/* <Error text="404 resource not found"/> */}
+            </Route>
+          </Switch>
+        </Content>
+      </NotificationProvider>
     </ThemeProvider>
   );
 

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Button, Card, Input } from './Common';
 import styled from 'styled-components';
+import { NotificationContext } from '../context/NotificationContext';
 
 const InputGroup = styled.div`
   display: flex;
@@ -18,13 +19,22 @@ const FormContainer = styled(Card)`
   `;
 
 const CreateRoomForm = () => {
+  const { triggerNotification } = useContext(NotificationContext);
   const [roomName, setRoomName] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
-  // const [alertText, setAlertText] = useState('');
+  const [alertText, setAlertText] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('oi');
+
+    if (roomName.trim().length === 0) {
+      triggerNotification('Please type in a room name!');
+    } else if (adminPassword.trim().length === 0) {
+      triggerNotification('Please type in a password!');
+    } else {
+      // setNotification(null);
+    }
   };
 
   return (
@@ -48,6 +58,7 @@ const CreateRoomForm = () => {
           />
         </InputGroup>
         <Button type="submit">Create Room</Button>
+        <small>{alertText}</small>
       </form>
     </FormContainer>
   );

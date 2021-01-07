@@ -1,11 +1,22 @@
-import React from 'react';
-import { Container } from 'react-bootstrap';
+import React, { useContext } from 'react';
+import styled from 'styled-components';
+import { NotificationContext } from '../context/NotificationContext';
+
+const NotificationContainer = styled.div`
+  display: ${p => p.isHidden ? 'none' : 'block' }
+  width: 100%; 
+  background-color: red;
+  font-size: 2em;
+  text-align: center;
+`;
 
 const Notification = () => {
+  const { notification } = useContext(NotificationContext);
+
   return (
-    <Container className="fixed-bottom">
-      OIOIOIO
-    </Container>
+    <NotificationContainer isHidden={notification === null}>
+      <span>{notification}</span>
+    </NotificationContainer>
   );
 };
 
