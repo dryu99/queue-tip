@@ -2,6 +2,9 @@ import React, { useContext, useState } from 'react';
 import { Button, Card, Input } from './Common';
 import styled from 'styled-components';
 import { NotificationContext } from '../context/NotificationContext';
+import { UserContext } from '../context/UserContext';
+import socket, { SocketEvents } from '../socket';
+import { useHistory } from 'react-router-dom';
 
 const InputGroup = styled.div`
   display: flex;
@@ -20,9 +23,11 @@ const FormContainer = styled(Card)`
 
 const CreateRoomForm = () => {
   const { triggerNotification } = useContext(NotificationContext);
+  const { user, setUser } = useContext(UserContext);
   const [roomName, setRoomName] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
-  const [alertText, setAlertText] = useState('');
+
+  const history = useHistory();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -33,7 +38,27 @@ const CreateRoomForm = () => {
     } else if (adminPassword.trim().length === 0) {
       triggerNotification('Please type in a password!');
     } else {
-      // setNotification(null);
+      setUser({ ...user, isAdmin: true });
+
+      const newRoom = {
+        name: roomName,
+        adminPassword
+      };
+
+      socket.emit(SocketEvents.CREATE_ROOM, newRoom, (res) => {
+        const { room, error } = res;
+
+        if (room && !error) {
+          setRoom(room);
+
+          // go to room url
+          history.push(`/room/${room.id}`);
+        } else {
+          triggerNotification('Sorry room doesn\'t exist...');
+        }
+      });
+
+
     }
   };
 
@@ -58,7 +83,6 @@ const CreateRoomForm = () => {
           />
         </InputGroup>
         <Button type="submit">Create Room</Button>
-        <small>{alertText}</small>
       </form>
     </FormContainer>
   );
