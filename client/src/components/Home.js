@@ -4,8 +4,11 @@ import { useHistory } from 'react-router-dom';
 import logger from '../utils/logger';
 
 import { emitCreateRoom } from '../socket';
+import CreateRoomForm from './CreateRoomForm';
+import styled from 'styled-components';
+import ActiveRoomsList from './ActiveRoomsList';
 
-const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
+const OldHome = ({ setIsAdmin, setRoom, setRoomError }) => {
   const [newRoomName, setNewRoomName] = useState('');
   const [newAdminPassword, setNewAdminPassword] = useState('');
   const [alertText, setAlertText] = useState('');
@@ -83,6 +86,25 @@ const Home = ({ setIsAdmin, setRoom, setRoomError }) => {
         </Form.Row>
       </Form>
     </Container>
+  );
+};
+
+const Row = styled.div`
+  display: flex;
+  justify-content: space-between;
+  & > div {
+    width: 50%;
+  }
+`;
+
+const Home = () => {
+  return (
+    <div>
+      <Row>
+        <ActiveRoomsList />
+        <CreateRoomForm />
+      </Row>
+    </div>
   );
 };
 
