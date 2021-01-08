@@ -12,6 +12,16 @@ export const ListItemButton = styled.button`
   padding: 0.4em 0.75em;
 `;
 
+export const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1em;
+`;
+
+export const InputLabel = styled.label`
+  margin-bottom: 0.25em;
+`;
+
 export const Input = styled.input`
   padding: 0.5em 1em;
   font-size: 1em;

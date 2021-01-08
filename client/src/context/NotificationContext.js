@@ -21,14 +21,14 @@ export const NotificationProvider = ({ children }) => {
     }, 10000);
   };
 
-  const contextValue = {
+  const providerValue = {
     notification,
     setNotification,
     triggerNotification
   };
 
   return (
-    <NotificationContext.Provider value={contextValue}>
+    <NotificationContext.Provider value={providerValue}>
       {children}
     </NotificationContext.Provider>
   );

@@ -20,6 +20,7 @@ import { NotificationProvider } from './context/NotificationContext';
 import Notification from './components/Notification';
 import { RoomProvider } from './context/RoomContext';
 import { UserProvider } from './context/UserContext';
+import RoomPage from './pages/RoomPage';
 
 // function App() {
 //   const [room, setRoom] = useState(null);
@@ -97,6 +98,7 @@ const Content = styled.div`
 `;
 
 const App = () => {
+  console.log('app render');
   return (
     <ThemeProvider>
       <GlobalStyle />
@@ -104,11 +106,10 @@ const App = () => {
         <Notification />
         <UserProvider>
           <Content>
-            <h1>queue-tip</h1>
+            <h1><a href="/">queue-tip</a></h1>
             <Switch>
               <Route path="/room/:id">
-                <Room />
-                {/* room container, either admin view or student view */}
+                <RoomPage />
               </Route>
               <Route exact path="/">
                 <Home />

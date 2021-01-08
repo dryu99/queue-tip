@@ -1,5 +1,5 @@
 import http from 'http';
-import socketio from 'socket.io';
+import socketio, { Socket } from 'socket.io';
 
 import app from './app';
 import config from './utils/config';
@@ -7,7 +7,7 @@ import logger from './utils/logger';
 import { AcknowledgementCallback as AckCallback, SocketEvents } from './types';
 import roomService from './services/roomService';
 import userService from './services/userService';
-import { toNewRoom, toNewUser, toCleanRoom, toUser, toSocketData } from './utils';
+import { toNewRoom, toCleanRoom, toUser, toSocketData } from './utils';
 
 const server = http.createServer(app);
 const io = socketio(server);
@@ -35,12 +35,38 @@ const handleSocketEvent = (
   logger.printAppState();
 };
 
+const removeSocket = (socket: Socket) => {
+  try {
+    // remove user from memory
+    const removedUser = userService.removeUser(socket.id);
+
+    // get socket room user was in
+    const socketRoom = io.sockets.adapter.rooms[removedUser.roomId];
+    logger.info(`Room ${removedUser.roomId} length: ${socketRoom ? socketRoom.length : 0}`);
+
+    // delete room from memory if its empty (empty rooms are undefined)
+    // we check for dev env b/c it's annoying to have rooms being deleted everytime client refreshes after hot change
+    // if (process.env.NODE_ENV !== 'development' && (!room || room.length === 0)) {
+    if (!socketRoom || socketRoom.length === 0) {
+      logger.info(`Room ${removedUser.roomId} is empty now, deleting from memory...`);
+      roomService.removeRoom(removedUser.roomId);
+
+      // just for logging purposes
+      roomCounter--;
+    }
+  } catch (e) {
+    // TODO this line will usually hit when a user who hasn't signed up disconnects, maybe emit LEAVE from client side?
+    const error = e as Error;
+    logger.error(error);
+  }
+};
+
 io.on('connection', (socket) => {
   logger.event('a user has connected!');
   console.log(`current number of users connected: ${++connectCounter}`);
   logger.printAppState();
 
-  // Create a new room and send back room data on success. Return error message on failure.
+  // Create a new room and send back room data on success.
   socket.on(SocketEvents.CREATE_ROOM, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.CREATE_ROOM, data, callback, () => {
       const newRoom = toNewRoom(data);
@@ -54,41 +80,38 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Check if room exists and send back room data on success. Return error message on failure.
+  // Check if room exists and send back room data on success.
   socket.on(SocketEvents.ROOM_CHECK, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.ROOM_CHECK, data, callback, () => {
       const { roomId } = toSocketData(data);
 
-      if (roomId) {
-        const room = roomService.getRoom(roomId);
-        const cleanRoom = toCleanRoom(room);
+      const room = roomService.getRoom(roomId as string); // TODO re-evaluate socketdata data type
+      const cleanRoom = toCleanRoom(room);
 
-        callback({
-          room: cleanRoom,
-          queuedUsers: room.queue
-        });
-      } else {
-        throw new Error('roomId is missing or invalid');
-      }
+      callback({ room: cleanRoom });
     });
   });
 
-  // Caches user and adds them to specified room. Return error message on failure.
+  // Cache user and add them to specified room. Return current user and queue lists for room.
   socket.on(SocketEvents.JOIN, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.JOIN, data, callback, () => {
-      const newUser = toNewUser(data);
+      const user = toUser(data);
 
       // store user in memory
-      userService.addUser(socket.id, newUser);
+      userService.addUser(socket.id, user);
 
-      // make socket join room
-      socket.join(newUser.roomId);
+      // make socket join socket.io room
+      socket.join(user.roomId);
 
-      callback({});
+      // broadcast new user to all clients in room except sender
+      socket.broadcast.to(user.roomId).emit(SocketEvents.JOIN, { user });
+
+      const { users, queue } = roomService.getRoom(user.roomId);
+      callback({ users, queue });
     });
   });
 
-  // Enqueues user in specfied room. Return error message on failure.
+  // Enqueues user in specified room.
   socket.on(SocketEvents.ENQUEUE, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.ENQUEUE, data, callback, () => {
       const user = toUser(data);
@@ -104,7 +127,7 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Dequeues user in specfied room. Return error message on failure.
+  // Dequeues user in specified room.
   socket.on(SocketEvents.DEQUEUE, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.DEQUEUE, data, callback, () => {
       const { username, roomId } = toSocketData(data);
@@ -124,7 +147,7 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Verifies given password and returns success/failure result. Return error message on failure.
+  // Verifies given password and returns success/failure result.
   socket.on(SocketEvents.TRY_ADMIN_STATUS, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, data, callback, () => {
       const { adminPassword, roomId } = toSocketData(data);
@@ -147,29 +170,9 @@ io.on('connection', (socket) => {
   socket.on(SocketEvents.DISCONNECT, () => {
     logger.event(`${SocketEvents.DISCONNECT} event received`);
 
+    // disconnected user not necessarily in a room
     if (userService.hasUser(socket.id)) {
-      try {
-        // remove user from memory
-        const removedUser = userService.removeUser(socket.id);
-
-        // get socket room user was in
-        const room = io.sockets.adapter.rooms[removedUser.roomId];
-        logger.info(`Room ${removedUser.roomId} length: ${room ? room.length : 0}`);
-
-        // delete room from memory if its empty (empty rooms are undefined)
-        // we check for dev env b/c it's annoying to have rooms being deleted everytime client refreshes after hot change
-        if (process.env.NODE_ENV !== 'development' && (!room || room.length === 0)) {
-          logger.info(`Room ${removedUser.roomId} is empty now, deleting from memory...`);
-          roomService.removeRoom(removedUser.roomId);
-
-          // just for logging purposes
-          roomCounter--;
-        }
-      } catch (e) {
-        // TODO this line will usually hit when a user who hasn't signed up disconnects, maybe emit LEAVE from client side?
-        const error = e as Error;
-        logger.error(error);
-      }
+      removeSocket(socket);
     }
 
     logger.printAppState();

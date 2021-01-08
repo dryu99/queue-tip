@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Container } from 'react-bootstrap';
 import socket, { SocketEvents, emitJoin } from '../socket';
 import logger from '../utils/logger';
@@ -10,6 +10,8 @@ import AdminPopup from './AdminPopup';
 
 import './room.css';
 import { useHistory, useRouteMatch } from 'react-router-dom';
+import { RoomContext } from '../context/RoomContext';
+import { UserContext } from '../context/UserContext';
 
 const OldRoom = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => {
   const [currentName, setCurrentName] = useState('');
@@ -91,43 +93,67 @@ const OldRoom = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => 
   );
 };
 
-const Room = () => {
-  const [room, setRoom] = useState(null);
+const AdminView = () => {
+  return (
+    <div>
+      <h2>Admin View</h2>
+    </div>
+  );
+};
 
-  const match = useRouteMatch('/room/:id');
-  const history = useHistory();
+const ParticipantView = () => {
+  return (
+    <div>
+      <h2>Participant View</h2>
+    </div>
+  );
+};
 
+const Room = ({ room }) => {
+  const { user } = useContext(UserContext);
+  const [users, setUsers] = useState([]);
+  const [queue, setQueue] = useState([]);
+
+  // join room on server + receive info on current room state
   useEffect(() => {
-    if (match && !room) {
-      logger.info('emitting room check event');
+    socket.emit(SocketEvents.JOIN, user, (res) => {
+      const { users, queue, error } = res;
 
-      // check to see if room exists on server, if so set room and queued users on client
-      // try joining room (if it exists) given url param
-      socket.emit(SocketEvents.JOIN, { roomId: match.params.id }, (res) => {
-        logger.info('acknowledged from JOIN event', res);
-        const { room, queuedUsers, error } = res;
+      if (!error) {
+        setUsers(users);
+        setQueue(queue);
+      } else {
+        logger.error(error);
+      }
+    });
+  }, [setQueue, setUsers, user]);
 
-        if (room && !error) {
-          setRoom(room);
-          // setQueuedUsers(queuedUsers);
-        } else {
-          logger.error(error);
-          // setRoomError('sorry room doesn\'t exist...');
-        }
-      });
-    }
-  }, [setRoom, room, match]);
+  // subscribe to relevant socket events
+  useEffect(() => {
+    // when new users join the room, update current user state
+    socket.on(SocketEvents.JOIN, ({ user }) => {
+      logger.info('join', user);
+      setUsers(users.concat(user));
+    });
+
+    // unsubscribe from listeners
+    return () => {
+      socket.off();
+    };
+  }, [setUsers, users]);
+
+  // const currQueuePos
 
   return (
     <div>
-      <h2>Room</h2>
+      <h2>Room {room.name}</h2>
+      <h3>Hi {user.name}</h3>
+      <p>{users.length} users currently in room</p>
       {
-        room ?
-          <div>{room.name}</div>
-          :
-          <p>room doesn't exist...</p>
+        user.isAdmin
+          ? <AdminView />
+          : <ParticipantView />
       }
-      <button onClick={() => history.push('/')}>Go Back</button>
     </div>
   );
 };

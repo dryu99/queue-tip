@@ -1,5 +1,6 @@
 export enum SocketEvents {
   JOIN = 'join',
+  LEAVE = 'leave',
   CREATE_ROOM = 'create_room',
   DISCONNECT = 'disconnect',
   ROOM_CHECK = 'room_check',
@@ -28,6 +29,7 @@ export interface RoomBase {
 export interface Room extends RoomBase {
   id: string,
   queue: User[],
+  users: User[],
   adminPassword: string
 }
 

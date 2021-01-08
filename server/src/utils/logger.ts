@@ -25,6 +25,7 @@ const printAppState = (): void => {
     name: r.name,
     adminPassword: r.adminPassword,
     queue: r.queue.map(u => `${u.name}`),
+    users: r.users.map(u => `${u.name}`)
   })));
   info('--------------------');
 };

@@ -28,6 +28,7 @@ export const emitTryAdminStatus = (data, callback) => {
 
 export const SocketEvents = Object.freeze({
   JOIN: 'join',
+  LEAVE: 'leave',
   CREATE_ROOM: 'create_room',
   DISCONNECT: 'disconnect',
   ROOM_CHECK: 'room_check',

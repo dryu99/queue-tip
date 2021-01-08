@@ -8,7 +8,8 @@ const addRoom = (newRoom: NewRoom): Room => {
     id: uuidv4(), // generate random id
     name: newRoom.name,
     adminPassword: newRoom.adminPassword,
-    queue: []
+    queue: [],
+    users: []
   };
 
   if (rooms.has(room.id)) {
@@ -77,6 +78,28 @@ const verifyAdminPassword = (passwordAttempt: string, roomId: string): boolean =
   return passwordAttempt === password;
 };
 
+const addUser = (user: User, roomId: string): void => {
+  const room = getRoom(roomId);
+
+  const existingUser = room.users.find(u => u.name === user.name);
+  if (existingUser) {
+    throw new Error(`user ${user.name} already exists in room ${roomId}; couldn't be added`);
+  }
+
+  room.users.push(user);
+};
+
+const removeUser = (name: string, roomId: string): User => {
+  const room = getRoom(roomId);
+
+  const index = room.users.findIndex(u => u.name === name);
+  if (index === -1) {
+    throw new Error(`user ${name} doesn't exist in queue in room ${roomId}; couldn't be dequeued`);
+  }
+
+  return room.users.splice(index, 1)[0];
+};
+
 export default {
   addRoom,
   removeRoom,
@@ -86,5 +109,7 @@ export default {
   getQueuedUsersInRoom,
   enqueueUser,
   dequeueUser,
-  verifyAdminPassword
+  verifyAdminPassword,
+  addUser,
+  removeUser
 };

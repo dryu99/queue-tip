@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Button, Card, Input } from './Common';
+import { Button, Card, Input, InputGroup, InputLabel } from './Common';
 import styled from 'styled-components';
 import { NotificationContext } from '../context/NotificationContext';
 import { UserContext } from '../context/UserContext';
@@ -7,20 +7,10 @@ import socket, { SocketEvents } from '../socket';
 import { useHistory } from 'react-router-dom';
 import { RoomContext } from '../context/RoomContext';
 
-const InputGroup = styled.div`
+const FormContainer = styled(Card)`
   display: flex;
   flex-direction: column;
-  margin-bottom: 1em;
 `;
-
-const InputLabel = styled.label`
-  margin-bottom: 0.25em;
-`;
-
-const FormContainer = styled(Card)`
-    display: flex;
-    flex-direction: column;
-  `;
 
 const CreateRoomForm = () => {
   const { triggerNotification } = useContext(NotificationContext);

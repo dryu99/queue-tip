@@ -1,18 +1,24 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useMemo, useState } from 'react';
 
 export const RoomContext = createContext();
 
 export const RoomProvider = ({ children }) => {
   console.log('room provider');
   const [room, setRoom] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [queue, setQueue] = useState([]);
 
-  const contextValue = {
+  const providerValue = useMemo(() => ({
     room,
-    setRoom
-  };
+    users,
+    queue,
+    setRoom,
+    setUsers,
+    setQueue
+  }), [queue, room, users]);
 
   return (
-    <RoomContext.Provider value={contextValue}>
+    <RoomContext.Provider value={providerValue}>
       {children}
     </RoomContext.Provider>
   );

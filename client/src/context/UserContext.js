@@ -7,13 +7,13 @@ export const UserProvider = ({ children }) => {
   // user:  { name: null, isAdmin: false }
   const [user, setUser] = useState(null);
 
-  const contextValue = {
+  const providerValue = {
     user,
     setUser
   };
 
   return (
-    <UserContext.Provider value={contextValue}>
+    <UserContext.Provider value={providerValue}>
       {children}
     </UserContext.Provider>
   );
