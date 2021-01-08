@@ -18,6 +18,8 @@ import GlobalStyle from './styles/GlobalStyle';
 import styled from 'styled-components';
 import { NotificationProvider } from './context/NotificationContext';
 import Notification from './components/Notification';
+import { RoomProvider } from './context/RoomContext';
+import { UserProvider } from './context/UserContext';
 
 // function App() {
 //   const [room, setRoom] = useState(null);
@@ -95,27 +97,28 @@ const Content = styled.div`
 `;
 
 const App = () => {
-  const [isAdmin, setIsAdmin] = useState(false);
-
   return (
     <ThemeProvider>
+      <GlobalStyle />
       <NotificationProvider>
-        <GlobalStyle />
         <Notification />
-        <Content>
-          <h1>queue-tip</h1>
-          <Switch>
-            <Route path="/room/:id">
-              {/* room container, either admin view or student view */}
-            </Route>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route>
-              {/* <Error text="404 resource not found"/> */}
-            </Route>
-          </Switch>
-        </Content>
+        <UserProvider>
+          <Content>
+            <h1>queue-tip</h1>
+            <Switch>
+              <Route path="/room/:id">
+                <Room />
+                {/* room container, either admin view or student view */}
+              </Route>
+              <Route exact path="/">
+                <Home />
+              </Route>
+              <Route>
+                {/* <Error text="404 resource not found"/> */}
+              </Route>
+            </Switch>
+          </Content>
+        </UserProvider>
       </NotificationProvider>
     </ThemeProvider>
   );

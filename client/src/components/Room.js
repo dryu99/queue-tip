@@ -9,8 +9,9 @@ import Queue from './Queue';
 import AdminPopup from './AdminPopup';
 
 import './room.css';
+import { useHistory, useRouteMatch } from 'react-router-dom';
 
-const Room = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => {
+const OldRoom = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => {
   const [currentName, setCurrentName] = useState('');
   const [adminPopupOpen, setAdminPopupOpen] = useState(false);
 
@@ -87,6 +88,47 @@ const Room = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => {
         setAdminPopupOpen={setAdminPopupOpen}
       />
     </>
+  );
+};
+
+const Room = () => {
+  const [room, setRoom] = useState(null);
+
+  const match = useRouteMatch('/room/:id');
+  const history = useHistory();
+
+  useEffect(() => {
+    if (match && !room) {
+      logger.info('emitting room check event');
+
+      // check to see if room exists on server, if so set room and queued users on client
+      // try joining room (if it exists) given url param
+      socket.emit(SocketEvents.JOIN, { roomId: match.params.id }, (res) => {
+        logger.info('acknowledged from JOIN event', res);
+        const { room, queuedUsers, error } = res;
+
+        if (room && !error) {
+          setRoom(room);
+          // setQueuedUsers(queuedUsers);
+        } else {
+          logger.error(error);
+          // setRoomError('sorry room doesn\'t exist...');
+        }
+      });
+    }
+  }, [setRoom, room, match]);
+
+  return (
+    <div>
+      <h2>Room</h2>
+      {
+        room ?
+          <div>{room.name}</div>
+          :
+          <p>room doesn't exist...</p>
+      }
+      <button onClick={() => history.push('/')}>Go Back</button>
+    </div>
   );
 };
 
