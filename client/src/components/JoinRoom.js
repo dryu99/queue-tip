@@ -11,10 +11,20 @@ const JoinRoomContainer = styled(Card)`
   width: 50%;
 `;
 
+function makeid(length) {
+  var result           = '';
+  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for ( var i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
 // TODO rename to Create User Form or sth lol
 const JoinRoom = ({ room }) => {
   const { user, setUser } = useContext(UserContext);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(makeid(5));
 
   // set current user data
   const handleSubmit = (e) => {

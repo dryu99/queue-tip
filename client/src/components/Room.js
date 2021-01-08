@@ -114,7 +114,7 @@ const Room = ({ room }) => {
   const [users, setUsers] = useState([]);
   const [queue, setQueue] = useState([]);
 
-  // join room on server + receive info on current room state
+  // send join request to server + receive data on current room state
   useEffect(() => {
     socket.emit(SocketEvents.JOIN, user, (res) => {
       const { users, queue, error } = res;
@@ -130,14 +130,18 @@ const Room = ({ room }) => {
 
   // subscribe to relevant socket events
   useEffect(() => {
-    // when new users join the room, update current user state
+    // when new users join the room, update user list
     socket.on(SocketEvents.JOIN, ({ user }) => {
-      logger.info('join', user);
       setUsers(users.concat(user));
     });
 
-    // unsubscribe from listeners
+    // when another user disconnects from room, remove from user list
+    socket.on(SocketEvents.LEAVE, ({ user }) => {
+      setUsers(users.filter(u => u.name !== user.name));
+    });
+
     return () => {
+      // unsubscribe from listeners
       socket.off();
     };
   }, [setUsers, users]);

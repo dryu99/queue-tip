@@ -1,5 +1,5 @@
 import http from 'http';
-import socketio, { Socket } from 'socket.io';
+import socketio from 'socket.io';
 
 import app from './app';
 import config from './utils/config';
@@ -11,10 +11,6 @@ import { toNewRoom, toCleanRoom, toUser, toSocketData } from './utils';
 
 const server = http.createServer(app);
 const io = socketio(server);
-
-// keeps track of current connections for logging purposes
-let connectCounter = 0;
-let roomCounter = 0;
 
 // executes given event handler and uses acknowledgement callback to send error back to client on failure
 // this is what every socket handler should call to keep consistency.
@@ -35,35 +31,8 @@ const handleSocketEvent = (
   logger.printAppState();
 };
 
-const removeSocket = (socket: Socket) => {
-  try {
-    // remove user from memory
-    const removedUser = userService.removeUser(socket.id);
-
-    // get socket room user was in
-    const socketRoom = io.sockets.adapter.rooms[removedUser.roomId];
-    logger.info(`Room ${removedUser.roomId} length: ${socketRoom ? socketRoom.length : 0}`);
-
-    // delete room from memory if its empty (empty rooms are undefined)
-    // we check for dev env b/c it's annoying to have rooms being deleted everytime client refreshes after hot change
-    // if (process.env.NODE_ENV !== 'development' && (!room || room.length === 0)) {
-    if (!socketRoom || socketRoom.length === 0) {
-      logger.info(`Room ${removedUser.roomId} is empty now, deleting from memory...`);
-      roomService.removeRoom(removedUser.roomId);
-
-      // just for logging purposes
-      roomCounter--;
-    }
-  } catch (e) {
-    // TODO this line will usually hit when a user who hasn't signed up disconnects, maybe emit LEAVE from client side?
-    const error = e as Error;
-    logger.error(error);
-  }
-};
-
 io.on('connection', (socket) => {
   logger.event('a user has connected!');
-  console.log(`current number of users connected: ${++connectCounter}`);
   logger.printAppState();
 
   // Create a new room and send back room data on success.
@@ -72,9 +41,6 @@ io.on('connection', (socket) => {
       const newRoom = toNewRoom(data);
       const room = roomService.addRoom(newRoom);
       const cleanRoom = toCleanRoom(room);
-
-      // just for logging purposes
-      roomCounter++;
 
       callback({ room: cleanRoom });
     });
@@ -92,7 +58,7 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Cache user and add them to specified room. Return current user and queue lists for room.
+  // Cache user and add them to specified room.
   socket.on(SocketEvents.JOIN, (data, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.JOIN, data, callback, () => {
       const user = toUser(data);
@@ -104,7 +70,10 @@ io.on('connection', (socket) => {
       socket.join(user.roomId);
 
       // broadcast new user to all clients in room except sender
-      socket.broadcast.to(user.roomId).emit(SocketEvents.JOIN, { user });
+      socket.broadcast.to(user.roomId).emit(
+        SocketEvents.JOIN,
+        { user }
+      );
 
       const { users, queue } = roomService.getRoom(user.roomId);
       callback({ users, queue });
@@ -170,14 +139,37 @@ io.on('connection', (socket) => {
   socket.on(SocketEvents.DISCONNECT, () => {
     logger.event(`${SocketEvents.DISCONNECT} event received`);
 
-    // disconnected user not necessarily in a room
-    if (userService.hasUser(socket.id)) {
-      removeSocket(socket);
+    if (userService.hasUser(socket.id)) { // if user is in a room
+      try {
+        // remove user from memory
+        const removedUser = userService.removeUser(socket.id);
+
+        // get socket room user was in
+        const socketRoom = io.sockets.adapter.rooms[removedUser.roomId];
+
+        // broadcast disconnected user to all clients in room except sender
+        socket.broadcast.to(removedUser.roomId).emit(
+          SocketEvents.LEAVE,
+          { user: removedUser }
+        );
+
+        // delete room from memory if its empty (empty rooms are undefined)
+        // we check for dev env b/c it's annoying to have rooms being deleted everytime client refreshes after hot change
+        // if (process.env.NODE_ENV !== 'development' && (!room || room.length === 0)) {
+        if (!socketRoom || socketRoom.length === 0) {
+          logger.info(`Room ${removedUser.roomId} is empty now, deleting from memory...`);
+          roomService.removeRoom(removedUser.roomId);
+        }
+      } catch (e) {
+        // TODO this line will usually hit when a user who hasn't signed up disconnects, maybe emit LEAVE from client side?
+        const error = e as Error;
+        logger.error(error);
+      }
     }
 
     logger.printAppState();
-    console.log(`current number of users connected: ${--connectCounter}`);
-    console.log(`current number of rooms: ${roomCounter}`);
+    // console.log(`current number of users connected: ${--connectCounter}`);
+    // console.log(`current number of rooms: ${roomCounter}`);
   });
 });
 

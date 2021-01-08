@@ -16,8 +16,8 @@ const CreateRoomForm = () => {
   const { triggerNotification } = useContext(NotificationContext);
   const { setUser } = useContext(UserContext);
 
-  const [roomName, setRoomName] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
+  const [roomName, setRoomName] = useState('cpsc 110');
+  const [adminPassword, setAdminPassword] = useState('pass');
 
   const history = useHistory();
 
