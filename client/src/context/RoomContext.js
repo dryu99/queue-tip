@@ -8,14 +8,14 @@ export const RoomProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [queue, setQueue] = useState([]);
 
-  const providerValue = {
+  const providerValue = useMemo(() => ({
     room,
     users,
     queue,
     setRoom,
     setUsers,
     setQueue
-  };
+  }), [queue, room, users]);
 
   return (
     <RoomContext.Provider value={providerValue}>

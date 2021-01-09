@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useCallback, useMemo, useState } from 'react';
 
 export const NotificationContext = createContext();
 
@@ -9,7 +9,7 @@ export const NotificationProvider = ({ children }) => {
   console.log('notification provider');
   const [notification, setNotification] = useState(null);
 
-  const triggerNotification = (newNotification) => {
+  const triggerNotification = useCallback((newNotification) => {
     setNotification(newNotification);
 
     if (timeoutId) {
@@ -19,13 +19,13 @@ export const NotificationProvider = ({ children }) => {
     timeoutId = setTimeout(() => {
       setNotification(null);
     }, 10000);
-  };
+  }, []);
 
-  const providerValue = {
+  const providerValue = useMemo(() => ({
     notification,
     setNotification,
     triggerNotification
-  };
+  }), [notification, triggerNotification]);
 
   return (
     <NotificationContext.Provider value={providerValue}>

@@ -5,6 +5,7 @@ import { Button, Card, Input, InputGroup, InputLabel } from './Common';
 import socket, { SocketEvents } from '../socket';
 import logger from '../utils/logger';
 import { RoomContext } from '../context/RoomContext';
+import { NotificationContext } from '../context/NotificationContext';
 
 const SignInContainer = styled(Card)`
   display: flex;
@@ -24,6 +25,7 @@ function makeid(length) {
 
 // TODO rename to Create User Form or sth lol
 const SignIn = () => {
+  const { triggerNotification } = useContext(NotificationContext);
   const { user, setUser } = useContext(UserContext);
   const { room, setUsers, setQueue } = useContext(RoomContext);
   const [username, setUsername] = useState(makeid(5));
@@ -48,6 +50,7 @@ const SignIn = () => {
         setQueue(queue);
       } else {
         logger.error(error);
+        triggerNotification(error);
       }
     });
   };
