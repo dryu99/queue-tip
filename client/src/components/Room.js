@@ -93,10 +93,11 @@ const OldRoom = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => 
   );
 };
 
-const AdminView = () => {
+const AdminView = ({ users }) => {
   return (
     <div>
       <h2>Admin View</h2>
+      <p>{users.length} users currently in room</p>
     </div>
   );
 };
@@ -109,42 +110,43 @@ const ParticipantView = () => {
   );
 };
 
-const Room = ({ room }) => {
+const Room = () => {
   const { user } = useContext(UserContext);
-  const [users, setUsers] = useState([]);
-  const [queue, setQueue] = useState([]);
+  const { room, users, queue } = useContext(RoomContext);
+  // const [users, setUsers] = useState([]);
+  // const [queue, setQueue] = useState([]);
 
-  // send join request to server + receive data on current room state
-  useEffect(() => {
-    socket.emit(SocketEvents.JOIN, user, (res) => {
-      const { users, queue, error } = res;
+  // // send join request to server + receive data on current room state
+  // useEffect(() => {
+  //   socket.emit(SocketEvents.JOIN, user, (res) => {
+  //     const { users, queue, error } = res;
 
-      if (!error) {
-        setUsers(users);
-        setQueue(queue);
-      } else {
-        logger.error(error);
-      }
-    });
-  }, [setQueue, setUsers, user]);
+  //     if (!error) {
+  //       setUsers(users);
+  //       setQueue(queue);
+  //     } else {
+  //       logger.error(error);
+  //     }
+  //   });
+  // }, [setQueue, setUsers, user]);
 
-  // subscribe to relevant socket events
-  useEffect(() => {
-    // when new users join the room, update user list
-    socket.on(SocketEvents.JOIN, ({ user }) => {
-      setUsers(users.concat(user));
-    });
+  // // subscribe to relevant socket events
+  // useEffect(() => {
+  //   // when new users join the room, update user list
+  //   socket.on(SocketEvents.JOIN, ({ user }) => {
+  //     setUsers(users.concat(user));
+  //   });
 
-    // when another user disconnects from room, remove from user list
-    socket.on(SocketEvents.LEAVE, ({ user }) => {
-      setUsers(users.filter(u => u.name !== user.name));
-    });
+  //   // when another user disconnects from room, remove from user list
+  //   socket.on(SocketEvents.LEAVE, ({ user }) => {
+  //     setUsers(users.filter(u => u.name !== user.name));
+  //   });
 
-    return () => {
-      // unsubscribe from listeners
-      socket.off();
-    };
-  }, [setUsers, users]);
+  //   return () => {
+  //     // unsubscribe from listeners
+  //     socket.off();
+  //   };
+  // }, [setUsers, users]);
 
   // const currQueuePos
 
@@ -152,10 +154,9 @@ const Room = ({ room }) => {
     <div>
       <h2>Room {room.name}</h2>
       <h3>Hi {user.name}</h3>
-      <p>{users.length} users currently in room</p>
       {
         user.isAdmin
-          ? <AdminView />
+          ? <AdminView users={users}/>
           : <ParticipantView />
       }
     </div>

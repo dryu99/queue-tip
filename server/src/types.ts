@@ -11,6 +11,7 @@ export enum SocketEvents {
 
 export interface UserBase {
   roomId: string,
+  isAdmin: boolean
 }
 
 export interface User extends UserBase {

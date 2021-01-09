@@ -28,6 +28,7 @@ export const toUser = (object: any): User  => {
   return {
     name: parseString(object.name, 'User', 'name'),
     roomId: parseString(object.roomId, 'User', 'roomId'),
+    isAdmin: parseBoolean(object.isAdmin, 'User', 'isAdmin')
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
@@ -36,6 +37,7 @@ export const toNewUser = (object: any): NewUser  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
     roomId: parseString(object.roomId, 'NewUser', 'roomId'),
+    isAdmin: parseBoolean(object.isAdmin, 'NewUser', 'isAdmin')
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
@@ -65,6 +67,17 @@ const parseString = (str: any, modelName: string, propName: string): string => {
   return str;
 };
 
+const parseBoolean = (bool: any, modelName: string, propName: string): boolean => {
+  if (!isBoolean(bool)) {
+    throw new Error(`${modelName} ${propName} is missing or invalid: ${bool}`);
+  }
+  return bool;
+};
+
 const isString = (val: any): val is string => {
   return typeof val === 'string' || val instanceof String;
+};
+
+const isBoolean = (val: any): val is boolean => {
+  return typeof val === 'boolean' || val instanceof Boolean;
 };

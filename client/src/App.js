@@ -109,7 +109,9 @@ const App = () => {
             <h1><a href="/">queue-tip</a></h1>
             <Switch>
               <Route path="/room/:id">
-                <RoomPage />
+                <RoomProvider>
+                  <RoomPage />
+                </RoomProvider>
               </Route>
               <Route exact path="/">
                 <Home />

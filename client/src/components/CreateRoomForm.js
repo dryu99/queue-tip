@@ -14,7 +14,7 @@ const FormContainer = styled(Card)`
 
 const CreateRoomForm = () => {
   const { triggerNotification } = useContext(NotificationContext);
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
   const [roomName, setRoomName] = useState('cpsc 110');
   const [adminPassword, setAdminPassword] = useState('pass');
@@ -29,7 +29,7 @@ const CreateRoomForm = () => {
     } else if (adminPassword.trim().length === 0) {
       triggerNotification('Please type in a password!');
     } else {
-      setUser({ name: null, isAdmin: true });
+      setUser({ ...user, name: null, isAdmin: true });
 
       const newRoom = {
         name: roomName,

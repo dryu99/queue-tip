@@ -76,7 +76,7 @@ io.on('connection', (socket) => {
       );
 
       const { users, queue } = roomService.getRoom(user.roomId);
-      callback({ users, queue });
+      callback({ user, users, queue });
     });
   });
 

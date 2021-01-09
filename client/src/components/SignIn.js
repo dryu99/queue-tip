@@ -4,8 +4,9 @@ import { UserContext } from '../context/UserContext';
 import { Button, Card, Input, InputGroup, InputLabel } from './Common';
 import socket, { SocketEvents } from '../socket';
 import logger from '../utils/logger';
+import { RoomContext } from '../context/RoomContext';
 
-const JoinRoomContainer = styled(Card)`
+const SignInContainer = styled(Card)`
   display: flex;
   flex-direction: column;
   width: 50%;
@@ -22,20 +23,37 @@ function makeid(length) {
 }
 
 // TODO rename to Create User Form or sth lol
-const JoinRoom = ({ room }) => {
+const SignIn = () => {
   const { user, setUser } = useContext(UserContext);
+  const { room, setUsers, setQueue } = useContext(RoomContext);
   const [username, setUsername] = useState(makeid(5));
 
   // set current user data
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newUser = { ...user, name: username, roomId: room.id };
-    setUser(newUser);
+    const newUser = {
+      ...user,
+      name: username,
+      roomId: room.id
+    };
+
+    // send join request to server + receive data on current room state
+    socket.emit(SocketEvents.JOIN, newUser, (res) => {
+      const { user, users, queue, error } = res;
+
+      if (!error) {
+        setUser(user);
+        setUsers(users);
+        setQueue(queue);
+      } else {
+        logger.error(error);
+      }
+    });
   };
 
   return (
-    <JoinRoomContainer>
+    <SignInContainer>
       <h2>Join Room {`"${room.name}"`}</h2>
       <form onSubmit={handleSubmit}>
         <InputGroup>
@@ -48,8 +66,8 @@ const JoinRoom = ({ room }) => {
         </InputGroup>
         <Button type="submit">Join</Button>
       </form>
-    </JoinRoomContainer>
+    </SignInContainer>
   );
 };
 
-export default JoinRoom;
+export default SignIn;
