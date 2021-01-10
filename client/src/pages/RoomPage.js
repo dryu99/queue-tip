@@ -30,17 +30,17 @@ const RoomPage = () => {
     }
   }, [room, match, setRoom]);
 
-  // subscribe to relevant socket events
+  // subscribe to socket events
   useEffect(() => {
+    // TODO rename user to sth else, name conflict with current user context
     // when new users join the room, update user list
-    socket.on(SocketEvents.JOIN, ({ user }) => {
-      setUsers(users.concat(user));
+    socket.on(SocketEvents.JOIN, ({ newUser }) => {
+      setUsers(users.concat(newUser));
     });
 
-    // TODO rename user to sth else, name conflict with current user context
     // when another user disconnects from room, remove from user list
-    socket.on(SocketEvents.LEAVE, ({ user }) => {
-      setUsers(users.filter(u => u.name !== user.name));
+    socket.on(SocketEvents.LEAVE, ({ disconnectedUser }) => {
+      setUsers(users.filter(u => u.id !== disconnectedUser.id));
     });
 
     socket.on(SocketEvents.ENQUEUE, ({ enqueuedUser }) => {
@@ -49,7 +49,7 @@ const RoomPage = () => {
 
     socket.on(SocketEvents.DEQUEUE, ({ dequeuedUser }) => {
       // TODO should pop here
-      setQueue(queue.filter(u => u.name !== dequeuedUser.name));
+      setQueue(queue.filter(u => u.id !== dequeuedUser.id));
     });
 
     return () => {

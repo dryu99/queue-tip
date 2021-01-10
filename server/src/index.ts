@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
   logger.event('a user has connected!');
   logger.printAppState();
 
-  // Create a new room and send back room data on success.
+  // Create a new room
   socket.on(SocketEvents.CREATE_ROOM, (eventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.CREATE_ROOM, eventData, callback, (data) => {
       const newRoom = toNewRoom(data.newRoom);
@@ -51,6 +51,7 @@ io.on('connection', (socket) => {
       // have admin user join socket.io room
       socket.join(user.roomId);
 
+      // send back minimal room data to sender
       const cleanRoom = toCleanRoom(room);
       callback({ room: cleanRoom, user });
     });
@@ -60,14 +61,15 @@ io.on('connection', (socket) => {
   socket.on(SocketEvents.ROOM_CHECK, (eventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.ROOM_CHECK, eventData, callback, (data) => {
       const roomId = parseString(data.roomId);
-      const room = roomService.getRoom(roomId); // TODO re-evaluate socketdata data type
+      const room = roomService.getRoom(roomId);
       const cleanRoom = toCleanRoom(room);
 
+      // send back minimal room data to sender
       callback({ room: cleanRoom });
     });
   });
 
-  // Cache user and add them to specified room.
+  // Add them to specified room.
   socket.on(SocketEvents.JOIN, (eventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.JOIN, eventData, callback, (data) => {
       const newUser = toNewUser(data.newUser);
@@ -80,17 +82,16 @@ io.on('connection', (socket) => {
       // broadcast new user to all clients in room except sender
       socket.broadcast.to(user.roomId).emit(
         SocketEvents.JOIN,
-        { user }
+        { newUser: user }
       );
 
+      // send back relevant room data to sender so they can init room state
       const { users, queue } = roomService.getRoom(user.roomId);
-
-      // send detailed room data to sender so they can init room state
       callback({ user, users, queue });
     });
   });
 
-  // Enqueues user in specified room.
+  // Enqueue user in specified room.
   socket.on(SocketEvents.ENQUEUE, (eventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.ENQUEUE, eventData, callback, (data) => {
       const userId = parseString(data.userId);
@@ -108,7 +109,7 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Dequeues user in specified room.
+  // Dequeue user in specified room.
   socket.on(SocketEvents.DEQUEUE, (eventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.DEQUEUE, eventData, callback, (data) => {
       const roomId = parseString(data.roomId);
@@ -149,32 +150,27 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Deletes user from user cache and deletes room if room is empty.
+  // Delete user from memory and delete room if room is empty.
   socket.on(SocketEvents.DISCONNECT, () => {
     logger.event(`${SocketEvents.DISCONNECT} event received`);
 
     if (userService.hasUser(socket.id)) { // if user is in a room
       try {
-        // remove user from memory
-        const removedUser = userService.removeUser(socket.id);
+        // remove user from user cache + room cache
+        const user = userService.removeUser(socket.id);
 
-        // get socket room user was in
-        const socketRoom = io.sockets.adapter.rooms[removedUser.roomId];
-
-        // const room = roomService.getRoom(removedUser.roomId);
+        const room = roomService.getRoom(user.roomId);
 
         // broadcast disconnected user to all clients in room except sender
-        socket.broadcast.to(removedUser.roomId).emit(
+        socket.broadcast.to(room.id).emit(
           SocketEvents.LEAVE,
-          { user: removedUser }
+          { disconnectedUser: user }
         );
 
         // delete room from memory if its empty (empty rooms are undefined)
-        // we check for dev env b/c it's annoying to have rooms being deleted everytime client refreshes after hot change
-        // if (process.env.NODE_ENV !== 'development' && (!room || room.length === 0)) {
-        if (!socketRoom || socketRoom.length === 0) {
-          logger.info(`Room ${removedUser.roomId} is empty now, deleting from memory...`);
-          roomService.removeRoom(removedUser.roomId);
+        if (!room || room.users.length === 0) {
+          logger.info(`Room ${room.id} '${room.name}' is empty now, deleting from memory...`);
+          roomService.removeRoom(room.id);
         }
       } catch (e) {
         // TODO this line will usually hit when a user who hasn't signed up disconnects, maybe emit LEAVE from client side?

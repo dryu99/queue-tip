@@ -151,7 +151,7 @@ const Room = () => {
 
   return (
     <div>
-      <h2>Room {room.name}</h2>
+      <h2>Current Room: {room.name}</h2>
       <h3>Hi {user.name}</h3>
       {
         user.isAdmin ?
