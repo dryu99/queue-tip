@@ -31,11 +31,13 @@ export interface RoomBase {
   name: string,
 }
 
+// TODO consider only storing user ids in queue and users props
 export interface Room extends RoomBase {
   id: string,
   queue: User[],
   users: User[],
-  adminPassword: string
+  adminPassword: string,
+  // owner: string
 }
 
 export interface NewRoom extends RoomBase {

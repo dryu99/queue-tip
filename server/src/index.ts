@@ -7,7 +7,7 @@ import logger from './utils/logger';
 import { AcknowledgementCallback as AckCallback, EventData, SocketEvents } from './types';
 import roomService from './services/roomService';
 import userService from './services/userService';
-import { toNewRoom, toCleanRoom, toUser, toNewUser, parseString } from './utils';
+import { toNewRoom, toCleanRoom, toNewUser, parseString } from './utils';
 
 const server = http.createServer(app);
 const io = socketio(server);
@@ -84,6 +84,8 @@ io.on('connection', (socket) => {
       );
 
       const { users, queue } = roomService.getRoom(user.roomId);
+
+      // send detailed room data to sender so they can init room state
       callback({ user, users, queue });
     });
   });
@@ -91,36 +93,38 @@ io.on('connection', (socket) => {
   // Enqueues user in specified room.
   socket.on(SocketEvents.ENQUEUE, (eventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.ENQUEUE, eventData, callback, (data) => {
-      const user = toUser(data);
+      const userId = parseString(data.userId);
+      const user = userService.getUser(userId);
+      const room = roomService.getRoom(user.roomId);
 
-      roomService.enqueueUser(user, user.roomId);
+      // enqueue user
+      room.queue.push(user);
 
       // broadcast new enqueued user to all clients in room including sender
-      io.in(user.roomId).emit(SocketEvents.ENQUEUE, {
-        enqueuedUser: user
-      });
-
-      callback({});
+      io.in(user.roomId).emit(
+        SocketEvents.ENQUEUE,
+        { enqueuedUser: user }
+      );
     });
   });
 
   // Dequeues user in specified room.
   socket.on(SocketEvents.DEQUEUE, (eventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.DEQUEUE, eventData, callback, (data) => {
-      const username = parseString(data.username);
       const roomId = parseString(data.roomId);
+      const room = roomService.getRoom(roomId);
 
-      if (username && roomId) {
-        const dequeuedUser = roomService.dequeueUser(username, roomId);
+      // dequeue user
+      const user = room.queue.shift();
 
+      if (user) {
         // broadcast dequeued user to all clients in room including sender
-        io.in(roomId).emit(SocketEvents.DEQUEUE, {
-          dequeuedUser
-        });
-
-        callback({});
+        io.in(roomId).emit(
+          SocketEvents.DEQUEUE,
+          { dequeuedUser: user }
+        );
       } else {
-        throw new Error('username or roomId are missing or invalid');
+        logger.error(`Room ${roomId} was empty, couldn't dequeue.`);
       }
     });
   });

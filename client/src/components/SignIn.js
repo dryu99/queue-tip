@@ -43,7 +43,6 @@ const SignIn = () => {
     // send room join request to server + receive data on current room state
     socket.emit(SocketEvents.JOIN, { newUser, roomId: room.id }, (res) => {
       const { user, users, queue, error } = res;
-
       if (!error) {
         setUser(user);
         setUsers(users);

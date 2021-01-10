@@ -12,6 +12,7 @@ import './room.css';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { RoomContext } from '../context/RoomContext';
 import { UserContext } from '../context/UserContext';
+import { Button } from './Common';
 
 const OldRoom = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => {
   const [currentName, setCurrentName] = useState('');
@@ -93,26 +94,58 @@ const OldRoom = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => 
   );
 };
 
-const AdminView = ({ users }) => {
+const AdminView = ({ room, users, queue }) => {
+
+  const isQueueEmpty = queue.length === 0;
+
+  const dequeue = (e) => {
+    socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, (res) => {
+      const { error } = res;
+      console.log(res);
+      error && logger.error(error);
+    });
+  };
+
   return (
     <div>
       <h2>Admin View</h2>
       <p>{users.length} users currently in room</p>
+      <ol>
+        {queue.map(u =>
+          <li key={u.id}>{u.name}</li>
+        )}
+      </ol>
+
+      <Button disabled={isQueueEmpty} onClick={dequeue}>Dequeue</Button>
     </div>
   );
 };
 
-const ParticipantView = () => {
+const ParticipantView = ({ user, queue }) => {
+
+  const joinQueue = (e) => {
+    socket.emit(SocketEvents.ENQUEUE, { userId: user.id }, (res) => {
+      const { error } = res;
+      console.log(res);
+      error && logger.error(error);
+    });
+  };
+
+  // TODO this is a bottleneck
+  const isUserInQueue = queue.some(u => u.name === user.name);
+
   return (
     <div>
       <h2>Participant View</h2>
+      <p>There are {queue.length} people in the queue.</p>
+      <Button disabled={isUserInQueue} onClick={joinQueue}>Join Queue</Button>
     </div>
   );
 };
 
 const Room = () => {
   const { user } = useContext(UserContext);
-  const { room, users, queue } = useContext(RoomContext);
+  const { room, users, queue, setQueue } = useContext(RoomContext);
 
   // const currQueuePos
 
@@ -121,9 +154,18 @@ const Room = () => {
       <h2>Room {room.name}</h2>
       <h3>Hi {user.name}</h3>
       {
-        user.isAdmin
-          ? <AdminView users={users}/>
-          : <ParticipantView />
+        user.isAdmin ?
+          <AdminView
+            room={room}
+            users={users}
+            queue={queue}
+          />
+          :
+          <ParticipantView
+            user={user}
+            queue={queue}
+            setQueue={setQueue}
+          />
       }
     </div>
   );

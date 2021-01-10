@@ -37,16 +37,26 @@ const RoomPage = () => {
       setUsers(users.concat(user));
     });
 
+    // TODO rename user to sth else, name conflict with current user context
     // when another user disconnects from room, remove from user list
     socket.on(SocketEvents.LEAVE, ({ user }) => {
       setUsers(users.filter(u => u.name !== user.name));
+    });
+
+    socket.on(SocketEvents.ENQUEUE, ({ enqueuedUser }) => {
+      setQueue(queue.concat(enqueuedUser));
+    });
+
+    socket.on(SocketEvents.DEQUEUE, ({ dequeuedUser }) => {
+      // TODO should pop here
+      setQueue(queue.filter(u => u.name !== dequeuedUser.name));
     });
 
     return () => {
       // unsubscribe from listeners
       socket.off();
     };
-  }, [setUsers, users]);
+  }, [queue, setQueue, setUsers, users]);
 
   return (
     <div>

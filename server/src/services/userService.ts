@@ -9,9 +9,22 @@ import roomService from './roomService';
  */
 const users = new Map<string, User>();
 
+const getUser = (userId: string): User => {
+  const user = users.get(userId);
+  if (!user) {
+    throw new Error(`User ${userId} doesn't exist; can't retrieve.`);
+  }
+
+  return user;
+};
+
+const getUsers = (): NewUser[] => {
+  return Array.from(users.values());
+};
+
 const addUser = (userId: string, roomId: string, newUser: NewUser): User => {
   if (users.has(userId)) {
-    logger.error(`User ${userId} '${userId}' already exists in user map; re-added user.`);
+    logger.error(`User ${userId} '${newUser.name}' already exists in user map; re-added user.`);
     // TODO throw error here?
   }
 
@@ -46,15 +59,12 @@ const removeUser = (socketId: string): User => {
   return user;
 };
 
-const getUsers = (): NewUser[] => {
-  return Array.from(users.values());
-};
-
 const hasUser = (socketId: string): boolean => {
   return users.has(socketId);
 };
 
 export default {
+  getUser,
   addUser,
   removeUser,
   getUsers,
