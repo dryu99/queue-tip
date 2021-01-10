@@ -15,21 +15,23 @@ const io = socketio(server);
 // executes given event handler and uses acknowledgement callback to send error back to client on failure
 // this is what every socket handler should call to keep consistency.
 const handleSocketEvent = (
-  eventType: string, eventData: any,
-  ackCallback: AckCallback, eventHandler: (data: EventData) => void
+  event: string,
+  data: any,
+  callback: AckCallback,
+  eventHandler: () => void
 ) => {
-  logger.event(`${eventType} event received`, eventData);
+  logger.event(`${event} event received`, data);
 
   try {
-    if (eventData === null || eventData === undefined) {
-      throw Error('event data received was null or undefined');
+    if (data === null || data === undefined) {
+      throw Error('event data was null or undefined');
     }
 
-    eventHandler(eventData);
+    eventHandler();
   } catch (e) {
     const error = e as Error;
     logger.error(error);
-    ackCallback({ error: error.message });
+    callback({ error: error.message });
   }
 
   logger.printAppState();
@@ -40,8 +42,8 @@ io.on('connection', (socket) => {
   logger.printAppState();
 
   // Create a new room
-  socket.on(SocketEvents.CREATE_ROOM, (eventData, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.CREATE_ROOM, eventData, callback, (data) => {
+  socket.on(SocketEvents.CREATE_ROOM, (data: EventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.CREATE_ROOM, data, callback, () => {
       const newRoom = toNewRoom(data.newRoom);
       const room = roomService.addRoom(newRoom);
 
@@ -58,8 +60,8 @@ io.on('connection', (socket) => {
   });
 
   // Check if room exists and send back room data on success.
-  socket.on(SocketEvents.ROOM_CHECK, (eventData, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.ROOM_CHECK, eventData, callback, (data) => {
+  socket.on(SocketEvents.ROOM_CHECK, (data: EventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.ROOM_CHECK, data, callback, () => {
       const roomId = parseString(data.roomId);
       const room = roomService.getRoom(roomId);
       const cleanRoom = toCleanRoom(room);
@@ -70,8 +72,8 @@ io.on('connection', (socket) => {
   });
 
   // Add them to specified room.
-  socket.on(SocketEvents.JOIN, (eventData, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.JOIN, eventData, callback, (data) => {
+  socket.on(SocketEvents.JOIN, (data: EventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.JOIN, data, callback, () => {
       const newUser = toNewUser(data.newUser);
       const roomId = parseString(data.roomId);
       const user = userService.addUser(socket.id, roomId, newUser);
@@ -92,8 +94,8 @@ io.on('connection', (socket) => {
   });
 
   // Enqueue user in specified room.
-  socket.on(SocketEvents.ENQUEUE, (eventData, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.ENQUEUE, eventData, callback, (data) => {
+  socket.on(SocketEvents.ENQUEUE, (data: EventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.ENQUEUE, data, callback, () => {
       const userId = parseString(data.userId);
       const user = userService.getUser(userId);
       const room = roomService.getRoom(user.roomId);
@@ -110,8 +112,8 @@ io.on('connection', (socket) => {
   });
 
   // Dequeue user in specified room.
-  socket.on(SocketEvents.DEQUEUE, (eventData, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.DEQUEUE, eventData, callback, (data) => {
+  socket.on(SocketEvents.DEQUEUE, (data: EventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.DEQUEUE, data, callback, () => {
       const roomId = parseString(data.roomId);
       const room = roomService.getRoom(roomId);
 
@@ -131,8 +133,8 @@ io.on('connection', (socket) => {
   });
 
   // Verifies given password and returns success/failure result.
-  socket.on(SocketEvents.TRY_ADMIN_STATUS, (eventData, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, eventData, callback, (data) => {
+  socket.on(SocketEvents.TRY_ADMIN_STATUS, (data: EventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, data, callback, () => {
       const adminPassword = parseString(data.adminPassword);
       const roomId = parseString(data.roomId);
 

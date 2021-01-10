@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 import { NewRoom, Room, User } from '../types';
 
 const rooms = new Map<string, Room>();
@@ -19,14 +19,14 @@ const rooms = new Map<string, Room>();
 // };
 
 const addRoom = (newRoom: NewRoom): Room => {
-  const newID = uuidv4(); // generate random id
+  const newId = nanoid(8);
 
-  if (rooms.has(newID)) {
+  if (rooms.has(newId)) {
     throw new Error('Trying to add room but id already exists, uuid fudged up or sth else went wrong.');
   }
 
   const room: Room = {
-    id: newID,
+    id: newId,
     name: newRoom.name,
     adminPassword: newRoom.adminPassword,
     queue: [],

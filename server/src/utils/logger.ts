@@ -9,7 +9,12 @@ const info = (...params: any[]): void => {
 };
 
 const event = (...params: any[]): void => {
-  info('<EV> ', params);
+  const today = new Date();
+  const date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+  const time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+  const dateTime = date + ' ' + time;
+
+  info(`<EV> ${dateTime}`, params);
 };
 
 const error = (...params: any[]): void => {
@@ -27,7 +32,6 @@ const printAppState = (): void => {
     queue: r.queue.map(u => `${u.name}`),
     users: r.users.map(u => `${u.name}`)
   })));
-  info('--------------------');
 };
 
 export default { info, event, error, printAppState };
