@@ -44,7 +44,6 @@ const CreateRoomForm = () => {
       };
 
       // TODO don't need to necessarily use socket here, can make http request
-      // ^ actually not true if I want to listen to all new room creations for ActiveRooms
       socket.emit(SocketEvents.CREATE_ROOM, { newRoom, newUser }, (res) => {
         const { user, room, error } = res;
 

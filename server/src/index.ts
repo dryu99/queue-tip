@@ -36,10 +36,11 @@ const handleSocketEvent = (
   logger.printAppState();
 };
 
-io.on('connection', (socket) => {
+io.on(SocketEvents.CONNECTION, (socket) => {
   logger.event('a user has connected!');
   logger.printAppState();
 
+  // TODO would love to just use an HTTP request to handle this but we need socket id.
   // Create a new room and cache on server
   socket.on(SocketEvents.CREATE_ROOM, (data: EventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.CREATE_ROOM, data, callback, () => {
@@ -56,18 +57,6 @@ io.on('connection', (socket) => {
       // send back relevant room and user data to sender
       const cleanRoom = toCleanRoom(room);
       callback({ room: cleanRoom, user });
-    });
-  });
-
-  // Check if room exists
-  socket.on(SocketEvents.ROOM_CHECK, (data: EventData, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.ROOM_CHECK, data, callback, () => {
-      const roomId = parseString(data.roomId);
-      const room = roomService.getRoom(roomId);
-      const cleanRoom = toCleanRoom(room);
-
-      // send back minimal room data to sender
-      callback({ room: cleanRoom });
     });
   });
 

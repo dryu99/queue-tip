@@ -6,6 +6,7 @@ import { RoomContext } from '../context/RoomContext';
 import { UserContext } from '../context/UserContext';
 import socket, { SocketEvents } from '../socket';
 import logger from '../utils/logger';
+import roomService from '../services/rooms';
 
 const RoomPage = () => {
   console.log('room page render');
@@ -18,15 +19,22 @@ const RoomPage = () => {
   // check to see if room exists on server, if so, init room data
   useEffect(() => {
     if (match && !room) {
-      socket.emit(SocketEvents.ROOM_CHECK, { roomId: match.params.id }, (res) => {
-        const { room, error } = res;
-
-        if (room && !error) {
+      roomService.getSingle(match.params.id)
+        .then(room => {
           setRoom(room);
-        } else {
+        })
+        .catch(error => {
           logger.error(error);
-        }
-      });
+        });
+      // socket.emit(SocketEvents.ROOM_CHECK, { roomId: match.params.id }, (res) => {
+      //   const { room, error } = res;
+
+      //   if (room && !error) {
+      //     setRoom(room);
+      //   } else {
+      //     logger.error(error);
+      //   }
+      // });
     }
   }, [room, match, setRoom]);
 
