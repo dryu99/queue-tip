@@ -12,7 +12,6 @@ const RoomPage = () => {
   console.log('room page render');
   const { user } = useContext(UserContext);
   const { room, queue, userCount, setRoom, setQueue, setUserCount } = useContext(RoomContext);
-  const 
 
   const match = useRouteMatch('/room/:id');
 
