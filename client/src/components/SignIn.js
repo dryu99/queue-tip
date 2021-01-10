@@ -28,7 +28,7 @@ const SignIn = () => {
   console.log('SIGN IN');
   const { triggerNotification } = useContext(NotificationContext);
   const { user, setUser } = useContext(UserContext);
-  const { room, setUsers, setQueue } = useContext(RoomContext);
+  const { room, setQueue } = useContext(RoomContext);
   const [username, setUsername] = useState(makeid(5));
 
   // set current user data
@@ -42,10 +42,9 @@ const SignIn = () => {
 
     // send room join request to server + receive data on current room state
     socket.emit(SocketEvents.JOIN, { newUser, roomId: room.id }, (res) => {
-      const { user, users, queue, error } = res;
+      const { user, queue, error } = res;
       if (!error) {
         setUser(user);
-        setUsers(users);
         setQueue(queue);
       } else {
         logger.error(error);

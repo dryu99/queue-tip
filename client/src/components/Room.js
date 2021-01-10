@@ -13,6 +13,7 @@ import { useHistory, useRouteMatch } from 'react-router-dom';
 import { RoomContext } from '../context/RoomContext';
 import { UserContext } from '../context/UserContext';
 import { Button } from './Common';
+import styled from 'styled-components';
 
 const OldRoom = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => {
   const [currentName, setCurrentName] = useState('');
@@ -94,7 +95,9 @@ const OldRoom = ({ isAdmin, setIsAdmin, room, queuedUsers, setQueuedUsers }) => 
   );
 };
 
-const AdminView = ({ room, users, queue }) => {
+const animalEmojis = ['🐢', '🐍','🦖','🦕','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐅','🐆','🦓','🦍','🐘','🦏','🐪','🐫','🦒','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🐐','🦌','🐕','🐩','🐈','🐓','🦃','🕊','🐇','🐁','🐀','🐿','🦔','🐉'];
+
+const AdminView = ({ room, queue, userCount }) => {
 
   const isQueueEmpty = queue.length === 0;
 
@@ -109,7 +112,7 @@ const AdminView = ({ room, users, queue }) => {
   return (
     <div>
       <h2>Admin View</h2>
-      <p>{users.length} users currently in room</p>
+      <p>{userCount} users currently in room</p>
       <ol>
         {queue.map(u =>
           <li key={u.id}>{u.name}</li>
@@ -121,10 +124,16 @@ const AdminView = ({ room, users, queue }) => {
   );
 };
 
-const ParticipantView = ({ user, queue }) => {
+const PositionTextContainer = styled.div`
+  display: flex;
+  flow-direction: column;
+  justify-content: center;
+`;
+
+const ParticipantView = ({ user, room, queue }) => {
 
   const joinQueue = (e) => {
-    socket.emit(SocketEvents.ENQUEUE, { userId: user.id }, (res) => {
+    socket.emit(SocketEvents.ENQUEUE, { user, roomId: room.id }, (res) => {
       const { error } = res;
       console.log(res);
       error && logger.error(error);
@@ -132,42 +141,87 @@ const ParticipantView = ({ user, queue }) => {
   };
 
   // TODO this is a bottleneck
-  const isUserInQueue = queue.some(u => u.name === user.name);
+  // const isUserInQueue = queue.some(u => u.id === user.id);
+  const currPosition = queue.findIndex(u => u.id === user.id);
+
+  // each user gets an emoji avatar based on the first char in their name
+  const animalSpans = queue.map(u => {
+    const firstCharCode = u.name.charCodeAt(0);
+    const index = !isNaN(firstCharCode)
+      ? firstCharCode % animalEmojis.length
+      : Math.floor(Math.random() * animalEmojis.length);
+
+    return (
+      <span key={u.id}>
+        {animalEmojis[index]}
+      </span>
+    );
+  });
 
   return (
     <div>
-      <h2>Participant View</h2>
-      <p>There are {queue.length} people in the queue.</p>
-      <Button disabled={isUserInQueue} onClick={joinQueue}>Join Queue</Button>
+      {
+        currPosition === -1
+          ?
+          <div>
+            <p>Current queue size is</p>
+            <h1>{queue.length}</h1>
+          </div>
+          :
+          <div>
+            <p>Your current queue position is</p>
+            <h1>{currPosition + 1}</h1>
+            <p>out of <b>{queue.length}</b></p>
+          </div>
+      }
+      <div>
+        {animalSpans}
+      </div>
+      <Button disabled={currPosition !== -1} onClick={joinQueue}>Join Queue</Button>
     </div>
   );
 };
 
+const RoomContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+`;
+
+const StyledH1 = styled.h1`
+  margin: 0 0 0.5em 0;
+`;
+
+const NameText = styled.p`
+  margin: 0 0 0.5em 0;
+`;
+
 const Room = () => {
   const { user } = useContext(UserContext);
-  const { room, users, queue, setQueue } = useContext(RoomContext);
+  const { room, queue, userCount } = useContext(RoomContext);
 
   // const currQueuePos
 
   return (
-    <div>
-      <h2>Current Room: {room.name}</h2>
-      <h3>Hi {user.name}</h3>
+    <RoomContainer>
+      <StyledH1>{room.name}</StyledH1>
+      <NameText>Welcome <b>{user.name}</b></NameText>
       {
         user.isAdmin ?
           <AdminView
             room={room}
-            users={users}
             queue={queue}
+            userCount={userCount}
           />
           :
           <ParticipantView
+            room={room}
             user={user}
             queue={queue}
-            setQueue={setQueue}
           />
       }
-    </div>
+    </RoomContainer>
   );
 };
 

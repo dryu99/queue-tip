@@ -11,7 +11,7 @@ const RoomPage = () => {
   console.log('room page render');
   const { user } = useContext(UserContext);
   // const [room, setRoom] = useState(null);
-  const { room, users, queue, setRoom, setUsers, setQueue } = useContext(RoomContext);
+  const { room, queue, userCount, setRoom, setQueue, setUserCount } = useContext(RoomContext);
 
   const match = useRouteMatch('/room/:id');
 
@@ -32,15 +32,14 @@ const RoomPage = () => {
 
   // subscribe to socket events
   useEffect(() => {
-    // TODO rename user to sth else, name conflict with current user context
-    // when new users join the room, update user list
+    // when new users join the room, update room user count
     socket.on(SocketEvents.JOIN, ({ newUser }) => {
-      setUsers(users.concat(newUser));
+      setUserCount(userCount + 1);
     });
 
     // when another user disconnects from room, remove from user list
-    socket.on(SocketEvents.LEAVE, ({ disconnectedUser }) => {
-      setUsers(users.filter(u => u.id !== disconnectedUser.id));
+    socket.on(SocketEvents.LEAVE, ({ disconnectedUserId }) => {
+      setUserCount(userCount - 1);
     });
 
     socket.on(SocketEvents.ENQUEUE, ({ enqueuedUser }) => {
@@ -56,7 +55,7 @@ const RoomPage = () => {
       // unsubscribe from listeners
       socket.off();
     };
-  }, [queue, setQueue, setUsers, users]);
+  }, [queue, setQueue, setUserCount, userCount]);
 
   return (
     <div>

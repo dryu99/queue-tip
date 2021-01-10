@@ -3,6 +3,7 @@ export enum SocketEvents {
   LEAVE = 'leave',
   CREATE_ROOM = 'create_room',
   DISCONNECT = 'disconnect',
+  DISCONNECTING = 'disconnecting',
   ROOM_CHECK = 'room_check',
   ENQUEUE = 'enqueue',
   DEQUEUE = 'dequeue',
@@ -17,7 +18,7 @@ export interface UserBase {
 // ids are generated on server which is why they're not part of NewUser
 export interface User extends UserBase {
   id: string,
-  roomId: string
+  // roomId: string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -35,8 +36,8 @@ export interface RoomBase {
 export interface Room extends RoomBase {
   id: string,
   queue: User[],
-  users: User[],
   adminPassword: string,
+  userCount: number
   // owner: string
 }
 
@@ -44,9 +45,10 @@ export interface NewRoom extends RoomBase {
   adminPassword: string
 }
 
-// Room that is safe to send back to client
+// Room that is safe to send back to client; no need to pass entire queue back and forth
 export interface CleanRoom extends RoomBase {
   id: string
+  userCount: number
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

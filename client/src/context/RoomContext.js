@@ -6,17 +6,17 @@ export const RoomContext = createContext();
 export const RoomProvider = ({ children }) => {
   console.log('room provider');
   const [room, setRoom] = useState(null);
-  const [users, setUsers] = useState([]);
   const [queue, setQueue] = useState([]);
+  const [userCount, setUserCount] = useState(0);
 
   const providerValue = useMemo(() => ({
     room,
-    users,
     queue,
+    userCount,
     setRoom,
-    setUsers,
-    setQueue
-  }), [queue, room, users]);
+    setQueue,
+    setUserCount
+  }), [queue, room, userCount]);
 
   return (
     <RoomContext.Provider value={providerValue}>

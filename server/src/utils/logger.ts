@@ -1,5 +1,5 @@
 import roomService from '../services/roomService';
-import userService from '../services/userService';
+// import userService from '../services/userService';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const info = (...params: any[]): void => {
@@ -24,13 +24,12 @@ const error = (...params: any[]): void => {
 
 const printAppState = (): void => {
   info('--- SERVER STATE ---');
-  info('USERS:', userService.getUsers());
+  // info('USERS:', userService.getUsers());
   info('ROOMS: ', roomService.getAllRooms().map(r => ({
     id: r.id,
     name: r.name,
     adminPassword: r.adminPassword,
-    queue: r.queue.map(u => `${u.name}`),
-    users: r.users.map(u => `${u.name}`)
+    queue: r.queue.map(u => `${u.name}`)
   })));
 };
 

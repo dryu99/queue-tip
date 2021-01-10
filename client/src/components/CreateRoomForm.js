@@ -15,7 +15,7 @@ const FormContainer = styled(Card)`
 const CreateRoomForm = () => {
   const { triggerNotification } = useContext(NotificationContext);
   const { setUser } = useContext(UserContext);
-  const { setRoom, setUsers } = useContext(RoomContext);
+  const { setRoom, setUserCount } = useContext(RoomContext);
 
   const [roomName, setRoomName] = useState('cpsc 110');
   const [userName, setUserName] = useState('dan');
@@ -51,7 +51,8 @@ const CreateRoomForm = () => {
         if (room && !error) {
           setUser(user);
           setRoom(room);
-          setUsers([user]);
+          setUserCount(1);
+
           history.push(`/room/${room.id}`);
         } else {
           triggerNotification('Sorry room doesn\'t exist...');

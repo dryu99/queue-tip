@@ -17,7 +17,8 @@ export const toCleanRoom = (object: any): CleanRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
     id: parseString(object.id),
-    name: parseString(object.name)
+    name: parseString(object.name),
+    userCount: parseNumber(object.userCount),
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
@@ -27,8 +28,7 @@ export const toUser = (object: any): User  => {
   return {
     id: parseString(object.id),
     name: parseString(object.name),
-    roomId: parseString(object.roomId),
-    isAdmin: parseBoolean(object.isAdmin, 'User', 'isAdmin')
+    isAdmin: parseBoolean(object.isAdmin)
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
@@ -38,7 +38,7 @@ export const toNewUser = (object: any): NewUser  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
     name: parseString(object.name),
-    isAdmin: parseBoolean(object.isAdmin, 'NewUser', 'isAdmin')
+    isAdmin: parseBoolean(object.isAdmin)
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
@@ -50,11 +50,18 @@ export const parseString = (str: any): string => {
   return str;
 };
 
-const parseBoolean = (bool: any, modelName: string, propName: string): boolean => {
+const parseBoolean = (bool: any): boolean => {
   if (!isBoolean(bool)) {
-    throw new Error(`${modelName} ${propName} is missing or invalid: ${bool}`);
+    throw new Error(`Expected boolean but got: ${bool}`);
   }
   return bool;
+};
+
+const parseNumber = (num: any): number => {
+  if (!isNumber(num)) {
+    throw new Error(`Expected number but got: ${num}`);
+  }
+  return num;
 };
 
 const isString = (val: any): val is string => {
@@ -63,4 +70,8 @@ const isString = (val: any): val is string => {
 
 const isBoolean = (val: any): val is boolean => {
   return typeof val === 'boolean' || val instanceof Boolean;
+};
+
+const isNumber = (val: any): val is number => {
+  return typeof val === 'number' || val instanceof Number;
 };
