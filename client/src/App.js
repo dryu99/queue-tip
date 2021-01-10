@@ -6,13 +6,11 @@ import {
   useRouteMatch
 } from 'react-router-dom';
 
-import Home from './components/Home';
+import HomePage from './pages/HomePage';
 import Room from './components/Room';
 import Error from './components/Error';
 import NavHeader from './components/NavHeader';
 
-import { emitCheckRoom } from './socket';
-import logger from './utils/logger';
 import ThemeProvider from './styles/ThemeProvider';
 import GlobalStyle from './styles/GlobalStyle';
 import styled from 'styled-components';
@@ -113,7 +111,7 @@ const App = () => {
                   <RoomPage />
                 </Route>
                 <Route exact path="/">
-                  <Home />
+                  <HomePage />
                 </Route>
                 <Route>
                   {/* <Error text="404 resource not found"/> */}

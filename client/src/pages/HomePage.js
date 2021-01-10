@@ -3,9 +3,9 @@ import { Button, Container, Form, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import logger from '../utils/logger';
 
-import CreateRoomForm from './CreateRoomForm';
+import CreateRoomForm from '../components/CreateRoomForm';
 import styled from 'styled-components';
-import ActiveRoomsList from './ActiveRoomsList';
+import ActiveRoomsList from '../components/ActiveRoomsList';
 
 const OldHome = ({ setIsAdmin, setRoom, setRoomError }) => {
   const [newRoomName, setNewRoomName] = useState('');
@@ -96,7 +96,7 @@ const Row = styled.div`
   }
 `;
 
-const Home = () => {
+const HomePage = () => {
   return (
     <div>
       <Row>
@@ -107,4 +107,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomePage;

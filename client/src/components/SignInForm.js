@@ -7,7 +7,7 @@ import logger from '../utils/logger';
 import { RoomContext } from '../context/RoomContext';
 import { NotificationContext } from '../context/NotificationContext';
 
-const SignInContainer = styled(Card)`
+const SignInFormContainer = styled(Card)`
   display: flex;
   flex-direction: column;
   width: 50%;
@@ -24,11 +24,10 @@ function makeid(length) {
 }
 
 // TODO rename to Create User Form or sth lol
-const SignIn = () => {
+const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {
   console.log('SIGN IN');
   const { triggerNotification } = useContext(NotificationContext);
   const { user, setUser } = useContext(UserContext);
-  const { room, setQueue } = useContext(RoomContext);
   const [username, setUsername] = useState(makeid(5));
 
   // set current user data
@@ -46,6 +45,7 @@ const SignIn = () => {
       if (!error) {
         setUser(user);
         setQueue(queue);
+        setUserCount(userCount + 1);
       } else {
         logger.error(error);
         triggerNotification(error);
@@ -54,7 +54,7 @@ const SignIn = () => {
   };
 
   return (
-    <SignInContainer>
+    <SignInFormContainer>
       <h2>Join Room {`"${room.name}"`}</h2>
       <form onSubmit={handleSubmit}>
         <InputGroup>
@@ -67,8 +67,8 @@ const SignIn = () => {
         </InputGroup>
         <Button type="submit">Join</Button>
       </form>
-    </SignInContainer>
+    </SignInFormContainer>
   );
 };
 
-export default SignIn;
+export default SignInForm;

@@ -80,8 +80,7 @@ io.on(SocketEvents.CONNECTION, (socket) => {
       );
 
       // send back relevant room data to sender so they can init room state
-      const cleanRoom = toCleanRoom(room);
-      callback({ user, queue: room.queue, room: cleanRoom });
+      callback({ user, queue: room.queue });
     });
   });
 

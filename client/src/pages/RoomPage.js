@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useRouteMatch } from 'react-router-dom';
-import SignIn from '../components/SignIn';
+import SignInForm from '../components/SignInForm';
 import Room from '../components/Room';
 import { RoomContext } from '../context/RoomContext';
 import { UserContext } from '../context/UserContext';
@@ -11,12 +11,12 @@ import roomService from '../services/rooms';
 const RoomPage = () => {
   console.log('room page render');
   const { user } = useContext(UserContext);
-  // const [room, setRoom] = useState(null);
   const { room, queue, userCount, setRoom, setQueue, setUserCount } = useContext(RoomContext);
+  const 
 
   const match = useRouteMatch('/room/:id');
 
-  // check to see if room exists on server, if so, init room data
+  // init room data if it exists, ow error
   useEffect(() => {
     if (match && !room) {
       roomService.getSingle(match.params.id)
@@ -26,15 +26,6 @@ const RoomPage = () => {
         .catch(error => {
           logger.error(error);
         });
-      // socket.emit(SocketEvents.ROOM_CHECK, { roomId: match.params.id }, (res) => {
-      //   const { room, error } = res;
-
-      //   if (room && !error) {
-      //     setRoom(room);
-      //   } else {
-      //     logger.error(error);
-      //   }
-      // });
     }
   }, [room, match, setRoom]);
 
@@ -68,9 +59,9 @@ const RoomPage = () => {
   return (
     <div>
       {user && user.name && room
-        ? <Room />
+        ? <Room room={room} queue={queue} userCount={userCount}/>
         : room
-          ? <SignIn />
+          ? <SignInForm room={room} userCount={userCount} setQueue={setQueue} setUserCount={setUserCount} />
           : <p>room doesn&apos;t exist...</p>
       }
     </div>

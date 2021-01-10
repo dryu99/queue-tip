@@ -112,9 +112,9 @@ const NameText = styled.p`
   margin: 0 0 0.5em 0;
 `;
 
-const Room = () => {
+const Room = ({ room, queue, userCount }) => {
   const { user } = useContext(UserContext);
-  const { room, queue, userCount, setQueue } = useContext(RoomContext);
+  const { setQueue } = useContext(RoomContext); // TODO delete after done testing
 
   return (
     <RoomContainer>
