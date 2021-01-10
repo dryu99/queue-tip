@@ -34,7 +34,6 @@ const RoomPage = () => {
   useEffect(() => {
     // when new users join the room, update user list
     socket.on(SocketEvents.JOIN, ({ user }) => {
-      console.log('joinjoin');
       setUsers(users.concat(user));
     });
 
