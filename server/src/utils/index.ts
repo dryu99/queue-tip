@@ -8,8 +8,8 @@ import logger from './logger';
 export const toNewRoom = (object: any): NewRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
-    name: parseString(object.name, 'NewRoom', 'name'),
-    adminPassword: parseString(object.adminPassword, 'NewRoom', 'adminPassword'),
+    name: parseString(object.name),
+    adminPassword: parseString(object.adminPassword),
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
@@ -17,8 +17,8 @@ export const toNewRoom = (object: any): NewRoom  => {
 export const toCleanRoom = (object: any): CleanRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
-    id: parseString(object.id, 'CleanRoom', 'id'),
-    name: parseString(object.name, 'CleanRoom', 'name')
+    id: parseString(object.id),
+    name: parseString(object.name)
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
@@ -26,17 +26,19 @@ export const toCleanRoom = (object: any): CleanRoom  => {
 export const toUser = (object: any): User  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
-    name: parseString(object.name, 'User', 'name'),
-    roomId: parseString(object.roomId, 'User', 'roomId'),
+    id: parseString(object.id),
+    name: parseString(object.name),
+    roomId: parseString(object.roomId),
     isAdmin: parseBoolean(object.isAdmin, 'User', 'isAdmin')
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
 
+// we pass in id
 export const toNewUser = (object: any): NewUser  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
-    roomId: parseString(object.roomId, 'NewUser', 'roomId'),
+    name: parseString(object.name),
     isAdmin: parseBoolean(object.isAdmin, 'NewUser', 'isAdmin')
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
@@ -60,9 +62,9 @@ const unstrictParseString = (str: any, modelName: string, propName: string): str
   return str;
 };
 
-const parseString = (str: any, modelName: string, propName: string): string => {
+export const parseString = (str: any): string => {
   if (!str || !isString(str)) {
-    throw new Error(`${modelName} ${propName} is missing or invalid: ${str}`);
+    throw new Error(`Expected string but got: ${str}`);
   }
   return str;
 };

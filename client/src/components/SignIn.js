@@ -25,6 +25,7 @@ function makeid(length) {
 
 // TODO rename to Create User Form or sth lol
 const SignIn = () => {
+  console.log('SIGN IN');
   const { triggerNotification } = useContext(NotificationContext);
   const { user, setUser } = useContext(UserContext);
   const { room, setUsers, setQueue } = useContext(RoomContext);
@@ -36,12 +37,11 @@ const SignIn = () => {
 
     const newUser = {
       ...user,
-      name: username,
-      roomId: room.id
+      name: username
     };
 
-    // send join request to server + receive data on current room state
-    socket.emit(SocketEvents.JOIN, newUser, (res) => {
+    // send room join request to server + receive data on current room state
+    socket.emit(SocketEvents.JOIN, { newUser, roomId: room.id }, (res) => {
       const { user, users, queue, error } = res;
 
       if (!error) {

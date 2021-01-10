@@ -9,16 +9,26 @@ import roomService from './roomService';
  */
 const users = new Map<string, User>();
 
-const addUser = (socketId: string, user: User): void => {
-  if (users.has(socketId)) {
-    logger.error(`User ${socketId} already exists in user map; re-added user.`);
+const addUser = (userId: string, roomId: string, newUser: NewUser): User => {
+  if (users.has(userId)) {
+    logger.error(`User ${userId} '${userId}' already exists in user map; re-added user.`);
+    // TODO throw error here?
   }
 
+  const user: User = {
+    id: userId,
+    name: newUser.name,
+    isAdmin: newUser.isAdmin,
+    roomId
+  };
+
   // add to user service
-  users.set(socketId, user);
+  users.set(userId, user);
 
   // add user to respective room
   roomService.addUser(user, user.roomId);
+
+  return user;
 };
 
 const removeUser = (socketId: string): User => {

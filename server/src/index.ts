@@ -4,10 +4,10 @@ import socketio from 'socket.io';
 import app from './app';
 import config from './utils/config';
 import logger from './utils/logger';
-import { AcknowledgementCallback as AckCallback, SocketEvents } from './types';
+import { AcknowledgementCallback as AckCallback, SockData, SocketEvents } from './types';
 import roomService from './services/roomService';
 import userService from './services/userService';
-import { toNewRoom, toCleanRoom, toUser, toSocketData } from './utils';
+import { toNewRoom, toCleanRoom, toUser, toNewUser, toSocketData, parseString } from './utils';
 
 const server = http.createServer(app);
 const io = socketio(server);
@@ -15,13 +15,17 @@ const io = socketio(server);
 // executes given event handler and uses acknowledgement callback to send error back to client on failure
 // this is what every socket handler should call to keep consistency.
 const handleSocketEvent = (
-  event: string, data: any,
-  ackCallback: AckCallback, eventHandler: () => void
+  eventType: string, eventData: any,
+  ackCallback: AckCallback, eventHandler: (data: SockData) => void
 ) => {
-  logger.event(`${event} event received`, data);
+  logger.event(`${eventType} event received`, eventData);
 
   try {
-    eventHandler();
+    if (eventData === null || eventData === undefined) {
+      throw Error('event data received was null or undefined');
+    }
+
+    eventHandler(eventData);
   } catch (e) {
     const error = e as Error;
     logger.error(error);
@@ -36,19 +40,25 @@ io.on('connection', (socket) => {
   logger.printAppState();
 
   // Create a new room and send back room data on success.
-  socket.on(SocketEvents.CREATE_ROOM, (data, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.CREATE_ROOM, data, callback, () => {
-      const newRoom = toNewRoom(data);
+  socket.on(SocketEvents.CREATE_ROOM, (eventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.CREATE_ROOM, eventData, callback, (data) => {
+      const newRoom = toNewRoom(data.newRoom);
       const room = roomService.addRoom(newRoom);
-      const cleanRoom = toCleanRoom(room);
 
-      callback({ room: cleanRoom });
+      const newUser = toNewUser(data.newUser);
+      const user = userService.addUser(socket.id, room.id, newUser);
+
+      // have admin user join socket.io room
+      socket.join(user.roomId);
+
+      const cleanRoom = toCleanRoom(room);
+      callback({ room: cleanRoom, user });
     });
   });
 
   // Check if room exists and send back room data on success.
-  socket.on(SocketEvents.ROOM_CHECK, (data, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.ROOM_CHECK, data, callback, () => {
+  socket.on(SocketEvents.ROOM_CHECK, (eventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.ROOM_CHECK, eventData, callback, (data) => {
       const { roomId } = toSocketData(data);
 
       const room = roomService.getRoom(roomId as string); // TODO re-evaluate socketdata data type
@@ -59,14 +69,13 @@ io.on('connection', (socket) => {
   });
 
   // Cache user and add them to specified room.
-  socket.on(SocketEvents.JOIN, (data, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.JOIN, data, callback, () => {
-      const user = toUser(data);
+  socket.on(SocketEvents.JOIN, (eventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.JOIN, eventData, callback, (data) => {
+      const newUser = toNewUser(data.newUser);
+      const roomId = parseString(data.roomId);
+      const user = userService.addUser(socket.id, roomId, newUser);
 
-      // store user in memory
-      userService.addUser(socket.id, user);
-
-      // make socket join socket.io room
+      // have user join socket.io room
       socket.join(user.roomId);
 
       // broadcast new user to all clients in room except sender
@@ -81,8 +90,8 @@ io.on('connection', (socket) => {
   });
 
   // Enqueues user in specified room.
-  socket.on(SocketEvents.ENQUEUE, (data, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.ENQUEUE, data, callback, () => {
+  socket.on(SocketEvents.ENQUEUE, (eventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.ENQUEUE, eventData, callback, (data) => {
       const user = toUser(data);
 
       roomService.enqueueUser(user, user.roomId);
@@ -97,8 +106,8 @@ io.on('connection', (socket) => {
   });
 
   // Dequeues user in specified room.
-  socket.on(SocketEvents.DEQUEUE, (data, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.DEQUEUE, data, callback, () => {
+  socket.on(SocketEvents.DEQUEUE, (eventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.DEQUEUE, eventData, callback, (data) => {
       const { username, roomId } = toSocketData(data);
 
       if (username && roomId) {
@@ -117,8 +126,8 @@ io.on('connection', (socket) => {
   });
 
   // Verifies given password and returns success/failure result.
-  socket.on(SocketEvents.TRY_ADMIN_STATUS, (data, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, data, callback, () => {
+  socket.on(SocketEvents.TRY_ADMIN_STATUS, (eventData, callback: AckCallback) => {
+    handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, eventData, callback, (data) => {
       const { adminPassword, roomId } = toSocketData(data);
 
       if (adminPassword && roomId) {
@@ -147,6 +156,8 @@ io.on('connection', (socket) => {
         // get socket room user was in
         const socketRoom = io.sockets.adapter.rooms[removedUser.roomId];
 
+        // const room = roomService.getRoom(removedUser.roomId);
+
         // broadcast disconnected user to all clients in room except sender
         socket.broadcast.to(removedUser.roomId).emit(
           SocketEvents.LEAVE,
@@ -168,8 +179,6 @@ io.on('connection', (socket) => {
     }
 
     logger.printAppState();
-    // console.log(`current number of users connected: ${--connectCounter}`);
-    // console.log(`current number of rooms: ${roomCounter}`);
   });
 });
 

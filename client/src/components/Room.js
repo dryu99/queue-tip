@@ -113,40 +113,6 @@ const ParticipantView = () => {
 const Room = () => {
   const { user } = useContext(UserContext);
   const { room, users, queue } = useContext(RoomContext);
-  // const [users, setUsers] = useState([]);
-  // const [queue, setQueue] = useState([]);
-
-  // // send join request to server + receive data on current room state
-  // useEffect(() => {
-  //   socket.emit(SocketEvents.JOIN, user, (res) => {
-  //     const { users, queue, error } = res;
-
-  //     if (!error) {
-  //       setUsers(users);
-  //       setQueue(queue);
-  //     } else {
-  //       logger.error(error);
-  //     }
-  //   });
-  // }, [setQueue, setUsers, user]);
-
-  // // subscribe to relevant socket events
-  // useEffect(() => {
-  //   // when new users join the room, update user list
-  //   socket.on(SocketEvents.JOIN, ({ user }) => {
-  //     setUsers(users.concat(user));
-  //   });
-
-  //   // when another user disconnects from room, remove from user list
-  //   socket.on(SocketEvents.LEAVE, ({ user }) => {
-  //     setUsers(users.filter(u => u.name !== user.name));
-  //   });
-
-  //   return () => {
-  //     // unsubscribe from listeners
-  //     socket.off();
-  //   };
-  // }, [setUsers, users]);
 
   // const currQueuePos
 

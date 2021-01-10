@@ -14,9 +14,11 @@ const FormContainer = styled(Card)`
 
 const CreateRoomForm = () => {
   const { triggerNotification } = useContext(NotificationContext);
-  const { user, setUser } = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
+  const { setRoom } = useContext(RoomContext);
 
   const [roomName, setRoomName] = useState('cpsc 110');
+  const [userName, setUserName] = useState('dan');
   const [adminPassword, setAdminPassword] = useState('pass');
 
   const history = useHistory();
@@ -26,25 +28,29 @@ const CreateRoomForm = () => {
 
     if (roomName.trim().length === 0) {
       triggerNotification('Please type in a room name!');
+    } else if (userName.trim().length === 0) {
+      triggerNotification('Please type in your name!');
     } else if (adminPassword.trim().length === 0) {
       triggerNotification('Please type in a password!');
     } else {
-      setUser({ ...user, name: null, isAdmin: true });
-
       const newRoom = {
         name: roomName,
         adminPassword
       };
 
+      const newUser = {
+        name: userName,
+        isAdmin: true
+      };
+
       // TODO don't need to necessarily use socket here, can make http request
       // ^ actually not true if I want to listen to all new room creations for ActiveRooms
-      socket.emit(SocketEvents.CREATE_ROOM, newRoom, (res) => {
-        const { room, error } = res;
+      socket.emit(SocketEvents.CREATE_ROOM, { newRoom, newUser }, (res) => {
+        const { user, room, error } = res;
 
         if (room && !error) {
-          // setRoom(room);
-
-          // go to room url
+          setUser(user);
+          setRoom(room);
           history.push(`/room/${room.id}`);
         } else {
           triggerNotification('Sorry room doesn\'t exist...');
@@ -63,6 +69,14 @@ const CreateRoomForm = () => {
             type="text"
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
+          />
+        </InputGroup>
+        <InputGroup>
+          <InputLabel>Your Name</InputLabel>
+          <Input
+            type="text"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
           />
         </InputGroup>
         <InputGroup>

@@ -3,18 +3,35 @@ import { NewRoom, Room, User } from '../types';
 
 const rooms = new Map<string, Room>();
 
+// set remove timer when:
+// 1) you add a new room
+// 2) a user disconnects
+// if there are no users in the room when the timer ends, delete room
+
+// const setRemoveTimer = (room: Room) => {
+//   clearTimeout(1);
+
+//   setTimeout(() => {
+//     if (room.users.length === 0) {
+//       removeRoom(room.id);
+//     }
+//   }, 180000);
+// };
+
 const addRoom = (newRoom: NewRoom): Room => {
+  const newID = uuidv4(); // generate random id
+
+  if (rooms.has(newID)) {
+    throw new Error('Trying to add room but id already exists, uuid fudged up or sth else went wrong.');
+  }
+
   const room: Room = {
-    id: uuidv4(), // generate random id
+    id: newID,
     name: newRoom.name,
     adminPassword: newRoom.adminPassword,
     queue: [],
     users: []
   };
-
-  if (rooms.has(room.id)) {
-    throw new Error('Trying to add room but id already exists, uuid fudged up or sth else went wrong.');
-  }
 
   rooms.set(room.id, room);
 

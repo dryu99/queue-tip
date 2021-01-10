@@ -10,18 +10,22 @@ export enum SocketEvents {
 }
 
 export interface UserBase {
-  roomId: string,
+  name: string,
   isAdmin: boolean
 }
 
+// ids are generated on server which is why they're not part of NewUser
 export interface User extends UserBase {
-  name: string
+  id: string,
+  roomId: string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface NewUser extends UserBase {
 
 }
+
+// need 2 new user interfaces
 
 export interface RoomBase {
   name: string,
@@ -53,3 +57,5 @@ export interface SocketData {
   roomId?: string,
   adminPassword?: string
 }
+
+export type SockData = Record<string, unknown>;

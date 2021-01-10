@@ -105,22 +105,22 @@ const App = () => {
       <NotificationProvider>
         <Notification />
         <UserProvider>
-          <Content>
-            <h1><a href="/">queue-tip</a></h1>
-            <Switch>
-              <Route path="/room/:id">
-                <RoomProvider>
+          <RoomProvider>
+            <Content>
+              <h1><a href="/">queue-tip</a></h1>
+              <Switch>
+                <Route path="/room/:id">
                   <RoomPage />
-                </RoomProvider>
-              </Route>
-              <Route exact path="/">
-                <Home />
-              </Route>
-              <Route>
-                {/* <Error text="404 resource not found"/> */}
-              </Route>
-            </Switch>
-          </Content>
+                </Route>
+                <Route exact path="/">
+                  <Home />
+                </Route>
+                <Route>
+                  {/* <Error text="404 resource not found"/> */}
+                </Route>
+              </Switch>
+            </Content>
+          </RoomProvider>
         </UserProvider>
       </NotificationProvider>
     </ThemeProvider>
