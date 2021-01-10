@@ -50,12 +50,4 @@ export interface CleanRoom extends RoomBase {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AcknowledgementCallback = (object: any) => void;
 
-// TODO toSocketData could be better if we had multiple types of SocketData and toSocketData util fns, but that didn't feel scalable.
-// client data that may or may not contain specified fields
-export interface SocketData {
-  username?: string,
-  roomId?: string,
-  adminPassword?: string
-}
-
-export type SockData = Record<string, unknown>;
+export type EventData = Record<string, unknown>;

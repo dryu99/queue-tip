@@ -4,10 +4,10 @@ import socketio from 'socket.io';
 import app from './app';
 import config from './utils/config';
 import logger from './utils/logger';
-import { AcknowledgementCallback as AckCallback, SockData, SocketEvents } from './types';
+import { AcknowledgementCallback as AckCallback, EventData, SocketEvents } from './types';
 import roomService from './services/roomService';
 import userService from './services/userService';
-import { toNewRoom, toCleanRoom, toUser, toNewUser, toSocketData, parseString } from './utils';
+import { toNewRoom, toCleanRoom, toUser, toNewUser, parseString } from './utils';
 
 const server = http.createServer(app);
 const io = socketio(server);
@@ -16,7 +16,7 @@ const io = socketio(server);
 // this is what every socket handler should call to keep consistency.
 const handleSocketEvent = (
   eventType: string, eventData: any,
-  ackCallback: AckCallback, eventHandler: (data: SockData) => void
+  ackCallback: AckCallback, eventHandler: (data: EventData) => void
 ) => {
   logger.event(`${eventType} event received`, eventData);
 
@@ -59,9 +59,8 @@ io.on('connection', (socket) => {
   // Check if room exists and send back room data on success.
   socket.on(SocketEvents.ROOM_CHECK, (eventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.ROOM_CHECK, eventData, callback, (data) => {
-      const { roomId } = toSocketData(data);
-
-      const room = roomService.getRoom(roomId as string); // TODO re-evaluate socketdata data type
+      const roomId = parseString(data.roomId);
+      const room = roomService.getRoom(roomId); // TODO re-evaluate socketdata data type
       const cleanRoom = toCleanRoom(room);
 
       callback({ room: cleanRoom });
@@ -108,7 +107,8 @@ io.on('connection', (socket) => {
   // Dequeues user in specified room.
   socket.on(SocketEvents.DEQUEUE, (eventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.DEQUEUE, eventData, callback, (data) => {
-      const { username, roomId } = toSocketData(data);
+      const username = parseString(data.username);
+      const roomId = parseString(data.roomId);
 
       if (username && roomId) {
         const dequeuedUser = roomService.dequeueUser(username, roomId);
@@ -128,7 +128,8 @@ io.on('connection', (socket) => {
   // Verifies given password and returns success/failure result.
   socket.on(SocketEvents.TRY_ADMIN_STATUS, (eventData, callback: AckCallback) => {
     handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, eventData, callback, (data) => {
-      const { adminPassword, roomId } = toSocketData(data);
+      const adminPassword = parseString(data.adminPassword);
+      const roomId = parseString(data.roomId);
 
       if (adminPassword && roomId) {
         const isPasswordCorrect = roomService.verifyAdminPassword(adminPassword, roomId);
