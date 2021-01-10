@@ -17,8 +17,8 @@ const CreateRoomForm = () => {
   const { setUser } = useContext(UserContext);
   const { setRoom, setUserCount } = useContext(RoomContext);
 
-  const [roomName, setRoomName] = useState('cpsc 110');
-  const [userName, setUserName] = useState('dan');
+  const [roomName, setRoomName] = useState('CPSC 110 Office Hours');
+  const [userName, setUserName] = useState('daniel');
   const [adminPassword, setAdminPassword] = useState('pass');
 
   const history = useHistory();

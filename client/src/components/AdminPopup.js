@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { emitTryAdminStatus } from '../socket';
 import logger from '../utils/logger';
 
 
@@ -27,17 +26,17 @@ const AdminPopup = ({ show, setAdminPopupOpen, setIsAdmin, room }) => {
 
   const submitAdminPassword = (e) => {
     e.preventDefault();
-    emitTryAdminStatus({ adminPassword, roomId: room.id }, (resData) => {
-      logger.info('acknowledged from TRY ADMIN STATUS event', resData);
+    // emitTryAdminStatus({ adminPassword, roomId: room.id }, (resData) => {
+    //   logger.info('acknowledged from TRY ADMIN STATUS event', resData);
 
-      if (!resData.error) {
-        setIsAdmin(true);
-        handleClose();
-      } else {
-        logger.error(resData.error);
-        setAlertText('Password is incorrect! Please try again.');
-      }
-    });
+    //   if (!resData.error) {
+    //     setIsAdmin(true);
+    //     handleClose();
+    //   } else {
+    //     logger.error(resData.error);
+    //     setAlertText('Password is incorrect! Please try again.');
+    //   }
+    // });
   };
 
   return (

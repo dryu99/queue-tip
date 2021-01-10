@@ -3,7 +3,6 @@ import { Button, Container, Form, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import logger from '../utils/logger';
 
-import { emitCreateRoom } from '../socket';
 import CreateRoomForm from './CreateRoomForm';
 import styled from 'styled-components';
 import ActiveRoomsList from './ActiveRoomsList';
@@ -28,19 +27,19 @@ const OldHome = ({ setIsAdmin, setRoom, setRoomError }) => {
 
       // create room on server, set room on client and enter room if it does
       logger.info('emitting room creation event');
-      emitCreateRoom({ name: newRoomName, adminPassword: newAdminPassword }, (resData) => {
-        const { room, error } = resData;
+      // emitCreateRoom({ name: newRoomName, adminPassword: newAdminPassword }, (resData) => {
+      //   const { room, error } = resData;
 
-        if (room && !error) {
-          setRoom(room);
+      //   if (room && !error) {
+      //     setRoom(room);
 
-          // go to room url
-          history.push(`/room/${room.id}`);
-        } else {
-          logger.error(error);
-          setRoomError('Sorry room doesn\'t exist...');
-        }
-      });
+      //     // go to room url
+      //     history.push(`/room/${room.id}`);
+      //   } else {
+      //     logger.error(error);
+      //     setRoomError('Sorry room doesn\'t exist...');
+      //   }
+      // });
     }
   };
 

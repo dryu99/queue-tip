@@ -2,9 +2,6 @@ import React from 'react';
 import { Container, Form, InputGroup, Button, Row, Col } from 'react-bootstrap';
 import TooltipWrapper from './TooltipWrapper';
 
-import logger from '../utils/logger';
-import { emitEnqueue } from '../socket';
-
 import crownIcon from '../assets/crown.png';
 
 const RoomActions = ({ currentName, setCurrentName, isAdmin, setAdminPopupOpen, queuedUsers, room }) => {
@@ -20,14 +17,14 @@ const RoomActions = ({ currentName, setCurrentName, isAdmin, setAdminPopupOpen, 
       // TODO make this a pretty modal
         alert('You\'re already in queue! Can\'t join again.');
       } else {
-        emitEnqueue({ name: currentName, roomId: room.id }, (resData) => {
-          logger.info('acknowledged from ENQUEUE event', resData);
+        // emitEnqueue({ name: currentName, roomId: room.id }, (resData) => {
+        //   logger.info('acknowledged from ENQUEUE event', resData);
 
-          // cache current name data
-          logger.info('caching current user data...');
-          const currentNameJSON = JSON.stringify({ value: currentName });
-          localStorage.setItem('currentNameData', currentNameJSON);
-        });
+        //   // cache current name data
+        //   logger.info('caching current user data...');
+        //   const currentNameJSON = JSON.stringify({ value: currentName });
+        //   localStorage.setItem('currentNameData', currentNameJSON);
+        // });
       }
     }
   };
