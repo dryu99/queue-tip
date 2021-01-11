@@ -87,7 +87,6 @@ const ParticipantRoomView = ({ user, room, queue }) => {
   const joinQueue = () => {
     socket.emit(SocketEvents.ENQUEUE, { user, roomId: room.id }, (res) => {
       const { error } = res;
-      console.log(res);
       error && logger.error(error);
     });
   };

@@ -27,7 +27,6 @@ const Title = styled.h3`
 `;
 
 const App = () => {
-  console.log('app render');
   return (
     <ThemeProvider>
       <GlobalStyle />
