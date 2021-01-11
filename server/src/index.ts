@@ -50,9 +50,9 @@ io.on(SocketEvents.CONNECTION, (socket) => {
       const newUser = toNewUser(data.newUser);
       const user = toUser({ ...newUser, id: socket.id });
 
-      // have admin user join socket.io room
+      // have admin user join room
       socket.join(room.id);
-      room.userCount++;
+      roomService.addUserToRoom(room, user);
 
       // send back relevant room and user data to sender
       const cleanRoom = toCleanRoom(room);
@@ -69,9 +69,9 @@ io.on(SocketEvents.CONNECTION, (socket) => {
       const newUser = toNewUser(data.newUser);
       const user = toUser({ ...newUser, id: socket.id });
 
-      // have user join socket.io room
+      // have user join room
       socket.join(roomId);
-      room.userCount++;
+      roomService.addUserToRoom(room, user);
 
       // broadcast new user to all clients in room except sender
       socket.broadcast.to(roomId).emit(
@@ -155,13 +155,7 @@ io.on(SocketEvents.CONNECTION, (socket) => {
       const room = roomService.getRoom(roomId);
 
       // update user count
-      room.userCount--;
-
-      // remove user from queue if they're in it
-      const index = room.queue.findIndex(u => u.id === socket.id);
-      if (index !== -1) {
-        room.queue.splice(index, 1);
-      }
+      roomService.removeUserFromRoom(room, socket.id);
 
       // broadcast disconnected user to all clients in room except sender
       socket.broadcast.to(roomId).emit(

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { NewRoom, NewUser, CleanRoom, User } from '../types';
+import { NewRoom, NewUser, CleanRoom, User, Room } from '../types';
 
 export const toNewRoom = (object: any): NewRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -13,12 +13,12 @@ export const toNewRoom = (object: any): NewRoom  => {
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
 
-export const toCleanRoom = (object: any): CleanRoom  => {
+export const toCleanRoom = (object: Room): CleanRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
     id: parseString(object.id),
     name: parseString(object.name),
-    userCount: parseNumber(object.userCount),
+    userCount: parseNumber(object.users.length),
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };

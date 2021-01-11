@@ -26,9 +26,9 @@ const printAppState = (): void => {
   info('ROOMS: ', roomService.getAllRooms().map(r => ({
     id: r.id,
     name: r.name,
-    userCount: r.userCount,
+    users: r.users.map(u => u.name),
     adminPassword: r.adminPassword,
-    queue: r.queue.map(u => `${u.name}`)
+    queue: r.queue.map(u => u.name)
   })));
 };
 

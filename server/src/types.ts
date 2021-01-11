@@ -25,12 +25,12 @@ export interface RoomBase {
   name: string,
 }
 
-// TODO consider only storing user ids in queue and users props
 export interface Room extends RoomBase {
   id: string,
+  users: User[] // TODO consider making this a Map<userid,User>
   queue: User[],
-  adminPassword: string,
-  userCount: number
+  adminPassword: string
+  // userCount: number
   // owner: string
 }
 
