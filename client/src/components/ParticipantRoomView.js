@@ -37,7 +37,6 @@ const YOUTextContainer = styled.span`
     position: absolute;
     top: -10px;
     right: 10px;
-    font-weight: bold;
   }
 `;
 
@@ -49,6 +48,11 @@ const QueueEmojiSpan = styled.span`
 const DoorEmojiSpan = styled.span`
   font-size: 3em;
   margin: ${p => p.isQueueEmpty ? '3px 3px 10px 3px' : '3px 30px 10px 3px'}
+`;
+
+const JoinButton = styled(Button)`
+  font-size: 1em;
+  padding: 0.75em 1em;
 `;
 
 // each user gets an emoji avatar based on the first char in their name
@@ -63,7 +67,7 @@ const QueueEmoji = ({ user, currentUser }) => {
       {
         user.id === currentUser.id ?
           <YOUTextContainer>
-            <span>YOU</span>
+            <span className="bold">YOU</span>
           </YOUTextContainer>
           :
           null
@@ -91,7 +95,7 @@ const ParticipantRoomView = ({ user, room, queue }) => {
     <div>
       <QueueInfoContainer>
         <Card>
-          <p>Your current position</p>
+          <p>Your position in queue</p>
           <h2>{currPosition !== -1 ? currPosition + 1 : 'N/A'}</h2>
         </Card>
         <Card>
@@ -99,13 +103,13 @@ const ParticipantRoomView = ({ user, room, queue }) => {
           <h2>{queue.length}</h2>
         </Card>
       </QueueInfoContainer>
-      <h3>Queue</h3>
-      <Button
+      {/* <h3>Queue</h3> */}
+      <JoinButton
         disabled={currPosition !== -1}
         onClick={joinQueue}
       >
-        Join
-      </Button>
+        Click to join
+      </JoinButton>
       <EmojisContainer>
         <DoorEmojiSpan isQueueEmpty={queue.length === 0}>🚪</DoorEmojiSpan>
         {

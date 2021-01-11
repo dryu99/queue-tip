@@ -17,7 +17,7 @@ const RoomNameText = styled.p`
   margin-top: 0;
   margin-bottom: 0.75em;
   font-size: 1.25em;
-  font-style: italic;
+  text-align: center;
 `;
 
 const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {

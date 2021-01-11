@@ -6,6 +6,7 @@ import logger from '../utils/logger';
 import CreateRoomForm from '../components/CreateRoomForm';
 import styled from 'styled-components';
 import ActiveRoomsList from '../components/ActiveRoomsList';
+import Introduction from '../components/Introduction';
 
 const OldHome = ({ setIsAdmin, setRoom, setRoomError }) => {
   const [newRoomName, setNewRoomName] = useState('');
@@ -91,6 +92,7 @@ const OldHome = ({ setIsAdmin, setRoom, setRoomError }) => {
 const HomePageContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   & > div {
     width: 50%;
   }
@@ -100,7 +102,8 @@ const HomePage = () => {
   return (
     <div>
       <HomePageContainer>
-        <ActiveRoomsList />
+        {/* <ActiveRoomsList /> */}
+        <Introduction />
         <CreateRoomForm />
       </HomePageContainer>
     </div>

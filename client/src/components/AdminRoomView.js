@@ -27,6 +27,11 @@ const QueueListContainer = styled(Card)`
   }
 `;
 
+const DequeueButton = styled(Button)`
+  font-size: 1em;
+  padding: 0.75em 1em;
+`;
+
 const AdminRoomView = ({ room, queue, userCount }) => {
   const dequeue = () => {
     socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, (res) => {
@@ -42,7 +47,7 @@ const AdminRoomView = ({ room, queue, userCount }) => {
     <AdminRoomViewContainer>
       <RoomInfoContainer>
         <Card>
-          <p>Current user count</p>
+          <p>Current room size</p>
           <h2>{userCount}</h2>
         </Card>
         <Card>
@@ -50,16 +55,16 @@ const AdminRoomView = ({ room, queue, userCount }) => {
           <h2>{queue.length}</h2>
         </Card>
       </RoomInfoContainer>
-      <h3>Queue</h3>
-      <Button
+      {/* <h3>Queue</h3> */}
+      <DequeueButton
         disabled={isQueueEmpty}
         onClick={dequeue}
       >
         Dequeue
-      </Button>
+      </DequeueButton>
       <QueueListContainer>
-        {queue.map(u =>
-          <div key={u.id}>
+        {queue.map((u, i) =>
+          <div key={u.id} className={i === 0 ? 'underline' : null}>
             {u.name}
           </div>
         )}

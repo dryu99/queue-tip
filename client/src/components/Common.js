@@ -39,5 +39,7 @@ export const Input = styled.input`
 `;
 
 export const Button = styled.button`
+  font-family: 'Roboto Slab';
   padding: 0.5em;
+  min-width: 80px;
 `;

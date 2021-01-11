@@ -12,6 +12,10 @@ const FormContainer = styled(Card)`
   flex-direction: column;
 `;
 
+const StyledForm = styled.form`
+  height: 100%;
+`;
+
 const CreateRoomForm = () => {
   const { setUser } = useContext(UserContext);
   const { setRoom, setUserCount } = useContext(RoomContext);
@@ -62,7 +66,7 @@ const CreateRoomForm = () => {
   return (
     <FormContainer>
       <CardTitle>Create Room</CardTitle>
-      <form onSubmit={handleSubmit}>
+      <StyledForm onSubmit={handleSubmit}>
         <InputGroup>
           <InputLabel>Room Name</InputLabel>
           <Input
@@ -93,7 +97,7 @@ const CreateRoomForm = () => {
         >
           Create Room
         </Button>
-      </form>
+      </StyledForm>
     </FormContainer>
   );
 };
