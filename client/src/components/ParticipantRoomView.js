@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
-import socket, { SocketEvents } from '../socket';
+import React from 'react';
+import socket, { SocketEvents } from '../services/socket';
 import logger from '../utils/logger';
 import { Button, Card } from './Common';
 import styled from 'styled-components';
-import { RoomContext } from '../context/RoomContext';
 
 const EMOJIS = [
   '🐢','🐍','🦖','🐡','🐠','🐬','🐳','🐅',
@@ -52,16 +51,6 @@ const DoorEmojiSpan = styled.span`
   margin: ${p => p.isQueueEmpty ? '3px 3px 10px 3px' : '3px 30px 10px 3px'}
 `;
 
-function makeid(length) {
-  var result           = '';
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-
 // each user gets an emoji avatar based on the first char in their name
 const QueueEmoji = ({ user, currentUser }) => {
   const firstCharCode = user.name.charCodeAt(0);
@@ -87,7 +76,6 @@ const QueueEmoji = ({ user, currentUser }) => {
 };
 
 const ParticipantRoomView = ({ user, room, queue }) => {
-  const { setQueue } = useContext(RoomContext); // TODO delete after done testing
 
   const joinQueue = (e) => {
     socket.emit(SocketEvents.ENQUEUE, { user, roomId: room.id }, (res) => {
@@ -95,10 +83,8 @@ const ParticipantRoomView = ({ user, room, queue }) => {
       console.log(res);
       error && logger.error(error);
     });
-    // setQueue(queue.concat({ name: makeid(3) }));
   };
 
-  // TODO this is a bottleneck
   const currPosition = queue.findIndex(u => u.id === user.id);
 
   return (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Container } from 'react-bootstrap';
-import socket, { SocketEvents } from '../socket';
+import socket, { SocketEvents } from '../services/socket';
 import logger from '../utils/logger';
 
 import RoomName from './RoomName';

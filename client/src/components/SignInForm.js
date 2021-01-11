@@ -1,10 +1,11 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { UserContext } from '../context/UserContext';
-import { Button, Card, CardTitle, Input, InputGroup, InputLabel } from './Common';
-import socket, { SocketEvents } from '../socket';
-import logger from '../utils/logger';
 import { RoomContext } from '../context/RoomContext';
+import { Button, Card, CardTitle, Input, InputGroup, InputLabel } from './Common';
+import socket, { SocketEvents } from '../services/socket';
+import logger from '../utils/logger';
+import { generateTestId } from '../utils/devHelpers';
 
 const SignInFormContainer = styled(Card)`
   display: flex;
@@ -19,20 +20,9 @@ const RoomNameText = styled.p`
   font-style: italic;
 `;
 
-function makeid(length) {
-  var result           = '';
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-
-// TODO rename to Create User Form or sth lol
 const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {
   const { user, setUser } = useContext(UserContext);
-  const [username, setUsername] = useState(makeid(5));
+  const [username, setUsername] = useState(generateTestId(5));
 
   // set current user data
   const handleSubmit = (e) => {

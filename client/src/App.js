@@ -12,6 +12,7 @@ import styled from 'styled-components';
 import { RoomProvider } from './context/RoomContext';
 import { UserProvider } from './context/UserContext';
 import RoomPage from './pages/RoomPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 // function App() {
 //   const [room, setRoom] = useState(null);
@@ -90,6 +91,10 @@ const Content = styled.div`
 
 const Title = styled.h3`
   text-align: center;
+
+  & > a {
+    color: ${p => p.theme.colors.primary};
+  }
 `;
 
 const App = () => {
@@ -109,7 +114,7 @@ const App = () => {
                 <HomePage />
               </Route>
               <Route>
-                {/* <Error text="404 resource not found"/> */}
+                <NotFoundPage />
               </Route>
             </Switch>
           </Content>

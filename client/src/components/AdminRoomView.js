@@ -1,18 +1,8 @@
-import React, { useState } from 'react';
-import socket, { SocketEvents } from '../socket';
+import React from 'react';
+import socket, { SocketEvents } from '../services/socket';
 import logger from '../utils/logger';
 import { Button, Card } from './Common';
 import styled from 'styled-components';
-
-function makeid(length) {
-  var result           = '';
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
 
 const AdminRoomViewContainer = styled.div`
 
@@ -38,15 +28,6 @@ const QueueListContainer = styled(Card)`
 `;
 
 const AdminRoomView = ({ room, queue, userCount }) => {
-// const AdminRoomView = ({ room, userCount }) => {
-  // const [queue, setQueue] = useState([
-  //   { name: 'bob', id: 1 },
-  //   { name: 'john', id: 2 },
-  //   { name: 'honey', id: 3 }
-  // ]);
-
-  const isQueueEmpty = queue.length === 0;
-
   const dequeue = () => {
     socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, (res) => {
       const { error } = res;
@@ -54,6 +35,8 @@ const AdminRoomView = ({ room, queue, userCount }) => {
       error && logger.error(error);
     });
   };
+
+  const isQueueEmpty = queue.length === 0;
 
   return (
     <AdminRoomViewContainer>
@@ -74,10 +57,6 @@ const AdminRoomView = ({ room, queue, userCount }) => {
       >
         Dequeue
       </Button>
-      {/* <Button
-        onClick={() => setQueue(queue.concat({ name: makeid(Math.random() * 10), id: makeid(Math.random() * 10) }))}>
-        TEST ADD
-      </Button> */}
       <QueueListContainer>
         {queue.map(u =>
           <div key={u.id}>

@@ -115,7 +115,7 @@ io.on(SocketEvents.CONNECTION, (socket) => {
         // broadcast dequeued user to all clients in room including sender
         io.in(roomId).emit(
           SocketEvents.DEQUEUE,
-          { dequeuedUser: user }
+          { dequeuedUserId: user.id }
         );
       } else {
         logger.error(`Room ${roomId} was empty, couldn't dequeue.`);

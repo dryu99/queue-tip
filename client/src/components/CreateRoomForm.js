@@ -2,9 +2,10 @@ import React, { useContext, useState } from 'react';
 import { Button, Card, CardTitle, Input, InputGroup, InputLabel } from './Common';
 import styled from 'styled-components';
 import { UserContext } from '../context/UserContext';
-import socket, { SocketEvents } from '../socket';
+import socket, { SocketEvents } from '../services/socket';
 import { useHistory } from 'react-router-dom';
 import { RoomContext } from '../context/RoomContext';
+import { generateTestId } from '../utils/devHelpers';
 
 const FormContainer = styled(Card)`
   display: flex;
@@ -15,9 +16,9 @@ const CreateRoomForm = () => {
   const { setUser } = useContext(UserContext);
   const { setRoom, setUserCount } = useContext(RoomContext);
 
-  const [roomName, setRoomName] = useState('CPSC 110 Office Hours');
-  const [userName, setUserName] = useState('daniel');
-  const [adminPassword, setAdminPassword] = useState('pass');
+  const [roomName, setRoomName] = useState(generateTestId(10));
+  const [userName, setUserName] = useState(generateTestId(5));
+  const [adminPassword, setAdminPassword] = useState('placeholder');
 
   const history = useHistory();
 
@@ -78,14 +79,14 @@ const CreateRoomForm = () => {
             onChange={(e) => setUserName(e.target.value)}
           />
         </InputGroup>
-        <InputGroup>
-          <InputLabel>Set Admin Password</InputLabel>
+        {/* <InputGroup>
+          <InputLabel>New Admin Password</InputLabel>
           <Input
             type="password"
             value={adminPassword}
             onChange={(e) => setAdminPassword(e.target.value)}
           />
-        </InputGroup>
+        </InputGroup> */}
         <Button
           className="float-right"
           type="submit"
