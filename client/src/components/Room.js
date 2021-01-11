@@ -57,11 +57,10 @@ const Room = ({ room, queue, userCount }) => {
       <RoomTitle>
         {room.name}
         <CopyLinkButton
-          role="img"
-          aria-label="link"
           title="copy link"
-          onClick={copyLinkToClipboard}>
-          🔗
+          onClick={copyLinkToClipboard}
+        >
+          <span role="img" aria-label="link">🔗</span>
         </CopyLinkButton>
       </RoomTitle>
       <NameText>

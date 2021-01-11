@@ -21,9 +21,8 @@ const CreateRoomForm = () => {
   const { setRoom, setUserCount } = useContext(RoomContext);
 
   const [roomName, setRoomName] = useState(generateTestId(10));
-  const [userName, setUserName] = useState(generateTestId(5));
-  // eslint-disable-next-line no-unused-vars
-  const [adminPassword, setAdminPassword] = useState('placeholder');
+  // const [userName, setUserName] = useState('');
+  // const [adminPassword, setAdminPassword] = useState('');
 
   const history = useHistory();
 
@@ -32,18 +31,14 @@ const CreateRoomForm = () => {
 
     if (roomName.trim().length === 0) {
       alert('Please type in a room name!');
-    } else if (userName.trim().length === 0) {
-      alert('Please type in your name!');
-    } else if (adminPassword.trim().length === 0) {
-      alert('Please type in a password!');
     } else {
       const newRoom = {
         name: roomName,
-        adminPassword
+        adminPassword: 'placeholder'
       };
 
       const newUser = {
-        name: userName,
+        name: 'admin',
         isAdmin: true
       };
 
@@ -54,7 +49,7 @@ const CreateRoomForm = () => {
         if (room && !error) {
           setUser(user);
           setRoom(room);
-          setUserCount(1);
+          setUserCount(0);
 
           history.push(`/room/${room.id}`);
         } else {
@@ -76,14 +71,14 @@ const CreateRoomForm = () => {
             onChange={(e) => setRoomName(e.target.value)}
           />
         </InputGroup>
-        <InputGroup>
+        {/* <InputGroup>
           <InputLabel>Your Name</InputLabel>
           <Input
             type="text"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
           />
-        </InputGroup>
+        </InputGroup> */}
         {/* <InputGroup>
           <InputLabel>New Admin Password</InputLabel>
           <Input

@@ -106,7 +106,6 @@ const ParticipantRoomView = ({ user, room, queue }) => {
           <h2>{queue.length}</h2>
         </Card>
       </QueueInfoContainer>
-      {/* <h3>Queue</h3> */}
       <JoinButton
         disabled={currPosition !== -1}
         onClick={joinQueue}
@@ -114,7 +113,13 @@ const ParticipantRoomView = ({ user, room, queue }) => {
         Click to join
       </JoinButton>
       <EmojisContainer>
-        <DoorEmojiSpan isQueueEmpty={queue.length === 0}>🚪</DoorEmojiSpan>
+        <DoorEmojiSpan
+          role="img"
+          aria-label="door"
+          isQueueEmpty={queue.length === 0}
+        >
+          🚪
+        </DoorEmojiSpan>
         {
           queue.map(u =>
             <QueueEmoji
