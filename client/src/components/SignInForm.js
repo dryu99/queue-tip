@@ -27,23 +27,27 @@ const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newUser = {
-      ...user,
-      name: username
-    };
+    if (username.length === 0) {
+      alert('Please type in your name!');
+    } else {
+      const newUser = {
+        ...user,
+        name: username
+      };
 
-    // send room join request to server + receive data on current room state
-    socket.emit(SocketEvents.JOIN, { newUser, roomId: room.id }, (res) => {
-      const { user, queue, error } = res;
-      if (!error) {
-        setUser(user);
-        setQueue(queue);
-        setUserCount(userCount + 1);
-      } else {
-        logger.error(error);
-        alert(error);
-      }
-    });
+      // send room join request to server + receive data on current room state
+      socket.emit(SocketEvents.JOIN, { newUser, roomId: room.id }, (res) => {
+        const { user, queue, error } = res;
+        if (!error) {
+          setUser(user);
+          setQueue(queue);
+          setUserCount(userCount + 1);
+        } else {
+          logger.error(error);
+          alert(error);
+        }
+      });
+    }
   };
 
   return (
