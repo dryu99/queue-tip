@@ -23,7 +23,7 @@ const Introduction = () => {
       </StyledP>
       <StyledP>
         As the room creator, you will be able to see everyone in the queue and remove queued users.
-        Participants who enter through the link are only able to join the queue and see their current positions.
+        Participants who enter through the link are only able to join the queue and see their current position.
       </StyledP>
 
     </IntroductionContainer>

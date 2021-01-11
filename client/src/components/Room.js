@@ -18,7 +18,7 @@ const RoomTitle = styled.h1`
 const CopyLinkButton = styled.button`
   padding: 0 0 0 5px;
   border: none;
-  font-size: 1em;
+  font-size: 0.75em;
   background-color: transparent;
 
   &:hover {
