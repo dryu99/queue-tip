@@ -1,21 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Spinner } from 'react-bootstrap';
 import {
   Switch,
-  Route,
-  useRouteMatch
+  Route
 } from 'react-router-dom';
 
 import HomePage from './pages/HomePage';
-import Room from './components/Room';
-import Error from './components/Error';
-import NavHeader from './components/NavHeader';
 
 import ThemeProvider from './styles/ThemeProvider';
 import GlobalStyle from './styles/GlobalStyle';
 import styled from 'styled-components';
-import { NotificationProvider } from './context/NotificationContext';
-import Notification from './components/Notification';
 import { RoomProvider } from './context/RoomContext';
 import { UserProvider } from './context/UserContext';
 import RoomPage from './pages/RoomPage';
@@ -104,27 +97,24 @@ const App = () => {
   return (
     <ThemeProvider>
       <GlobalStyle />
-      <NotificationProvider>
-        <Notification />
-        <UserProvider>
-          <RoomProvider>
-            <Content>
-              <Title><a href="/">queue-tip</a></Title>
-              <Switch>
-                <Route path="/room/:id">
-                  <RoomPage />
-                </Route>
-                <Route exact path="/">
-                  <HomePage />
-                </Route>
-                <Route>
-                  {/* <Error text="404 resource not found"/> */}
-                </Route>
-              </Switch>
-            </Content>
-          </RoomProvider>
-        </UserProvider>
-      </NotificationProvider>
+      <UserProvider>
+        <RoomProvider>
+          <Content>
+            <Title><a href="/">queue-tip</a></Title>
+            <Switch>
+              <Route path="/room/:id">
+                <RoomPage />
+              </Route>
+              <Route exact path="/">
+                <HomePage />
+              </Route>
+              <Route>
+                {/* <Error text="404 resource not found"/> */}
+              </Route>
+            </Switch>
+          </Content>
+        </RoomProvider>
+      </UserProvider>
     </ThemeProvider>
   );
 

@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Button, Card, CardTitle, Input, InputGroup, InputLabel } from './Common';
 import styled from 'styled-components';
-import { NotificationContext } from '../context/NotificationContext';
 import { UserContext } from '../context/UserContext';
 import socket, { SocketEvents } from '../socket';
 import { useHistory } from 'react-router-dom';
@@ -13,7 +12,6 @@ const FormContainer = styled(Card)`
 `;
 
 const CreateRoomForm = () => {
-  const { triggerNotification } = useContext(NotificationContext);
   const { setUser } = useContext(UserContext);
   const { setRoom, setUserCount } = useContext(RoomContext);
 
@@ -27,11 +25,11 @@ const CreateRoomForm = () => {
     e.preventDefault();
 
     if (roomName.trim().length === 0) {
-      triggerNotification('Please type in a room name!');
+      alert('Please type in a room name!');
     } else if (userName.trim().length === 0) {
-      triggerNotification('Please type in your name!');
+      alert('Please type in your name!');
     } else if (adminPassword.trim().length === 0) {
-      triggerNotification('Please type in a password!');
+      alert('Please type in a password!');
     } else {
       const newRoom = {
         name: roomName,
@@ -54,7 +52,7 @@ const CreateRoomForm = () => {
 
           history.push(`/room/${room.id}`);
         } else {
-          triggerNotification('Sorry room doesn\'t exist...');
+          alert('Something went wrong with room creation, please try again!');
         }
       });
     }
