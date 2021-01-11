@@ -1,29 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const uuid_1 = require("uuid");
+const nanoid_1 = require("nanoid");
+// We cache live room metadata in this map so new clients can init their rooms properly.
+// key = id, val = Room
 const rooms = new Map();
 const addRoom = (newRoom) => {
-    const room = {
-        id: uuid_1.v4(),
-        name: newRoom.name,
-        adminPassword: newRoom.adminPassword,
-        queue: []
-    };
-    if (rooms.has(room.id)) {
+    const newId = nanoid_1.nanoid(8);
+    if (rooms.has(newId)) {
         throw new Error('Trying to add room but id already exists, uuid fudged up or sth else went wrong.');
     }
+    const room = {
+        id: newId,
+        name: newRoom.name,
+        adminPassword: newRoom.adminPassword,
+        queue: [],
+        userCount: 0
+    };
     rooms.set(room.id, room);
     return room;
-};
-// TODO change output to boolean
-const removeRoom = (id) => {
-    if (!rooms.has(id)) {
-        throw new Error(`room ${id} doesn't exist`);
-    }
-    rooms.delete(id);
-};
-const removeAllRooms = () => {
-    rooms.clear();
 };
 const getRoom = (id) => {
     if (!rooms.has(id)) {
@@ -34,26 +28,12 @@ const getRoom = (id) => {
 const getAllRooms = () => {
     return Array.from(rooms.values());
 };
-// returns a ref to a new User array (not array linked to room!)
-const getQueuedUsersInRoom = (roomId) => {
-    return [...getRoom(roomId).queue];
-};
-const enqueueUser = (user, roomId) => {
-    const queue = getRoom(roomId).queue;
-    const existingQueuedUser = queue.find(u => u.name === user.name);
-    if (existingQueuedUser) {
-        throw new Error(`user ${user.name} already exists in queue in room ${roomId}; couldn't be enqueued`);
+// TODO change output to boolean
+const removeRoom = (id) => {
+    if (!rooms.has(id)) {
+        throw new Error(`room ${id} doesn't exist`);
     }
-    queue.push(user);
-};
-// TODO rename id param to userId
-const dequeueUser = (name, roomId) => {
-    const queue = getRoom(roomId).queue;
-    const index = queue.findIndex(u => u.name === name);
-    if (index === -1) {
-        throw new Error(`user ${name} doesn't exist in queue in room ${roomId}; couldn't be dequeued`);
-    }
-    return queue.splice(index, 1)[0];
+    rooms.delete(id);
 };
 const verifyAdminPassword = (passwordAttempt, roomId) => {
     const password = getRoom(roomId).adminPassword;
@@ -62,11 +42,7 @@ const verifyAdminPassword = (passwordAttempt, roomId) => {
 exports.default = {
     addRoom,
     removeRoom,
-    removeAllRooms,
     getRoom,
     getAllRooms,
-    getQueuedUsersInRoom,
-    enqueueUser,
-    dequeueUser,
-    verifyAdminPassword
+    verifyAdminPassword,
 };
