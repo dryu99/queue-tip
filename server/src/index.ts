@@ -37,7 +37,7 @@ const handleSocketEvent = (
 };
 
 io.on(SocketEvents.CONNECTION, (socket) => {
-  logger.event('a user has connected!');
+  logger.event(SocketEvents.CONNECTION);
   logger.printAppState();
 
   // TODO would love to just use an HTTP request to handle this but we need socket id.

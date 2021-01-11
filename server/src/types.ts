@@ -17,14 +17,9 @@ export interface UserBase {
 
 // ids are generated on server which is why they're not part of NewUser
 export interface User extends UserBase {
-  id: string,
-  // roomId: string
+  id: string
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface NewUser extends UserBase {
-
-}
+export type NewUser = UserBase;
 
 export interface RoomBase {
   name: string,

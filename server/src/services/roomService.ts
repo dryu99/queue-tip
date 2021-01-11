@@ -1,7 +1,8 @@
 import { nanoid } from 'nanoid';
 import { NewRoom, Room } from '../types';
 
-// We cache live room metadata in this map.
+// We cache live room metadata in this map so new clients can init their rooms properly.
+// key = id, val = Room
 const rooms = new Map<string, Room>();
 
 const addRoom = (newRoom: NewRoom): Room => {
