@@ -67,6 +67,7 @@ const CreateRoomForm = () => {
           <InputLabel>Room Name</InputLabel>
           <Input
             type="text"
+            placeholder="e.g. CPSC 110 Office Hours"
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
           />
