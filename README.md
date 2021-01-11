@@ -1,5 +1,5 @@
 # queue-tip
-Simple web app that allows users to facilitate online queues with ease. May include animal emojis.
+Simple web app that allows users to facilitate online queues with ease. May include animal emojis 🙉
 
 You can check it out [here](https://queue-tip.herokuapp.com/)!
 
