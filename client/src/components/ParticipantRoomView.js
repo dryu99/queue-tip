@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import socket, { SocketEvents } from '../socket';
 import logger from '../utils/logger';
-import { Button } from './Common';
+import { Button, Card } from './Common';
 import styled from 'styled-components';
+import { RoomContext } from '../context/RoomContext';
 
 const EMOJIS = [
   '🐢','🐍','🦖','🐡','🐠','🐬','🐳','🐅',
@@ -17,14 +18,15 @@ const QueueInfoContainer = styled.div`
   justify-content: space-around;
 `;
 
-const EmojisContainer = styled.div`
+const EmojisContainer = styled(Card)`
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;
   align-items: flex-end;
+  padding-top: 1.5em;
 `;
 
-const UserEmojiContainer = styled.div`
+const QueueEmojiContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
@@ -40,18 +42,14 @@ const YOUTextContainer = styled.span`
   }
 `;
 
-const QueueEmoji = styled.span`
+const QueueEmojiSpan = styled.span`
   font-size: 3em;
   margin: 3px 3px 10px 3px;
 `;
 
-const DoorEmoji = styled.span`
+const DoorEmojiSpan = styled.span`
   font-size: 3em;
   margin: ${p => p.isQueueEmpty ? '3px 3px 10px 3px' : '3px 30px 10px 3px'}
-`;
-
-const StyledButton = styled(Button)`
-  margin-bottom: 2em;
 `;
 
 function makeid(length) {
@@ -64,7 +62,32 @@ function makeid(length) {
   return result;
 }
 
-const ParticipantRoomView = ({ user, room, queue, setQueue }) => {
+// each user gets an emoji avatar based on the first char in their name
+const QueueEmoji = ({ user, currentUser }) => {
+  const firstCharCode = user.name.charCodeAt(0);
+  const index = !isNaN(firstCharCode)
+    ? firstCharCode % EMOJIS.length
+    : Math.floor(Math.random() * EMOJIS.length);
+
+  return (
+    <QueueEmojiContainer>
+      {
+        user.id === currentUser.id ?
+          <YOUTextContainer>
+            <span>YOU</span>
+          </YOUTextContainer>
+          :
+          null
+      }
+      <QueueEmojiSpan>
+        {EMOJIS[index]}
+      </QueueEmojiSpan>
+    </QueueEmojiContainer>
+  );
+};
+
+const ParticipantRoomView = ({ user, room, queue }) => {
+  const { setQueue } = useContext(RoomContext); // TODO delete after done testing
 
   const joinQueue = (e) => {
     socket.emit(SocketEvents.ENQUEUE, { user, roomId: room.id }, (res) => {
@@ -81,45 +104,32 @@ const ParticipantRoomView = ({ user, room, queue, setQueue }) => {
   return (
     <div>
       <QueueInfoContainer>
-        <div>
+        <Card>
           <p>Your current position</p>
           <h2>{currPosition !== -1 ? currPosition + 1 : 'N/A'}</h2>
-        </div>
-        <div>
+        </Card>
+        <Card>
           <p>Current queue size</p>
           <h2>{queue.length}</h2>
-        </div>
+        </Card>
       </QueueInfoContainer>
-      <StyledButton
+      <h3>Queue</h3>
+      <Button
         disabled={currPosition !== -1}
-        onClick={joinQueue}>
-        Join Queue
-      </StyledButton>
+        onClick={joinQueue}
+      >
+        Join
+      </Button>
       <EmojisContainer>
-        <DoorEmoji isQueueEmpty={queue.length === 0}>🚪</DoorEmoji>
+        <DoorEmojiSpan isQueueEmpty={queue.length === 0}>🚪</DoorEmojiSpan>
         {
-          // each user gets an emoji avatar based on the first char in their name
-          queue.map(u => {
-            const firstCharCode = u.name.charCodeAt(0);
-            const index = !isNaN(firstCharCode)
-              ? firstCharCode % EMOJIS.length
-              : Math.floor(Math.random() * EMOJIS.length);
-
-            return u.id === user.id ? (
-              <UserEmojiContainer key={u.id}>
-                <YOUTextContainer>
-                  <span>YOU</span>
-                </YOUTextContainer>
-                <QueueEmoji>
-                  {EMOJIS[index]}
-                </QueueEmoji>
-              </UserEmojiContainer>
-            ) : (
-              <QueueEmoji>
-                {EMOJIS[index]}
-              </QueueEmoji>
-            );
-          })
+          queue.map(u =>
+            <QueueEmoji
+              key={u.id}
+              user={u}
+              currentUser={user}
+            />
+          )
         }
       </EmojisContainer>
     </div>

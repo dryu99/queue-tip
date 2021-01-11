@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { UserContext } from '../context/UserContext';
-import { Button, Card, Input, InputGroup, InputLabel } from './Common';
+import { Button, Card, CardTitle, Input, InputGroup, InputLabel } from './Common';
 import socket, { SocketEvents } from '../socket';
 import logger from '../utils/logger';
 import { RoomContext } from '../context/RoomContext';
@@ -11,6 +11,13 @@ const SignInFormContainer = styled(Card)`
   display: flex;
   flex-direction: column;
   width: 50%;
+`;
+
+const RoomNameText = styled.p`
+  margin-top: 0;
+  margin-bottom: 0.75em;
+  font-size: 1.25em;
+  font-style: italic;
 `;
 
 function makeid(length) {
@@ -55,7 +62,11 @@ const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {
 
   return (
     <SignInFormContainer>
-      <h2>Join Room {`"${room.name}"`}</h2>
+      <div>
+        <CardTitle>Enter Room</CardTitle>
+        <RoomNameText>{room.name}</RoomNameText>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <InputGroup>
           <InputLabel>Your Name</InputLabel>
@@ -65,7 +76,11 @@ const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {
             onChange={(e) => setUsername(e.target.value)}
           />
         </InputGroup>
-        <Button type="submit">Join</Button>
+        <Button
+          className="float-right"
+          type="submit">
+          Join
+        </Button>
       </form>
     </SignInFormContainer>
   );

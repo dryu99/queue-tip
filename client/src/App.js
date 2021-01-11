@@ -95,6 +95,10 @@ const Content = styled.div`
   padding: 2em 7.5em;
 `;
 
+const Title = styled.h3`
+  text-align: center;
+`;
+
 const App = () => {
   console.log('app render');
   return (
@@ -105,7 +109,7 @@ const App = () => {
         <UserProvider>
           <RoomProvider>
             <Content>
-              <h1><a href="/">queue-tip</a></h1>
+              <Title><a href="/">queue-tip</a></Title>
               <Switch>
                 <Route path="/room/:id">
                   <RoomPage />

@@ -7,6 +7,12 @@ import { UserContext } from '../context/UserContext';
 import socket, { SocketEvents } from '../socket';
 import logger from '../utils/logger';
 import roomService from '../services/rooms';
+import styled from 'styled-components';
+
+const RoomPageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
 
 const RoomPage = () => {
   console.log('room page render');
@@ -56,14 +62,14 @@ const RoomPage = () => {
   }, [queue, setQueue, setUserCount, userCount]);
 
   return (
-    <div>
+    <RoomPageContainer>
       {user && user.name && room
         ? <Room room={room} queue={queue} userCount={userCount}/>
         : room
           ? <SignInForm room={room} userCount={userCount} setQueue={setQueue} setUserCount={setUserCount} />
           : <p>room doesn&apos;t exist...</p>
       }
-    </div>
+    </RoomPageContainer>
   );
 };
 

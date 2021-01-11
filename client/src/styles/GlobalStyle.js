@@ -7,6 +7,10 @@ const GlobalStyle = createGlobalStyle`
     background-color: ${p => p.theme.colors.background};
     font-family: Open-Sans, Sans-Serif, Helvetica;
   }
+
+  .float-right {
+    float: right;
+  }
 `;
 
 export default GlobalStyle;

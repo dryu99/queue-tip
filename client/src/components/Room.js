@@ -104,22 +104,29 @@ const RoomContainer = styled.div`
   text-align: center;
 `;
 
-const StyledH1 = styled.h1`
+const RoomNameText = styled.h1`
   margin: 0 0 0.5em 0;
 `;
 
 const NameText = styled.p`
   margin: 0 0 0.5em 0;
+  font-size: 1.25em;
+`;
+
+const AdminIcon = styled.span`
+  margin: 0.5em;
 `;
 
 const Room = ({ room, queue, userCount }) => {
   const { user } = useContext(UserContext);
-  const { setQueue } = useContext(RoomContext); // TODO delete after done testing
 
   return (
     <RoomContainer>
-      <StyledH1>{room.name}</StyledH1>
-      <NameText>Welcome <b>{user.name}</b>!</NameText>
+      <RoomNameText>{room.name}</RoomNameText>
+      <NameText>
+        Welcome <b>{user.name}</b>!
+        {user.isAdmin ? <AdminIcon>👑</AdminIcon> : null}
+      </NameText>
       {
         user.isAdmin ?
           <AdminRoomView
@@ -129,7 +136,6 @@ const Room = ({ room, queue, userCount }) => {
           />
           :
           <ParticipantRoomView
-            setQueue={setQueue}
             room={room}
             user={user}
             queue={queue}

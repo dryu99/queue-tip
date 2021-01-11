@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Card } from './Common';
+import { Card, CardTitle } from './Common';
 
 const ActiveRoomsListContainer = styled(Card)`
   display: flex;
@@ -10,7 +10,7 @@ const ActiveRoomsListContainer = styled(Card)`
 const ActiveRoomsList = () => {
   return (
     <ActiveRoomsListContainer>
-      <h2>Active Rooms</h2>
+      <CardTitle>Active Rooms</CardTitle>
       <p>TBA</p>
     </ActiveRoomsListContainer>
   );

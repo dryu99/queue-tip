@@ -88,7 +88,7 @@ const OldHome = ({ setIsAdmin, setRoom, setRoomError }) => {
   );
 };
 
-const Row = styled.div`
+const HomePageContainer = styled.div`
   display: flex;
   justify-content: space-between;
   & > div {
@@ -99,10 +99,10 @@ const Row = styled.div`
 const HomePage = () => {
   return (
     <div>
-      <Row>
+      <HomePageContainer>
         <ActiveRoomsList />
         <CreateRoomForm />
-      </Row>
+      </HomePageContainer>
     </div>
   );
 };

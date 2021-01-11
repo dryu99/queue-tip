@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Button, Card, Input, InputGroup, InputLabel } from './Common';
+import { Button, Card, CardTitle, Input, InputGroup, InputLabel } from './Common';
 import styled from 'styled-components';
 import { NotificationContext } from '../context/NotificationContext';
 import { UserContext } from '../context/UserContext';
@@ -62,7 +62,7 @@ const CreateRoomForm = () => {
 
   return (
     <FormContainer>
-      <h2>Create Room</h2>
+      <CardTitle>Create Room</CardTitle>
       <form onSubmit={handleSubmit}>
         <InputGroup>
           <InputLabel>Room Name</InputLabel>
@@ -88,7 +88,12 @@ const CreateRoomForm = () => {
             onChange={(e) => setAdminPassword(e.target.value)}
           />
         </InputGroup>
-        <Button type="submit">Create Room</Button>
+        <Button
+          className="float-right"
+          type="submit"
+        >
+          Create Room
+        </Button>
       </form>
     </FormContainer>
   );
