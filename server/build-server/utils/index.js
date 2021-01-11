@@ -17,7 +17,7 @@ exports.toCleanRoom = (object) => {
     return {
         id: exports.parseString(object.id),
         name: exports.parseString(object.name),
-        userCount: parseNumber(object.userCount),
+        userCount: parseNumber(object.users.length),
     };
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };

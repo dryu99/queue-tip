@@ -41,9 +41,9 @@ io.on(types_1.SocketEvents.CONNECTION, (socket) => {
             const room = roomService_1.default.addRoom(newRoom);
             const newUser = utils_1.toNewUser(data.newUser);
             const user = utils_1.toUser(Object.assign(Object.assign({}, newUser), { id: socket.id }));
-            // have admin user join socket.io room
+            // have admin user join room
             socket.join(room.id);
-            room.userCount++;
+            roomService_1.default.addUserToRoom(room, user);
             // send back relevant room and user data to sender
             const cleanRoom = utils_1.toCleanRoom(room);
             callback({ room: cleanRoom, user });
@@ -56,9 +56,9 @@ io.on(types_1.SocketEvents.CONNECTION, (socket) => {
             const room = roomService_1.default.getRoom(roomId);
             const newUser = utils_1.toNewUser(data.newUser);
             const user = utils_1.toUser(Object.assign(Object.assign({}, newUser), { id: socket.id }));
-            // have user join socket.io room
+            // have user join room
             socket.join(roomId);
-            room.userCount++;
+            roomService_1.default.addUserToRoom(room, user);
             // broadcast new user to all clients in room except sender
             socket.broadcast.to(roomId).emit(types_1.SocketEvents.JOIN, { newUser: user });
             // send back relevant room data to sender so they can init room state
@@ -122,12 +122,7 @@ io.on(types_1.SocketEvents.CONNECTION, (socket) => {
             const roomId = socketSids[1];
             const room = roomService_1.default.getRoom(roomId);
             // update user count
-            room.userCount--;
-            // remove user from queue if they're in it
-            const index = room.queue.findIndex(u => u.id === socket.id);
-            if (index !== -1) {
-                room.queue.splice(index, 1);
-            }
+            roomService_1.default.removeUserFromRoom(room, socket.id);
             // broadcast disconnected user to all clients in room except sender
             socket.broadcast.to(roomId).emit(types_1.SocketEvents.LEAVE, { disconnectedUserId: socket.id });
             // delete room from memory if it is empty

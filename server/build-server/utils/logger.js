@@ -26,9 +26,9 @@ const printAppState = () => {
     info('ROOMS: ', roomService_1.default.getAllRooms().map(r => ({
         id: r.id,
         name: r.name,
-        userCount: r.userCount,
+        users: r.users.map(u => u.name),
         adminPassword: r.adminPassword,
-        queue: r.queue.map(u => `${u.name}`)
+        queue: r.queue.map(u => u.name)
     })));
 };
 exports.default = { info, event, error, printAppState };
