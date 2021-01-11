@@ -84,7 +84,7 @@ const QueueEmoji = ({ user, currentUser }) => {
 
 const ParticipantRoomView = ({ user, room, queue }) => {
 
-  const joinQueue = (e) => {
+  const joinQueue = () => {
     socket.emit(SocketEvents.ENQUEUE, { user, roomId: room.id }, (res) => {
       const { error } = res;
       console.log(res);

@@ -22,6 +22,7 @@ const CreateRoomForm = () => {
 
   const [roomName, setRoomName] = useState(generateTestId(10));
   const [userName, setUserName] = useState(generateTestId(5));
+  // eslint-disable-next-line no-unused-vars
   const [adminPassword, setAdminPassword] = useState('placeholder');
 
   const history = useHistory();

@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { UserContext } from '../context/UserContext';
-import { RoomContext } from '../context/RoomContext';
 import { Button, Card, CardTitle, Input, InputGroup, InputLabel } from './Common';
 import socket, { SocketEvents } from '../services/socket';
 import logger from '../utils/logger';
@@ -53,7 +52,6 @@ const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {
         <CardTitle>Enter Room</CardTitle>
         <RoomNameText>{room.name}</RoomNameText>
       </div>
-
       <form onSubmit={handleSubmit}>
         <InputGroup>
           <InputLabel>Your Name</InputLabel>
