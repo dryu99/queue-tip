@@ -4,7 +4,7 @@ Simple web app that allows users to facilitate online queues with ease. No sign-
 You can check it out [here](https://queue-tip.herokuapp.com/)!
 
 ## Purpose
-I primarily built this for teaching staff who host online office hours or labs. Keeping track of queues using google docs and the like felt like a hassle, so I thought building this single purpose app would help maintain sanity. 
+I primarily developed this for post-secondary teaching staff who host online office hours or labs. Using google docs and the like to manage queues can be a hassle, so I thought building this single purpose app would help maintain sanity. 
 
 ## How to use
 1. Create room
