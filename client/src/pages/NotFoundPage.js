@@ -8,7 +8,7 @@ const NotFoundPageContainer = styled.div`
   text-align: center;
 `;
 
-const NotFoundIcon = styled.p`
+const NotFoundIcon = styled.span`
   margin: 0;
   font-size: 2em;
 `;
@@ -17,7 +17,12 @@ const NotFoundPage = () => {
   return (
     <NotFoundPageContainer>
       <h1>Page not found!</h1>
-      <NotFoundIcon>🙉</NotFoundIcon>
+      <NotFoundIcon
+        role="img"
+        aria-label="shook-monkey"
+      >
+        🙉
+      </NotFoundIcon>
     </NotFoundPageContainer>
   );
 };

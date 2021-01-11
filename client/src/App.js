@@ -13,6 +13,7 @@ import { RoomProvider } from './context/RoomContext';
 import { UserProvider } from './context/UserContext';
 import RoomPage from './pages/RoomPage';
 import NotFoundPage from './pages/NotFoundPage';
+import Brand from './components/Brand';
 
 // function App() {
 //   const [room, setRoom] = useState(null);
@@ -93,7 +94,9 @@ const Title = styled.h3`
   text-align: center;
 
   & > a {
-    color: ${p => p.theme.colors.primary};
+    // color: ${p => p.theme.colors.primary};
+    color: black;
+    // text-decoration: none;
   }
 `;
 
@@ -105,6 +108,7 @@ const App = () => {
       <UserProvider>
         <RoomProvider>
           <Content>
+            <Brand />
             <Title><a href="/">queue-tip</a></Title>
             <Switch>
               <Route path="/room/:id">

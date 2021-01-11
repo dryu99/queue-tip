@@ -150,8 +150,9 @@ const Room = ({ room, queue, userCount }) => {
       <RoomTitle>
         {room.name}
         <CopyLinkButton
+          role="img"
+          aria-label="link"
           title="copy link"
-          aria-label="copy-link"
           onClick={copyLinkToClipboard}>
           🔗
         </CopyLinkButton>

@@ -72,7 +72,10 @@ const QueueEmoji = ({ user, currentUser }) => {
           :
           null
       }
-      <QueueEmojiSpan>
+      <QueueEmojiSpan
+        role="img"
+        aria-label="user-avatar"
+      >
         {EMOJIS[index]}
       </QueueEmojiSpan>
     </QueueEmojiContainer>
