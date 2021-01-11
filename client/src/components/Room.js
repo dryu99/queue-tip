@@ -3,6 +3,7 @@ import { UserContext } from '../context/UserContext';
 import styled from 'styled-components';
 import ParticipantRoomView from './ParticipantRoomView';
 import AdminRoomView from './AdminRoomView';
+import emojis from '../utils/emojis';
 
 const RoomContainer = styled.div`
   display: flex;
@@ -57,6 +58,8 @@ const copyLinkToClipboard = () => {
 
 const Room = ({ room, queue, userCount }) => {
   const { user } = useContext(UserContext);
+
+  const userEmoji = emojis.getUserEmoji(user);
 
   return (
     <RoomContainer>

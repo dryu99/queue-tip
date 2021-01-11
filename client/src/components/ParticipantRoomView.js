@@ -3,14 +3,7 @@ import socket, { SocketEvents } from '../services/socket';
 import logger from '../utils/logger';
 import { Button, Card } from './Common';
 import styled from 'styled-components';
-
-const EMOJIS = [
-  '🐢','🐍','🦖','🐡','🐠','🐬','🐳','🐅',
-  '🦓','🦍','🐘','🦏','🐫','🦒','🐂','🐄','🐎',
-  '🐖','🐑','🐐','🦌','🐕','🐈','🐓','🦃','🐇',
-  '🐀','🐿','🦔','🐉','🦆','🦅','🦇','🐝','🐛',
-  '🐜','🌛','🗿','🐒'
-];
+import emojis from '../utils/emojis';
 
 const QueueInfoContainer = styled.div`
   display: flex;
@@ -55,12 +48,15 @@ const JoinButton = styled(Button)`
   padding: 0.75em 1em;
 `;
 
+const EmptyQueueText = styled.p`
+  margin: auto;
+  padding-right: 2.5em;
+  text-align: center;
+`;
+
 // each user gets an emoji avatar based on the first char in their name
 const QueueEmoji = ({ user, currentUser }) => {
-  const firstCharCode = user.name.charCodeAt(0);
-  const index = !isNaN(firstCharCode)
-    ? firstCharCode % EMOJIS.length
-    : Math.floor(Math.random() * EMOJIS.length);
+  const emoji = emojis.getUserEmoji(user);
 
   return (
     <QueueEmojiContainer>
@@ -76,7 +72,7 @@ const QueueEmoji = ({ user, currentUser }) => {
         role="img"
         aria-label="user-avatar"
       >
-        {EMOJIS[index]}
+        {emoji}
       </QueueEmojiSpan>
     </QueueEmojiContainer>
   );
@@ -129,17 +125,11 @@ const ParticipantRoomView = ({ user, room, queue }) => {
               />
             )
             :
-            <EmptyQueueText>It's quiet in here...</EmptyQueueText>
+            <EmptyQueueText>It&apos;s quiet in here...</EmptyQueueText>
         }
       </EmojisContainer>
     </div>
   );
 };
-
-const EmptyQueueText = styled.p`
-  margin: auto;
-  padding-right: 2.5em;
-  text-align: center;
-`;
 
 export default ParticipantRoomView;

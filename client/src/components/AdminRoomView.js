@@ -3,6 +3,7 @@ import socket, { SocketEvents } from '../services/socket';
 import logger from '../utils/logger';
 import { Button, Card } from './Common';
 import styled from 'styled-components';
+import emojis from '../utils/emojis';
 
 const AdminRoomViewContainer = styled.div`
 
@@ -30,6 +31,10 @@ const QueueListContainer = styled(Card)`
 const DequeueButton = styled(Button)`
   font-size: 1em;
   padding: 0.75em 1em;
+`;
+
+const QueueEmoji = styled.span`
+  padding-left: 3px;
 `;
 
 const AdminRoomView = ({ room, queue, userCount }) => {
@@ -64,12 +69,17 @@ const AdminRoomView = ({ room, queue, userCount }) => {
         {
           queue.length > 0 ?
             queue.map((u, i) =>
-              <div key={u.id} className={i === 0 ? 'underline' : null}>
-                {u.name}
+              <div key={u.id}>
+                <span className={i === 0 ? 'underline' : null}>
+                  {u.name}
+                </span>
+                <QueueEmoji role="img" aria-label="user-avatar">
+                  {emojis.getUserEmoji(u)}
+                </QueueEmoji>
               </div>
             )
             :
-            <p>It's quiet in here...</p>
+            <p>It&apos;s quiet in here...</p>
         }
       </QueueListContainer>
     </AdminRoomViewContainer>
