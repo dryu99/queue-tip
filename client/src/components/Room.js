@@ -13,12 +13,18 @@ const RoomContainer = styled.div`
 
 const RoomTitle = styled.h1`
   margin: 0 0 0.5em 0;
+  // position: relative;
+
+  // & > button {
+  //   position: absolute;
+  //   right: 0.5em;
+  // }
 `;
 
 const CopyLinkButton = styled.button`
-  padding: 0 0 0 5px;
+  padding: 0 0 0 3px;
   border: none;
-  font-size: 0.75em;
+  font-size: 0.5em;
   background-color: transparent;
 
   &:hover {

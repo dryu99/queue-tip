@@ -61,11 +61,16 @@ const AdminRoomView = ({ room, queue, userCount }) => {
         Dequeue
       </DequeueButton>
       <QueueListContainer>
-        {queue.map((u, i) =>
-          <div key={u.id} className={i === 0 ? 'underline' : null}>
-            {u.name}
-          </div>
-        )}
+        {
+          queue.length > 0 ?
+            queue.map((u, i) =>
+              <div key={u.id} className={i === 0 ? 'underline' : null}>
+                {u.name}
+              </div>
+            )
+            :
+            <p>It's quiet in here...</p>
+        }
       </QueueListContainer>
     </AdminRoomViewContainer>
   );

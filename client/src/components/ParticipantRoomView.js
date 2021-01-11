@@ -120,17 +120,26 @@ const ParticipantRoomView = ({ user, room, queue }) => {
           🚪
         </DoorEmojiSpan>
         {
-          queue.map(u =>
-            <QueueEmoji
-              key={u.id}
-              user={u}
-              currentUser={user}
-            />
-          )
+          queue.length > 0 ?
+            queue.map(u =>
+              <QueueEmoji
+                key={u.id}
+                user={u}
+                currentUser={user}
+              />
+            )
+            :
+            <EmptyQueueText>It's quiet in here...</EmptyQueueText>
         }
       </EmojisContainer>
     </div>
   );
 };
+
+const EmptyQueueText = styled.p`
+  margin: auto;
+  padding-right: 2.5em;
+  text-align: center;
+`;
 
 export default ParticipantRoomView;
