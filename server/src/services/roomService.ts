@@ -24,7 +24,6 @@ const addRoom = (newRoom: NewRoom): Room => {
   return room;
 };
 
-
 const getRoom = (id: string): Room => {
   if (!rooms.has(id)) {
     throw new Error(`room ${id} doesn't exist`);

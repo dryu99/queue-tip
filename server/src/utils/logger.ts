@@ -21,13 +21,12 @@ const error = (...params: any[]): void => {
   console.error('<ER>', ...params);
 };
 
-
 const printAppState = (): void => {
   info('--- SERVER STATE ---');
-  // info('USERS:', userService.getUsers());
   info('ROOMS: ', roomService.getAllRooms().map(r => ({
     id: r.id,
     name: r.name,
+    userCount: r.userCount,
     adminPassword: r.adminPassword,
     queue: r.queue.map(u => `${u.name}`)
   })));

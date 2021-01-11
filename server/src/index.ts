@@ -145,15 +145,23 @@ io.on(SocketEvents.CONNECTION, (socket) => {
 
   // Broadcast to other clients in room about disconnect, and delete room if empty
   socket.on(SocketEvents.DISCONNECTING, () => {
+    logger.event(SocketEvents.DISCONNECTING);
     const socketSids = Object.keys(io.sockets.adapter.sids[socket.id]);
 
+    // if length > 1, socket was in a room
     if (socketSids.length > 1) {
-      // if length > 1, socket was in a room
-
       // NOTE: this logic assumes that the user will be in 1 room max at a time
       const roomId = socketSids[1];
       const room = roomService.getRoom(roomId);
+
+      // update user count
       room.userCount--;
+
+      // remove user from queue if they're in it
+      const index = room.queue.findIndex(u => u.id === socket.id);
+      if (index !== -1) {
+        room.queue.splice(index, 1);
+      }
 
       // broadcast disconnected user to all clients in room except sender
       socket.broadcast.to(roomId).emit(
@@ -163,7 +171,7 @@ io.on(SocketEvents.CONNECTION, (socket) => {
 
       // delete room from memory if it is empty
       const socketRoom = io.sockets.adapter.rooms[roomId];
-      if (!socketRoom || socketRoom.length === 0) {
+      if (!socketRoom || socketRoom.length === 1) {
         logger.info(`Room ${roomId} is empty now, deleting from memory...`);
         roomService.removeRoom(roomId);
       }
