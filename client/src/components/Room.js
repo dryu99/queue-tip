@@ -104,8 +104,28 @@ const RoomContainer = styled.div`
   text-align: center;
 `;
 
-const RoomNameText = styled.h1`
+const RoomTitle = styled.h1`
   margin: 0 0 0.5em 0;
+`;
+
+const CopyLinkButton = styled.button`
+  padding: 0 0 0 5px;
+  border: none;
+  font-size: 1em;
+  background-color: transparent;
+
+  &:hover {
+    text-shadow: 0 0 1px black;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:active {
+    text-shadow: 0 0 3px black;
+  }
 `;
 
 const NameText = styled.p`
@@ -113,19 +133,31 @@ const NameText = styled.p`
   font-size: 1.25em;
 `;
 
-const AdminIcon = styled.span`
-  margin: 0.5em;
-`;
+const copyLinkToClipboard = () => {
+  let tempTextArea = document.createElement('textarea');
+  document.body.appendChild(tempTextArea);
+  tempTextArea.value = window.location.href;
+  tempTextArea.select();
+  document.execCommand('copy');
+  document.body.removeChild(tempTextArea);
+};
 
 const Room = ({ room, queue, userCount }) => {
   const { user } = useContext(UserContext);
 
   return (
     <RoomContainer>
-      <RoomNameText>{room.name}</RoomNameText>
+      <RoomTitle>
+        {room.name}
+        <CopyLinkButton
+          title="copy link"
+          aria-label="copy-link"
+          onClick={copyLinkToClipboard}>
+          🔗
+        </CopyLinkButton>
+      </RoomTitle>
       <NameText>
-        Welcome <b>{user.name}</b>!
-        {user.isAdmin ? <AdminIcon>👑</AdminIcon> : null}
+        Welcome <span className="bold">{user.name}</span>!
       </NameText>
       {
         user.isAdmin ?

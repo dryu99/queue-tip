@@ -55,7 +55,6 @@ const AdminRoomView = ({ room, queue, userCount }) => {
           <h2>{queue.length}</h2>
         </Card>
       </RoomInfoContainer>
-      {/* <h3>Queue</h3> */}
       <DequeueButton
         disabled={isQueueEmpty}
         onClick={dequeue}
