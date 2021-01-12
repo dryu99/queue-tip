@@ -5,20 +5,21 @@ import { Button, Card } from './Common';
 import styled from 'styled-components';
 import emojis from '../utils/emojis';
 
-const AdminRoomViewContainer = styled.div`
-
-`;
-
 const RoomInfoContainer = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+
+  & > div {
+    // width: 50%;
+    width: 150px;
+  }
 `;
 
 const QueueListContainer = styled(Card)`
   display: flex;
   flex-direction: column;
   margin: 1em auto;
-  width: 50%;
+  width: 240px;
   height: 400px;
   padding: 1em;
   overflow: auto;
@@ -37,6 +38,12 @@ const QueueEmoji = styled.span`
   padding-left: 3px;
 `;
 
+const EmptyQueueTextContainer = styled.div` 
+  & > p {
+    margin-top: 0;
+  }
+`;
+
 const AdminRoomView = ({ room, queue, userCount }) => {
   const dequeue = () => {
     socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, (res) => {
@@ -48,7 +55,7 @@ const AdminRoomView = ({ room, queue, userCount }) => {
   const isQueueEmpty = queue.length === 0;
 
   return (
-    <AdminRoomViewContainer>
+    <div>
       <RoomInfoContainer>
         <Card>
           <p>Current room size</p>
@@ -79,10 +86,13 @@ const AdminRoomView = ({ room, queue, userCount }) => {
               </div>
             )
             :
-            <p>It&apos;s quiet in here...</p>
+            <EmptyQueueTextContainer>
+              <p>It&apos;s quiet in here...</p>
+              <p>Click the 🔗 icon above to copy the room link and share it!</p>
+            </EmptyQueueTextContainer>
         }
       </QueueListContainer>
-    </AdminRoomViewContainer>
+    </div>
   );
 };
 
