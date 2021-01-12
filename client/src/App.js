@@ -4,7 +4,6 @@ import {
   Route
 } from 'react-router-dom';
 
-
 import ThemeProvider from './styles/ThemeProvider';
 import GlobalStyle from './styles/GlobalStyle';
 import styled from 'styled-components';

@@ -3,7 +3,6 @@ import { UserContext } from '../context/UserContext';
 import styled from 'styled-components';
 import ParticipantRoomView from './ParticipantRoomView';
 import AdminRoomView from './AdminRoomView';
-import emojis from '../utils/emojis';
 
 const RoomContainer = styled.div`
   display: flex;
@@ -12,20 +11,24 @@ const RoomContainer = styled.div`
   text-align: center;
 `;
 
+const RoomTitleContainer = styled.div`
+  margin: 0 0 0.5em 0;
+`;
+
 const RoomTitle = styled.h1`
   margin: 0 0 0.5em 0;
-  // position: relative;
+  position: relative;
 
-  // & > button {
-  //   position: absolute;
-  //   right: 0.5em;
-  // }
+  & > button {
+    position: absolute;
+  }
 `;
 
 const CopyLinkButton = styled.button`
-  padding: 0 0 0 3px;
+  padding-left: 5px;
+  padding-top: 10px;
+  font-size: 0.7em;
   border: none;
-  font-size: 0.5em;
   background-color: transparent;
 
   &:hover {
@@ -59,19 +62,19 @@ const copyLinkToClipboard = () => {
 const Room = ({ room, queue, userCount }) => {
   const { user } = useContext(UserContext);
 
-  const userEmoji = emojis.getUserEmoji(user);
-
   return (
     <RoomContainer>
-      <RoomTitle>
-        {room.name}
-        <CopyLinkButton
-          title="copy room link"
-          onClick={copyLinkToClipboard}
-        >
-          <span role="img" aria-label="link">🔗</span>
-        </CopyLinkButton>
-      </RoomTitle>
+      <RoomTitleContainer>
+        <RoomTitle>
+          {room.name}
+          <CopyLinkButton
+            title="copy room link"
+            onClick={copyLinkToClipboard}
+          >
+            <span role="img" aria-label="link">🔗</span>
+          </CopyLinkButton>
+        </RoomTitle>
+      </RoomTitleContainer>
       <NameText>
         Welcome <span className="bold">{user.name}</span>!
       </NameText>
