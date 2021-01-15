@@ -49,7 +49,7 @@ const CreateRoomForm = () => {
         if (room && !error) {
           setUser(user);
           setRoom(room);
-          setUserCount(0);
+          setUserCount(1);
 
           history.push(`/room/${room.id}`);
         } else {

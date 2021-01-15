@@ -3,6 +3,7 @@ import { UserContext } from '../context/UserContext';
 import styled from 'styled-components';
 import ParticipantRoomView from './ParticipantRoomView';
 import AdminRoomView from './AdminRoomView';
+import { useParams } from 'react-router-dom';
 
 const RoomContainer = styled.div`
   display: flex;
@@ -27,17 +28,17 @@ const RoomTitle = styled.h1`
 const CopyLinkButton = styled.button`
   padding-left: 5px;
   padding-top: 10px;
-  font-size: 0.7em;
+  font-size: 0.5em;
   border: none;
   background-color: transparent;
-
-  &:hover {
-    text-shadow: 0 0 1px black;
-  }
 
   &:focus {
     outline: none;
     box-shadow: none;
+  }
+
+  &:hover {
+    text-shadow: 0 0 1px black;
   }
 
   &:active {
@@ -48,6 +49,36 @@ const CopyLinkButton = styled.button`
 const NameText = styled.p`
   margin: 0 0 0.5em 0;
   font-size: 1.25em;
+  position: relative;
+
+  & > button {
+    position: absolute;
+  }
+`;
+
+const MakeAdminButton = styled.button`
+  opacity: ${p => p.isAdmin ? '1' : '0.5'};
+  padding-left: 5px;
+  font-size: 0.7em;
+  border: none;
+  background-color: transparent;
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  ${p =>
+    !p.isAdmin &&
+  `
+    &:hover {
+      opacity: 1;
+    }
+
+    &:active {
+      opacity: 0.75;
+    }
+  `}
 `;
 
 const copyLinkToClipboard = () => {
@@ -60,7 +91,18 @@ const copyLinkToClipboard = () => {
 };
 
 const Room = ({ room, queue, userCount }) => {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
+
+  const openMakeAdminDialog = () => {
+    // we don't disable button when user is admin b/c we don't want < 1 opacity, so we do this check
+    if (!user.isAdmin) {
+      const adminPassword = prompt('Please enter admin password to gain admin access');
+
+      // make POST request to check for admin password
+
+      setUser({ ...user, isAdmin: true });
+    }
+  };
 
   return (
     <RoomContainer>
@@ -68,7 +110,7 @@ const Room = ({ room, queue, userCount }) => {
         <RoomTitle>
           {room.name}
           <CopyLinkButton
-            title="copy room link"
+            title="Copy room link"
             onClick={copyLinkToClipboard}
           >
             <span role="img" aria-label="link">🔗</span>
@@ -77,6 +119,13 @@ const Room = ({ room, queue, userCount }) => {
       </RoomTitleContainer>
       <NameText>
         Welcome <span className="bold">{user.name}</span>!
+        <MakeAdminButton
+          title={user.isAdmin ? 'You\'re an admin!' : 'Become admin'}
+          onClick={openMakeAdminDialog}
+          isAdmin={user.isAdmin}
+        >
+          <span role="img" aria-label="crown">👑</span>
+        </MakeAdminButton>
       </NameText>
       {
         user.isAdmin ?
