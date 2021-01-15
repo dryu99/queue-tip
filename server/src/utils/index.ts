@@ -50,6 +50,13 @@ export const parseString = (str: any): string => {
   return str;
 };
 
+export const parseObject = (obj: any): Record<string, unknown> => {
+  if (!isObject(obj)) {
+    throw new Error(`Expected object but got: ${obj}`);
+  }
+  return obj;
+};
+
 const parseBoolean = (bool: any): boolean => {
   if (!isBoolean(bool)) {
     throw new Error(`Expected boolean but got: ${bool}`);
@@ -74,4 +81,9 @@ const isBoolean = (val: any): val is boolean => {
 
 const isNumber = (val: any): val is number => {
   return typeof val === 'number' || val instanceof Number;
+};
+
+
+const isObject = (val: any): val is Record<string, unknown> => {
+  return typeof val === 'object';
 };

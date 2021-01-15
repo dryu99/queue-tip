@@ -1,6 +1,6 @@
 import express from 'express';
 import roomService from '../services/roomService';
-import { toCleanRoom, toNewRoom } from '../utils';
+import { parseObject, parseString, toCleanRoom, toNewRoom } from '../utils';
 
 const router = express.Router();
 
@@ -35,6 +35,25 @@ router.post('/', (req, res) => {
     const error = e as Error;
     return res.status(400).json({ error: error.message });
   }
+});
+
+router.post('/check-admin-password', (req, res) => {
+  try {
+    const body = parseObject(req.body);
+
+    const adminPassword = parseString(body.adminPassword);
+    const roomId = parseString(body.roomId);
+
+    if (!roomService.checkAdminPassword(adminPassword, roomId)) {
+      return res.status(401).json({ error: 'Given admin password is invalid.' });
+    }
+
+    return res.json({ message: 'Given admin password is valid' });
+  } catch (e) {
+    const error = e as Error;
+    return res.status(400).json({ error: error.message });
+  }
+
 });
 
 export default router;

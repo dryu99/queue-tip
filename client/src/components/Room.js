@@ -3,7 +3,7 @@ import { UserContext } from '../context/UserContext';
 import styled from 'styled-components';
 import ParticipantRoomView from './ParticipantRoomView';
 import AdminRoomView from './AdminRoomView';
-import { useParams } from 'react-router-dom';
+import roomService from '../services/rooms';
 
 const RoomContainer = styled.div`
   display: flex;
@@ -99,8 +99,13 @@ const Room = ({ room, queue, userCount }) => {
       const adminPassword = prompt('Please enter admin password to gain admin access');
 
       // make POST request to check for admin password
-
-      setUser({ ...user, isAdmin: true });
+      roomService.checkAdminPassword(adminPassword, room.id)
+        .then(() => {
+          setUser({ ...user, isAdmin: true });
+        })
+        .catch(() => {
+          alert('Password is incorrect!');
+        });
     }
   };
 

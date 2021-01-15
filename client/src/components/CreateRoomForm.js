@@ -22,7 +22,7 @@ const CreateRoomForm = () => {
 
   const [roomName, setRoomName] = useState(generateTestId(10));
   // const [userName, setUserName] = useState('');
-  // const [adminPassword, setAdminPassword] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
 
   const history = useHistory();
 
@@ -34,7 +34,7 @@ const CreateRoomForm = () => {
     } else {
       const newRoom = {
         name: roomName,
-        adminPassword: 'placeholder'
+        adminPassword
       };
 
       const newUser = {
@@ -80,14 +80,14 @@ const CreateRoomForm = () => {
             onChange={(e) => setUserName(e.target.value)}
           />
         </InputGroup> */}
-        {/* <InputGroup>
-          <InputLabel>New Admin Password</InputLabel>
+        <InputGroup>
+          <InputLabel>Admin Password</InputLabel>
           <Input
             type="password"
             value={adminPassword}
             onChange={(e) => setAdminPassword(e.target.value)}
           />
-        </InputGroup> */}
+        </InputGroup>
         <Button
           className="float-right"
           type="submit"

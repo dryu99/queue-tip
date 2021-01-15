@@ -123,25 +123,25 @@ io.on(SocketEvents.CONNECTION, (socket) => {
     });
   });
 
-  // Verifies given password and returns success/failure result.
-  socket.on(SocketEvents.TRY_ADMIN_STATUS, (data: EventData, callback: AckCallback) => {
-    handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, data, callback, () => {
-      const adminPassword = parseString(data.adminPassword);
-      const roomId = parseString(data.roomId);
+  // // Verifies given password and returns success/failure result.
+  // socket.on(SocketEvents.TRY_ADMIN_STATUS, (data: EventData, callback: AckCallback) => {
+  //   handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, data, callback, () => {
+  //     const adminPassword = parseString(data.adminPassword);
+  //     const roomId = parseString(data.roomId);
 
-      if (adminPassword && roomId) {
-        const isPasswordCorrect = roomService.verifyAdminPassword(adminPassword, roomId);
+  //     if (adminPassword && roomId) {
+  //       const isPasswordCorrect = roomService.checkAdminPassword(adminPassword, roomId);
 
-        if (isPasswordCorrect) {
-          callback({}); // empty callback means success
-        } else {
-          throw new Error('given admin password was incorrect');
-        }
-      } else {
-        throw new Error('adminPassword or roomId are missing or invalid');
-      }
-    });
-  });
+  //       if (isPasswordCorrect) {
+  //         callback({}); // empty callback means success
+  //       } else {
+  //         throw new Error('given admin password was incorrect');
+  //       }
+  //     } else {
+  //       throw new Error('adminPassword or roomId are missing or invalid');
+  //     }
+  //   });
+  // });
 
   // Broadcast to other clients in room about disconnect, and delete room if empty
   socket.on(SocketEvents.DISCONNECTING, () => {
