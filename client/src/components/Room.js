@@ -98,14 +98,21 @@ const Room = ({ room, queue, userCount }) => {
     if (!user.isAdmin) {
       const adminPassword = prompt('Please enter admin password to gain admin access');
 
-      // make POST request to check for admin password
-      roomService.checkAdminPassword(adminPassword, room.id)
-        .then(() => {
-          setUser({ ...user, isAdmin: true });
-        })
-        .catch(() => {
-          alert('Password is incorrect!');
-        });
+      if (adminPassword === null) return;
+
+      if (adminPassword.length > 0) {
+        // make POST request to check for admin password
+        roomService.checkAdminPassword(adminPassword, room.id)
+          .then(() => {
+            setUser({ ...user, isAdmin: true });
+          })
+          .catch(() => {
+            alert('Password is incorrect!');
+          });
+      } else {
+        alert('Password can\'t be empty!');
+      }
+
     }
   };
 

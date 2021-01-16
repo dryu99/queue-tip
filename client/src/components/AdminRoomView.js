@@ -40,11 +40,25 @@ const QueueEmoji = styled.span`
 
 const EmptyQueueTextContainer = styled.div` 
   & > p {
-    margin-top: 0;
+    margin-top: 10px;
   }
 `;
 
+const QueueUser = ({ user, i }) => {
+  return (
+    <div key={user.id}>
+      <span className={i === 0 ? 'underline' : null}>
+        {user.name}
+      </span>
+      <QueueEmoji role="img" aria-label="user-avatar">
+        {emojis.getUserEmoji(user)}
+      </QueueEmoji>
+    </div>
+  );
+};
+
 const AdminRoomView = ({ room, queue, userCount }) => {
+
   const dequeue = () => {
     socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, (res) => {
       const { error } = res;
@@ -76,14 +90,7 @@ const AdminRoomView = ({ room, queue, userCount }) => {
         {
           queue.length > 0 ?
             queue.map((u, i) =>
-              <div key={u.id}>
-                <span className={i === 0 ? 'underline' : null}>
-                  {u.name}
-                </span>
-                <QueueEmoji role="img" aria-label="user-avatar">
-                  {emojis.getUserEmoji(u)}
-                </QueueEmoji>
-              </div>
+              <QueueUser key={u.id} user={u} i={i} />
             )
             :
             <EmptyQueueTextContainer>

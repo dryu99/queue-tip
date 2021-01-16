@@ -31,6 +31,8 @@ const CreateRoomForm = () => {
 
     if (roomName.trim().length === 0) {
       alert('Please type in a room name!');
+    } else if (adminPassword.trim().length === 0) {
+      alert('Please type in an admin password!');
     } else {
       const newRoom = {
         name: roomName,
