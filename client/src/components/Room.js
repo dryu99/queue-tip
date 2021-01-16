@@ -131,13 +131,13 @@ const Room = ({ room, queue, userCount }) => {
       </RoomTitleContainer>
       <NameText>
         Welcome <span className="bold">{user.name}</span>!
-        <MakeAdminButton
+        {/* <MakeAdminButton
           title={user.isAdmin ? 'You\'re an admin!' : 'Become admin'}
           onClick={openMakeAdminDialog}
           isAdmin={user.isAdmin}
         >
           <span role="img" aria-label="crown">👑</span>
-        </MakeAdminButton>
+        </MakeAdminButton> */}
       </NameText>
       {
         user.isAdmin ?
