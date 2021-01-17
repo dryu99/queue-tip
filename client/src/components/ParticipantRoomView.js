@@ -105,7 +105,7 @@ const ParticipantRoomView = ({ user, room, queue }) => {
         disabled={currPosition !== -1}
         onClick={joinQueue}
       >
-        Click to join
+        Join queue
       </JoinButton>
       <EmojisContainer>
         <DoorEmojiSpan
