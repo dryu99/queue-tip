@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    // "types": ["jest", "node"]
+    "types": ["reflect-metadata", "jest"]
+  }
+}
