@@ -33,8 +33,9 @@ const CreateRoomForm = () => {
     if (formDataJSON) {
       const parsedFormData = JSON.parse(formDataJSON);
       setRoomName(parsedFormData.roomName);
+      setAdminPassword(parsedFormData.adminPassword);
     }
-  }, [setRoomName]);
+  }, [setRoomName, setAdminPassword]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -62,9 +63,12 @@ const CreateRoomForm = () => {
           setUser(user);
           setRoom(room);
           setUserCount(1);
-
+          console.log(room);
           // cache form data
-          const formDataJSON = JSON.stringify({ roomName: room.name });
+          const formDataJSON = JSON.stringify({
+            roomName,
+            adminPassword
+          });
           localStorage.setItem(CREATE_ROOM_DATA_CACHE_KEY, formDataJSON);
 
           // redirect to room page
