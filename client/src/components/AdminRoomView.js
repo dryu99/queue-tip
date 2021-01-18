@@ -63,6 +63,7 @@ const AdminRoomView = ({ room, queue, userCount }) => {
     socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, (res) => {
       const { error } = res;
       error && logger.error(error);
+      alert('Something went wrong on server!');
     });
   };
 

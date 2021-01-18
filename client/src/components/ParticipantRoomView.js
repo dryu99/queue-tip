@@ -88,6 +88,7 @@ const ParticipantRoomView = ({ user, room, queue }) => {
     socket.emit(SocketEvents.ENQUEUE, { user, roomId: room.id }, (res) => {
       const { error } = res;
       error && logger.error(error);
+      alert('Something went wrong on server!');
     });
   };
 

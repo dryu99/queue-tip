@@ -100,7 +100,7 @@ const CreateRoomForm = () => {
         <InputGroup>
           <InputLabel>Admin Password</InputLabel>
           <Input
-            type="password"
+            type="text"
             value={adminPassword}
             onChange={(e) => setAdminPassword(e.target.value)}
           />
