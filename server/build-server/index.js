@@ -12,7 +12,9 @@ const types_1 = require("./types");
 const roomService_1 = __importDefault(require("./services/roomService"));
 const utils_1 = require("./utils");
 const server = http_1.default.createServer(app_1.default);
-const io = socket_io_1.default(server);
+const io = socket_io_1.default(server, {
+    pingTimeout: 300000
+});
 // executes given event handler and uses acknowledgement callback to send error back to client on failure
 // this is what every socket handler should call to keep consistency.
 const handleSocketEvent = (event, data, callback, eventHandler) => {
