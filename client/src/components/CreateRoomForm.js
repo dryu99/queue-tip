@@ -1,11 +1,12 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, Card, CardTitle, Input, InputGroup, InputLabel } from './Common';
 import styled from 'styled-components';
 import { UserContext } from '../context/UserContext';
 import socket, { SocketEvents } from '../services/socket';
 import { useHistory } from 'react-router-dom';
 import { RoomContext } from '../context/RoomContext';
-import { generateTestId } from '../utils/devHelpers';
+
+const CREATE_ROOM_DATA_CACHE_KEY = 'queuetip_create_room_data';
 
 const FormContainer = styled(Card)`
   display: flex;
@@ -20,11 +21,20 @@ const CreateRoomForm = () => {
   const { setUser } = useContext(UserContext);
   const { setRoom, setUserCount } = useContext(RoomContext);
 
-  const [roomName, setRoomName] = useState(generateTestId(10));
+  const [roomName, setRoomName] = useState('');
   // const [userName, setUserName] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
 
   const history = useHistory();
+
+  // check cache for form data and autofill input fields
+  useEffect(() => {
+    const formDataJSON = localStorage.getItem(CREATE_ROOM_DATA_CACHE_KEY);
+    if (formDataJSON) {
+      const parsedFormData = JSON.parse(formDataJSON);
+      setRoomName(parsedFormData.roomName);
+    }
+  }, [setRoomName]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -53,6 +63,11 @@ const CreateRoomForm = () => {
           setRoom(room);
           setUserCount(1);
 
+          // cache form data
+          const formDataJSON = JSON.stringify({ roomName: room.name });
+          localStorage.setItem(CREATE_ROOM_DATA_CACHE_KEY, formDataJSON);
+
+          // redirect to room page
           history.push(`/room/${room.id}`);
         } else {
           alert('Something went wrong with room creation, please try again!');

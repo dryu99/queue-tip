@@ -46,7 +46,6 @@ const RoomPage = () => {
 
     // when another user disconnects from room, remove from user list
     socket.on(SocketEvents.LEAVE, ({ disconnectedUserId }) => {
-      setQueue(queue.filter(u => u.id !== disconnectedUserId));
       setUserCount(userCount - 1);
     });
 
