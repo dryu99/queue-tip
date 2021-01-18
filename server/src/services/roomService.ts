@@ -72,11 +72,11 @@ const removeUserFromRoom = (room: Room, userId: string): User => {
 
   const user = room.users.splice(usersIndex, 1)[0];
 
-  // remove from queue list
-  const queueIndex = room.queue.findIndex(u => u.id === userId);
-  if (queueIndex !== -1) {
-    room.queue.splice(queueIndex, 1);
-  }
+  // // remove from queue list
+  // const queueIndex = room.queue.findIndex(u => u.id === userId);
+  // if (queueIndex !== -1) {
+  //   room.queue.splice(queueIndex, 1);
+  // }
 
   return user;
 };
