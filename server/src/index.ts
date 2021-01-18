@@ -9,7 +9,9 @@ import roomService from './services/roomService';
 import { toNewRoom, toCleanRoom, toNewUser, parseString, toUser } from './utils';
 
 const server = http.createServer(app);
-const io = socketio(server);
+const io = socketio(server, {
+  pingTimeout: 300000
+});
 
 // executes given event handler and uses acknowledgement callback to send error back to client on failure
 // this is what every socket handler should call to keep consistency.
