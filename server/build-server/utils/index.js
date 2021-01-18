@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseString = exports.toNewUser = exports.toUser = exports.toCleanRoom = exports.toNewRoom = void 0;
+exports.parseObject = exports.parseString = exports.toNewUser = exports.toUser = exports.toCleanRoom = exports.toNewRoom = void 0;
 exports.toNewRoom = (object) => {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     return {
@@ -45,6 +45,12 @@ exports.parseString = (str) => {
     }
     return str;
 };
+exports.parseObject = (obj) => {
+    if (!isObject(obj)) {
+        throw new Error(`Expected object but got: ${obj}`);
+    }
+    return obj;
+};
 const parseBoolean = (bool) => {
     if (!isBoolean(bool)) {
         throw new Error(`Expected boolean but got: ${bool}`);
@@ -65,4 +71,7 @@ const isBoolean = (val) => {
 };
 const isNumber = (val) => {
     return typeof val === 'number' || val instanceof Number;
+};
+const isObject = (val) => {
+    return typeof val === 'object';
 };

@@ -35,9 +35,10 @@ const removeRoom = (id) => {
     }
     rooms.delete(id);
 };
+// TODO inconsistent with other fns, takes in roomid instead of room
 const verifyAdminPassword = (passwordAttempt, roomId) => {
     const password = getRoom(roomId).adminPassword;
-    return passwordAttempt === password;
+    return password === passwordAttempt;
 };
 const addUserToRoom = (room, user) => {
     // use name to search b/c we don't want users with duplicate names in same room
@@ -67,7 +68,7 @@ exports.default = {
     removeRoom,
     getRoom,
     getAllRooms,
-    verifyAdminPassword,
+    checkAdminPassword: verifyAdminPassword,
     addUserToRoom,
     removeUserFromRoom
 };

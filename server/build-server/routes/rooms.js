@@ -39,4 +39,19 @@ router.post('/', (req, res) => {
         return res.status(400).json({ error: error.message });
     }
 });
+router.post('/check-admin-password', (req, res) => {
+    try {
+        const body = utils_1.parseObject(req.body);
+        const adminPassword = utils_1.parseString(body.adminPassword);
+        const roomId = utils_1.parseString(body.roomId);
+        if (!roomService_1.default.checkAdminPassword(adminPassword, roomId)) {
+            return res.status(401).json({ error: 'Given admin password is invalid.' });
+        }
+        return res.json({ message: 'Given admin password is valid' });
+    }
+    catch (e) {
+        const error = e;
+        return res.status(400).json({ error: error.message });
+    }
+});
 exports.default = router;

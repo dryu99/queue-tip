@@ -64,7 +64,7 @@ io.on(types_1.SocketEvents.CONNECTION, (socket) => {
             // broadcast new user to all clients in room except sender
             socket.broadcast.to(roomId).emit(types_1.SocketEvents.JOIN, { newUser: user });
             // send back relevant room data to sender so they can init room state
-            callback({ user, queue: room.queue });
+            callback({ user, queue: room.queue, userCount: room.users.length });
         });
     });
     // Enqueue user in specified room.
@@ -95,25 +95,23 @@ io.on(types_1.SocketEvents.CONNECTION, (socket) => {
             }
         });
     });
-    // Verifies given password and returns success/failure result.
-    socket.on(types_1.SocketEvents.TRY_ADMIN_STATUS, (data, callback) => {
-        handleSocketEvent(types_1.SocketEvents.TRY_ADMIN_STATUS, data, callback, () => {
-            const adminPassword = utils_1.parseString(data.adminPassword);
-            const roomId = utils_1.parseString(data.roomId);
-            if (adminPassword && roomId) {
-                const isPasswordCorrect = roomService_1.default.verifyAdminPassword(adminPassword, roomId);
-                if (isPasswordCorrect) {
-                    callback({}); // empty callback means success
-                }
-                else {
-                    throw new Error('given admin password was incorrect');
-                }
-            }
-            else {
-                throw new Error('adminPassword or roomId are missing or invalid');
-            }
-        });
-    });
+    // // Verifies given password and returns success/failure result.
+    // socket.on(SocketEvents.TRY_ADMIN_STATUS, (data: EventData, callback: AckCallback) => {
+    //   handleSocketEvent(SocketEvents.TRY_ADMIN_STATUS, data, callback, () => {
+    //     const adminPassword = parseString(data.adminPassword);
+    //     const roomId = parseString(data.roomId);
+    //     if (adminPassword && roomId) {
+    //       const isPasswordCorrect = roomService.checkAdminPassword(adminPassword, roomId);
+    //       if (isPasswordCorrect) {
+    //         callback({}); // empty callback means success
+    //       } else {
+    //         throw new Error('given admin password was incorrect');
+    //       }
+    //     } else {
+    //       throw new Error('adminPassword or roomId are missing or invalid');
+    //     }
+    //   });
+    // });
     // Broadcast to other clients in room about disconnect, and delete room if empty
     socket.on(types_1.SocketEvents.DISCONNECTING, () => {
         try {
