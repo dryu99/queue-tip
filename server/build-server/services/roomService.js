@@ -55,11 +55,11 @@ const removeUserFromRoom = (room, userId) => {
         throw new Error(`user with id ${userId} doesn't exist in room ${room.name}; couldn't remove user.`);
     }
     const user = room.users.splice(usersIndex, 1)[0];
-    // remove from queue list
-    const queueIndex = room.queue.findIndex(u => u.id === userId);
-    if (queueIndex !== -1) {
-        room.queue.splice(queueIndex, 1);
-    }
+    // // remove from queue list
+    // const queueIndex = room.queue.findIndex(u => u.id === userId);
+    // if (queueIndex !== -1) {
+    //   room.queue.splice(queueIndex, 1);
+    // }
     return user;
 };
 exports.default = {
