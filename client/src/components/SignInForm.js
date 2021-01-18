@@ -20,7 +20,7 @@ const RoomNameText = styled.p`
   text-align: center;
 `;
 
-const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {
+const SignInForm = ({ room, setQueue, setUserCount }) => {
   const { user, setUser } = useContext(UserContext);
   const [username, setUsername] = useState('');
 
@@ -47,11 +47,11 @@ const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {
 
       // send room join request to server + receive data on current room state
       socket.emit(SocketEvents.JOIN, { newUser, roomId: room.id }, (res) => {
-        const { user, queue, error } = res;
+        const { user, queue, userCount, error } = res;
         if (!error) {
           setUser(user);
           setQueue(queue);
-          setUserCount(userCount + 1);
+          setUserCount(userCount);
 
           // cache form data
           const formDataJSON = JSON.stringify({ username: user.name });

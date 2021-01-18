@@ -72,7 +72,7 @@ const RoomPage = () => {
         user && user.name && room
           ? <Room room={room} queue={queue} userCount={userCount}/>
           : room
-            ? <SignInForm room={room} userCount={userCount} setQueue={setQueue} setUserCount={setUserCount} />
+            ? <SignInForm room={room} setQueue={setQueue} setUserCount={setUserCount} />
             : roomChecked
               ? <p>Room <i>{match.params.id}</i> doesn&apos;t exist...</p>
               : null

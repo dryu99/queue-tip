@@ -73,7 +73,7 @@ const AdminRoomView = ({ room, queue, userCount }) => {
     <div>
       <RoomInfoContainer>
         <Card>
-          <p>Current room size</p>
+          <p># of users in room</p>
           <h2>{userCount}</h2>
         </Card>
         <Card>

@@ -82,7 +82,7 @@ io.on(SocketEvents.CONNECTION, (socket) => {
       );
 
       // send back relevant room data to sender so they can init room state
-      callback({ user, queue: room.queue });
+      callback({ user, queue: room.queue, userCount: room.users.length });
     });
   });
 
