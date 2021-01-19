@@ -7,10 +7,10 @@ import emojis from '../utils/emojis';
 
 const QueueInfoContainer = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
 
   & > div {
-    width: 170px;
+    width: 50%;
   }
 `;
 

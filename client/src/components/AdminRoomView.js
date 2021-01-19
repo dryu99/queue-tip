@@ -7,11 +7,10 @@ import emojis from '../utils/emojis';
 
 const RoomInfoContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
 
   & > div {
-    // width: 50%;
-    width: 150px;
+    width: 30%;
   }
 `;
 
@@ -19,9 +18,8 @@ const QueueListContainer = styled(Card)`
   display: flex;
   flex-direction: column;
   margin: 1em auto;
-  width: 240px;
+  width: 50%;
   height: 400px;
-  padding: 1em;
   overflow: auto;
 
   & > div {
@@ -34,8 +32,21 @@ const DequeueButton = styled(Button)`
   padding: 0.75em 1em;
 `;
 
+const QueueUserContentContainer = styled.div`
+  display: flex;
+  align-items: center;
+
+  & > :nth-child(1), & > :nth-child(2) {
+    margin-right: auto;
+  }
+`;
+
 const QueueEmoji = styled.span`
   padding-left: 3px;
+`;
+
+const StyledHR = styled.hr`
+  margin-bottom: 0;
 `;
 
 const EmptyQueueTextContainer = styled.div` 
@@ -47,12 +58,18 @@ const EmptyQueueTextContainer = styled.div`
 const QueueUser = ({ user, i }) => {
   return (
     <div key={user.id}>
-      <span className={i === 0 ? 'underline' : null}>
-        {user.name}
-      </span>
-      <QueueEmoji role="img" aria-label="user-avatar">
-        {emojis.getUserEmoji(user)}
-      </QueueEmoji>
+      <QueueUserContentContainer>
+        <span>{i + 1}.</span>
+        <div>
+          <span>{user.name}</span>
+          <QueueEmoji role="img" aria-label="user-avatar">
+            {emojis.getUserEmoji(user)}
+          </QueueEmoji>
+        </div>
+        {/* dummy span so flex css aligning can work */}
+        <span></span>
+      </QueueUserContentContainer>
+      <StyledHR />
     </div>
   );
 };

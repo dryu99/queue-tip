@@ -10,6 +10,7 @@ const RoomContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   text-align: center;
+  width: 550px;
 `;
 
 const RoomTitleContainer = styled.div`

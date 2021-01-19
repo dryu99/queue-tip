@@ -11,6 +11,9 @@ const GlobalStyle = createGlobalStyle`
   .float-right {
     float: right;
   }
+  .float-left {
+    float: left;
+  }
   .bold {
     font-weight: bold;
   }

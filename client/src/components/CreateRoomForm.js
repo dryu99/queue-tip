@@ -32,8 +32,10 @@ const CreateRoomForm = () => {
     const formDataJSON = localStorage.getItem(CREATE_ROOM_DATA_CACHE_KEY);
     if (formDataJSON) {
       const parsedFormData = JSON.parse(formDataJSON);
-      setRoomName(parsedFormData.roomName);
-      setAdminPassword(parsedFormData.adminPassword);
+
+      // check if props exist in case old cache object already exists (don't want to store undefined)
+      setRoomName(parsedFormData.roomName ? parsedFormData.roomName : '');
+      setAdminPassword(parsedFormData.adminPassword ? parsedFormData.adminPassword : '');
     }
   }, [setRoomName, setAdminPassword]);
 
@@ -63,7 +65,7 @@ const CreateRoomForm = () => {
           setUser(user);
           setRoom(room);
           setUserCount(1);
-          console.log(room);
+
           // cache form data
           const formDataJSON = JSON.stringify({
             roomName,
