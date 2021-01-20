@@ -1,10 +1,11 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { UserContext } from '../context/UserContext';
 import { Button, Card, CardTitle, Input, InputGroup, InputLabel } from './Common';
 import socket, { SocketEvents } from '../services/socket';
 import logger from '../utils/logger';
-import { generateTestId } from '../utils/devHelpers';
+
+const SIGN_IN_DATA_CACHE_KEY = 'queuetip_sign_in_data';
 
 const SignInFormContainer = styled(Card)`
   display: flex;
@@ -19,9 +20,18 @@ const RoomNameText = styled.p`
   text-align: center;
 `;
 
-const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {
+const SignInForm = ({ room, setQueue, setUserCount }) => {
   const { user, setUser } = useContext(UserContext);
-  const [username, setUsername] = useState(generateTestId(5));
+  const [username, setUsername] = useState('');
+
+  // check cache for form data and autofill input fields
+  useEffect(() => {
+    const formDataJSON = localStorage.getItem(SIGN_IN_DATA_CACHE_KEY);
+    if (formDataJSON) {
+      const parsedFormData = JSON.parse(formDataJSON);
+      setUsername(parsedFormData.username);
+    }
+  }, [setUsername]);
 
   // set current user data
   const handleSubmit = (e) => {
@@ -37,11 +47,15 @@ const SignInForm = ({ room, userCount, setQueue, setUserCount }) => {
 
       // send room join request to server + receive data on current room state
       socket.emit(SocketEvents.JOIN, { newUser, roomId: room.id }, (res) => {
-        const { user, queue, error } = res;
+        const { user, queue, userCount, error } = res;
         if (!error) {
           setUser(user);
           setQueue(queue);
-          setUserCount(userCount + 1);
+          setUserCount(userCount);
+
+          // cache form data
+          const formDataJSON = JSON.stringify({ username: user.name });
+          localStorage.setItem(SIGN_IN_DATA_CACHE_KEY, formDataJSON);
         } else {
           logger.error(error);
           alert(error);

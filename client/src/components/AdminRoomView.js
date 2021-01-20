@@ -7,11 +7,10 @@ import emojis from '../utils/emojis';
 
 const RoomInfoContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
 
   & > div {
-    // width: 50%;
-    width: 150px;
+    width: 30%;
   }
 `;
 
@@ -19,9 +18,8 @@ const QueueListContainer = styled(Card)`
   display: flex;
   flex-direction: column;
   margin: 1em auto;
-  width: 240px;
+  width: 50%;
   height: 400px;
-  padding: 1em;
   overflow: auto;
 
   & > div {
@@ -34,21 +32,55 @@ const DequeueButton = styled(Button)`
   padding: 0.75em 1em;
 `;
 
+const QueueUserContentContainer = styled.div`
+  display: flex;
+  align-items: center;
+
+  & > :nth-child(1), & > :nth-child(2) {
+    margin-right: auto;
+  }
+`;
+
 const QueueEmoji = styled.span`
   padding-left: 3px;
 `;
 
+const StyledHR = styled.hr`
+  margin-bottom: 0;
+`;
+
 const EmptyQueueTextContainer = styled.div` 
   & > p {
-    margin-top: 0;
+    margin-top: 10px;
   }
 `;
 
+const QueueUser = ({ user, i }) => {
+  return (
+    <div key={user.id}>
+      <QueueUserContentContainer>
+        <span>{i + 1}.</span>
+        <div>
+          <span>{user.name}</span>
+          <QueueEmoji role="img" aria-label="user-avatar">
+            {emojis.getUserEmoji(user)}
+          </QueueEmoji>
+        </div>
+        {/* dummy span so flex css aligning can work */}
+        <span></span>
+      </QueueUserContentContainer>
+      <StyledHR />
+    </div>
+  );
+};
+
 const AdminRoomView = ({ room, queue, userCount }) => {
+
   const dequeue = () => {
     socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, (res) => {
       const { error } = res;
       error && logger.error(error);
+      alert('Something went wrong on server!');
     });
   };
 
@@ -58,7 +90,7 @@ const AdminRoomView = ({ room, queue, userCount }) => {
     <div>
       <RoomInfoContainer>
         <Card>
-          <p>Current room size</p>
+          <p># of users in room</p>
           <h2>{userCount}</h2>
         </Card>
         <Card>
@@ -76,14 +108,7 @@ const AdminRoomView = ({ room, queue, userCount }) => {
         {
           queue.length > 0 ?
             queue.map((u, i) =>
-              <div key={u.id}>
-                <span className={i === 0 ? 'underline' : null}>
-                  {u.name}
-                </span>
-                <QueueEmoji role="img" aria-label="user-avatar">
-                  {emojis.getUserEmoji(u)}
-                </QueueEmoji>
-              </div>
+              <QueueUser key={u.id} user={u} i={i} />
             )
             :
             <EmptyQueueTextContainer>

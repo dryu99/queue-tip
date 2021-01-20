@@ -45,9 +45,10 @@ const removeRoom = (id: string): void => {
   rooms.delete(id);
 };
 
+// TODO inconsistent with other fns, takes in roomid instead of room
 const verifyAdminPassword = (passwordAttempt: string, roomId: string): boolean => {
   const password = getRoom(roomId).adminPassword;
-  return passwordAttempt === password;
+  return password === passwordAttempt;
 };
 
 const addUserToRoom = (room: Room, user: User): void => {
@@ -72,11 +73,11 @@ const removeUserFromRoom = (room: Room, userId: string): User => {
 
   const user = room.users.splice(usersIndex, 1)[0];
 
-  // remove from queue list
-  const queueIndex = room.queue.findIndex(u => u.id === userId);
-  if (queueIndex !== -1) {
-    room.queue.splice(queueIndex, 1);
-  }
+  // // remove from queue list
+  // const queueIndex = room.queue.findIndex(u => u.id === userId);
+  // if (queueIndex !== -1) {
+  //   room.queue.splice(queueIndex, 1);
+  // }
 
   return user;
 };
@@ -86,7 +87,7 @@ export default {
   removeRoom,
   getRoom,
   getAllRooms,
-  verifyAdminPassword,
+  checkAdminPassword: verifyAdminPassword,
   addUserToRoom,
   removeUserFromRoom
 };

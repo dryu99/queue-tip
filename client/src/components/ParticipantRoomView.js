@@ -7,7 +7,11 @@ import emojis from '../utils/emojis';
 
 const QueueInfoContainer = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+
+  & > div {
+    width: 50%;
+  }
 `;
 
 const EmojisContainer = styled(Card)`
@@ -18,7 +22,7 @@ const EmojisContainer = styled(Card)`
   padding-top: 1.5em;
 `;
 
-const QueueEmojiContainer = styled.div`
+const QueueUserContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
@@ -33,12 +37,12 @@ const YOUTextContainer = styled.span`
   }
 `;
 
-const QueueEmojiSpan = styled.span`
+const QueueEmoji = styled.span`
   font-size: 3em;
   margin: 3px 3px 10px 3px;
 `;
 
-const DoorEmojiSpan = styled.span`
+const DoorEmoji = styled.span`
   font-size: 3em;
   margin: ${p => p.isQueueEmpty ? '3px 3px 10px 3px' : '3px 30px 10px 3px'}
 `;
@@ -55,11 +59,11 @@ const EmptyQueueText = styled.p`
 `;
 
 // each user gets an emoji avatar based on the first char in their name
-const QueueEmoji = ({ user, currentUser }) => {
+const QueueUser = ({ user, currentUser }) => {
   const emoji = emojis.getUserEmoji(user);
 
   return (
-    <QueueEmojiContainer>
+    <QueueUserContainer>
       {
         user.id === currentUser.id ?
           <YOUTextContainer>
@@ -68,13 +72,13 @@ const QueueEmoji = ({ user, currentUser }) => {
           :
           null
       }
-      <QueueEmojiSpan
+      <QueueEmoji
         role="img"
         aria-label="user-avatar"
       >
         {emoji}
-      </QueueEmojiSpan>
-    </QueueEmojiContainer>
+      </QueueEmoji>
+    </QueueUserContainer>
   );
 };
 
@@ -84,6 +88,7 @@ const ParticipantRoomView = ({ user, room, queue }) => {
     socket.emit(SocketEvents.ENQUEUE, { user, roomId: room.id }, (res) => {
       const { error } = res;
       error && logger.error(error);
+      alert('Something went wrong on server!');
     });
   };
 
@@ -105,20 +110,20 @@ const ParticipantRoomView = ({ user, room, queue }) => {
         disabled={currPosition !== -1}
         onClick={joinQueue}
       >
-        Click to join
+        Join queue
       </JoinButton>
       <EmojisContainer>
-        <DoorEmojiSpan
+        <DoorEmoji
           role="img"
           aria-label="door"
           isQueueEmpty={queue.length === 0}
         >
           🚪
-        </DoorEmojiSpan>
+        </DoorEmoji>
         {
           queue.length > 0 ?
             queue.map(u =>
-              <QueueEmoji
+              <QueueUser
                 key={u.id}
                 user={u}
                 currentUser={user}

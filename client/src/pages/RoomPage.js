@@ -46,7 +46,6 @@ const RoomPage = () => {
 
     // when another user disconnects from room, remove from user list
     socket.on(SocketEvents.LEAVE, ({ disconnectedUserId }) => {
-      setQueue(queue.filter(u => u.id !== disconnectedUserId));
       setUserCount(userCount - 1);
     });
 
@@ -73,7 +72,7 @@ const RoomPage = () => {
         user && user.name && room
           ? <Room room={room} queue={queue} userCount={userCount}/>
           : room
-            ? <SignInForm room={room} userCount={userCount} setQueue={setQueue} setUserCount={setUserCount} />
+            ? <SignInForm room={room} setQueue={setQueue} setUserCount={setUserCount} />
             : roomChecked
               ? <p>Room <i>{match.params.id}</i> doesn&apos;t exist...</p>
               : null

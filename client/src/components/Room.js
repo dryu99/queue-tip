@@ -3,13 +3,14 @@ import { UserContext } from '../context/UserContext';
 import styled from 'styled-components';
 import ParticipantRoomView from './ParticipantRoomView';
 import AdminRoomView from './AdminRoomView';
-import { useParams } from 'react-router-dom';
+import roomService from '../services/rooms';
 
 const RoomContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: center;
+  width: 550px;
 `;
 
 const RoomTitleContainer = styled.div`
@@ -98,9 +99,21 @@ const Room = ({ room, queue, userCount }) => {
     if (!user.isAdmin) {
       const adminPassword = prompt('Please enter admin password to gain admin access');
 
-      // make POST request to check for admin password
+      if (adminPassword === null) return;
 
-      setUser({ ...user, isAdmin: true });
+      if (adminPassword.length > 0) {
+        // make POST request to check for admin password
+        roomService.checkAdminPassword(adminPassword, room.id)
+          .then(() => {
+            setUser({ ...user, isAdmin: true });
+          })
+          .catch(() => {
+            alert('Password is incorrect!');
+          });
+      } else {
+        alert('Password can\'t be empty!');
+      }
+
     }
   };
 
@@ -119,13 +132,13 @@ const Room = ({ room, queue, userCount }) => {
       </RoomTitleContainer>
       <NameText>
         Welcome <span className="bold">{user.name}</span>!
-        {/* <MakeAdminButton
+        <MakeAdminButton
           title={user.isAdmin ? 'You\'re an admin!' : 'Become admin'}
           onClick={openMakeAdminDialog}
           isAdmin={user.isAdmin}
         >
           <span role="img" aria-label="crown">👑</span>
-        </MakeAdminButton> */}
+        </MakeAdminButton>
       </NameText>
       {
         user.isAdmin ?
