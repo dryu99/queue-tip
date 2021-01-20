@@ -25,7 +25,7 @@ export interface RoomBase {
   name: string,
 }
 
-export interface Room extends RoomBase {
+export interface IRoom extends RoomBase {
   id: string,
   users: User[] // TODO consider making this a Map<userid,User>
   queue: User[],

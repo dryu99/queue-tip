@@ -1,18 +1,18 @@
 import { nanoid } from 'nanoid';
-import { NewRoom, Room, User } from '../types';
+import { NewRoom, IRoom, User } from '../types';
 
 // We cache live room metadata in this map so new clients can init their rooms properly.
 // key = id, val = Room
-const rooms = new Map<string, Room>();
+const rooms = new Map<string, IRoom>();
 
-const addRoom = (newRoom: NewRoom): Room => {
+const addRoom = (newRoom: NewRoom): IRoom => {
   const newId = nanoid(8);
 
   if (rooms.has(newId)) {
     throw new Error('Trying to add room but id already exists, uuid fudged up or sth else went wrong.');
   }
 
-  const room: Room = {
+  const room: IRoom = {
     id: newId,
     name: newRoom.name,
     adminPassword: newRoom.adminPassword,
@@ -25,14 +25,14 @@ const addRoom = (newRoom: NewRoom): Room => {
   return room;
 };
 
-const getRoom = (id: string): Room => {
+const getRoom = (id: string): IRoom => {
   if (!rooms.has(id)) {
     throw new Error(`room ${id} doesn't exist`);
   }
-  return rooms.get(id) as Room; // TODO change signature to Room | null
+  return rooms.get(id) as IRoom; // TODO change signature to Room | null
 };
 
-const getAllRooms = (): Room[] => {
+const getAllRooms = (): IRoom[] => {
   return Array.from(rooms.values());
 };
 
@@ -51,7 +51,7 @@ const verifyAdminPassword = (passwordAttempt: string, roomId: string): boolean =
   return password === passwordAttempt;
 };
 
-const addUserToRoom = (room: Room, user: User): void => {
+const addUserToRoom = (room: IRoom, user: User): void => {
   // use name to search b/c we don't want users with duplicate names in same room
   const index = room.users.findIndex(u =>
     u.name.toLowerCase() === user.name.toLowerCase()
@@ -63,7 +63,7 @@ const addUserToRoom = (room: Room, user: User): void => {
   room.users.push(user);
 };
 
-const removeUserFromRoom = (room: Room, userId: string): User => {
+const removeUserFromRoom = (room: IRoom, userId: string): User => {
   // remove from users list
   // use id to search b/c we only have access to id when a socket disconnects
   const usersIndex = room.users.findIndex(u => u.id === userId);

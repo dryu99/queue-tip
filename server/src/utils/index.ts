@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { NewRoom, NewUser, CleanRoom, User, Room } from '../types';
+import { NewRoom, NewUser, CleanRoom, User, IRoom } from '../types';
 
 export const toNewRoom = (object: any): NewRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -13,7 +13,7 @@ export const toNewRoom = (object: any): NewRoom  => {
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
 
-export const toCleanRoom = (object: Room): CleanRoom  => {
+export const toCleanRoom = (object: IRoom): CleanRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
     id: parseString(object.id),
