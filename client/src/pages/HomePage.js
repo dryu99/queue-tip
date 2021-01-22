@@ -10,7 +10,6 @@ const HomePageContainer = styled.div`
   align-items: flex-start;
   & > div {
     width: 50%;
-    min-width: 300px;
   }
 `;
 

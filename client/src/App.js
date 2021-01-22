@@ -15,7 +15,8 @@ import NotFoundPage from './pages/NotFoundPage';
 import Brand from './components/Brand';
 
 const Content = styled.div`
-  padding: 2em 7.5em;
+  padding: 2em 3vw;
+  min-width: 500px;
 `;
 
 const Title = styled.h3`
@@ -29,10 +30,11 @@ const App = () => {
   return (
     <ThemeProvider>
       <GlobalStyle />
+      <Brand />
       <UserProvider>
         <RoomProvider>
           <Content>
-            <Brand />
+
             <Title><a href="/">queue-tip</a></Title>
             <Switch>
               <Route path="/room/:id">
