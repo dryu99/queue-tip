@@ -3,9 +3,9 @@ import { describe, beforeEach, afterEach, expect, test } from '@jest/globals';
 import ioServer from 'socket.io';
 import ioClient from 'socket.io-client';
 
-import SocketService from '../src/models/SocketService';
+import SocketManager from '../src/models/SocketManager';
 import roomService from '../src/services/roomService';
-import { CleanUser, JoinRequestData, JoinResponseData, NewRoom, NewUser, SocketEvents } from '../src/types';
+import { CleanUser, JoinRequestData, JoinResponseData, NewRoom, NewUser, SocketEvents, User } from '../src/types';
 
 const socketUrl = 'http://localhost:5000';
 const socketOptions: SocketIOClient.ConnectOpts = {
@@ -15,14 +15,14 @@ const socketOptions: SocketIOClient.ConnectOpts = {
 
 describe('socket.io integration tests', () => {
   let server: SocketIO.Server;
-  let socketService: SocketService;
+  let socketManager: SocketManager;
   let client: SocketIOClient.Socket;
 
   beforeEach(() => {
     // initialize server, client, and socket handlers
     server = ioServer().listen(5000);
-    socketService = new SocketService(server);
-    socketService.initHandlers();
+    socketManager = new SocketManager(server);
+    socketManager.initHandlers();
     client = ioClient.connect(socketUrl, socketOptions);
   });
 
@@ -49,7 +49,7 @@ describe('socket.io integration tests', () => {
         name: 'CPSC 110 Office Hours',
         adminPassword: '110'
       };
-      const addedRoom = roomService.addRoom(newRoom);
+      const room = roomService.addRoom(newRoom);
 
       client.on(SocketEvents.CONNECT, () => {
         // setup event data
@@ -58,7 +58,7 @@ describe('socket.io integration tests', () => {
           isAdmin: false
         };
         const reqData: JoinRequestData = {
-          roomId: addedRoom.id,
+          roomId: room.id,
           newUser
         };
 
@@ -86,29 +86,30 @@ describe('socket.io integration tests', () => {
         name: 'CPSC 110 Office Hours',
         adminPassword: '110'
       };
-      const addedRoom = roomService.addRoom(newRoom);
+      const room = roomService.addRoom(newRoom);
+
+      // setup users on server
+      const dummyUsers: User[] = [
+        { id: '1', name: 'Jessica', isAdmin: false },
+        { id: '2', name: 'Sam', isAdmin: true },
+        { id: '3', name: 'Kenny', isAdmin: false },
+      ];
+
+      for (const dummyUser of dummyUsers) {
+        room.addUser(dummyUser);
+      }
+
+      room.addQueueUser(dummyUsers[0]);
+      room.addQueueUser(dummyUsers[2]);
 
       client.on(SocketEvents.CONNECT, () => {
-        // setup users on server
-        const dummyNewUsers: NewUser[] = [
-          { name: 'Jessica', isAdmin: false },
-          { name: 'Sam', isAdmin: true },
-          { name: 'Kenny', isAdmin: false },
-        ];
-
-        for (const newUser of dummyNewUsers) {
-          client.emit(SocketEvents.JOIN, { newUser, roomId: addedRoom.id }, (_resData) => {
-            // don't need callback to do anything
-          });
-        }
-
         // setup event data
         const newUser: NewUser = {
           name: 'John',
           isAdmin: false
         };
         const reqData: JoinRequestData = {
-          roomId: addedRoom.id,
+          roomId: room.id,
           newUser
         };
 
@@ -122,7 +123,7 @@ describe('socket.io integration tests', () => {
         client.emit(SocketEvents.JOIN, reqData, (resData: JoinResponseData) => {
           const { user, queue, userCount, error } = resData;
           expect(user).toEqual(expectedUser);
-          expect(queue).toHaveLength(0); // TODO enqueue users for this test
+          expect(queue).toHaveLength(2);
           expect(userCount).toBe(4);
           expect(error).toBeUndefined();
           done();

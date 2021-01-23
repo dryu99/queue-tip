@@ -44,7 +44,9 @@ router.post('/check-admin-password', (req, res) => {
     const adminPassword = parseString(body.adminPassword);
     const roomId = parseString(body.roomId);
 
-    if (!roomService.checkAdminPassword(adminPassword, roomId)) {
+    const room = roomService.getRoom(roomId);
+
+    if (!room.checkAdminPassword(adminPassword)) {
       return res.status(401).json({ error: 'Given admin password is invalid.' });
     }
 

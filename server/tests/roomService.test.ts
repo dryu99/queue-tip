@@ -2,6 +2,7 @@ import { describe, beforeEach, expect, test } from '@jest/globals';
 // import roomService from '../src/services/roomService';
 
 describe('roomService unit tests', () => {
+  let testRoomManager: RoomManager;
 
   beforeEach(() => {
     // // reset rooms map in service before each test

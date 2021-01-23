@@ -3,7 +3,7 @@ import { parseString, toCleanRoom, toNewRoom, toNewUser, toUser } from '../utils
 import logger from '../utils/logger';
 import roomService from '../services/roomService';
 
-export default class SocketService {
+export default class SocketManager {
   private io: SocketIO.Server;
 
   constructor(io: SocketIO.Server) {
@@ -28,7 +28,7 @@ export default class SocketService {
 
           // have admin user join room
           socket.join(room.id);
-          roomService.addUserToRoom(room, user);
+          room.addUser(user);
 
           // send back relevant room and user data to sender
           const cleanRoom = toCleanRoom(room);
@@ -47,7 +47,7 @@ export default class SocketService {
 
           // have user join room
           socket.join(roomId);
-          roomService.addUserToRoom(room, user);
+          room.addUser(user);
 
           // broadcast new user to all clients in room except sender
           socket.broadcast.to(roomId).emit(
@@ -112,7 +112,7 @@ export default class SocketService {
             const room = roomService.getRoom(roomId);
 
             // update user count
-            roomService.removeUserFromRoom(room, socket.id);
+            room.removeUser(socket.id);
 
             // broadcast disconnected user to all clients in room except sender
             socket.broadcast.to(roomId).emit(

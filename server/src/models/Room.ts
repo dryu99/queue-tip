@@ -1,4 +1,4 @@
-import {  User } from '../types';
+import {  IRoom, User } from '../types';
 
 export default class Room {
   id: string;
@@ -16,7 +16,7 @@ export default class Room {
   }
 
   public addUser(user: User): void {
-    // don't want users with duplicate names in room
+    // don't want users with duplicate names or ids in room
     const index = this.users.findIndex(u =>
       u.name.toLowerCase() === user.name.toLowerCase()
       || u.id === user.id
@@ -39,13 +39,6 @@ export default class Room {
     }
 
     const user = this.users.splice(index, 1)[0];
-
-    // // remove from queue list
-    // const queueIndex = room.queue.findIndex(u => u.id === userId);
-    // if (queueIndex !== -1) {
-    //   room.queue.splice(queueIndex, 1);
-    // }
-
     return user;
   }
 
@@ -71,5 +64,15 @@ export default class Room {
 
   public checkAdminPassword(passwordAttempt: string): boolean {
     return this.adminPassword === passwordAttempt;
+  }
+
+  public toJSON(): IRoom {
+    return {
+      id: this.id,
+      name: this.name,
+      adminPassword: this.adminPassword,
+      users: this.users,
+      queue: this.queue
+    };
   }
 }
