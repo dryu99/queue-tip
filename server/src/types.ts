@@ -2,6 +2,7 @@ export enum SocketEvents {
   JOIN = 'join',
   LEAVE = 'leave',
   CREATE_ROOM = 'create_room',
+  CONNECT = 'connect',
   CONNECTION = 'connection',
   DISCONNECT = 'disconnect',
   DISCONNECTING = 'disconnecting',
@@ -20,7 +21,9 @@ export interface User extends UserBase {
   id: string
 }
 export type NewUser = UserBase;
-
+export interface CleanUser extends UserBase {
+  id: string
+}
 export interface RoomBase {
   name: string,
 }
@@ -48,3 +51,15 @@ export interface CleanRoom extends RoomBase {
 export type AcknowledgementCallback = (object: any) => void;
 
 export type EventData = Record<string, unknown>;
+
+export interface JoinResponseData {
+  user: User,
+  queue: User[],
+  userCount: number,
+  error: string
+}
+
+export interface JoinRequestData {
+  roomId: string,
+  newUser: NewUser
+}
