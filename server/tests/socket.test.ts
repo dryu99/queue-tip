@@ -5,7 +5,7 @@ import ioClient from 'socket.io-client';
 
 import SocketManager from '../src/models/SocketManager';
 import roomService from '../src/services/roomService';
-import { CleanUser, JoinRequestData, JoinResponseData, NewRoom, NewUser, SocketEvents, User } from '../src/types';
+import { CleanUser, JoinRequestData, JoinEmitResponseData, NewRoom, NewUser, SocketEvents, User, JoinOnResponseData } from '../src/types';
 
 const socketUrl = 'http://localhost:5000';
 const socketOptions: SocketIOClient.ConnectOpts = {
@@ -43,92 +43,115 @@ describe('socket.io integration tests', () => {
   });
 
   describe(SocketEvents.JOIN, () => {
-    test('SUCCESS: new user should be added to empty room', (done) => {
-      // setup room on server
-      const newRoom: NewRoom = {
-        name: 'CPSC 110 Office Hours',
-        adminPassword: '110'
-      };
-      const room = roomService.addRoom(newRoom);
-
-      client.on(SocketEvents.CONNECT, () => {
-        // setup event data
-        const newUser: NewUser = {
-          name: 'John',
-          isAdmin: false
+    describe('emitting client POV', () => {
+      test('SUCCESS: new user should be added to empty room', (done) => {
+        // setup room on server
+        const newRoom: NewRoom = {
+          name: 'CPSC 110 Office Hours',
+          adminPassword: '110'
         };
-        const reqData: JoinRequestData = {
-          roomId: room.id,
-          newUser
-        };
+        const room = roomService.addRoom(newRoom);
 
-        // setup expected results
-        const expectedUser: CleanUser = {
-          ...newUser,
-          id: client.id
-        };
+        client.on(SocketEvents.CONNECT, () => {
+          // setup event data
+          const newUser: NewUser = { name: 'John', isAdmin: false };
+          const reqData: JoinRequestData = { roomId: room.id,newUser };
 
-        // emit event from client
-        client.emit(SocketEvents.JOIN, reqData, (resData: JoinResponseData) => {
-          const { user, queue, userCount, error } = resData;
-          expect(user).toEqual(expectedUser);
-          expect(queue).toHaveLength(0);
-          expect(userCount).toBe(1);
-          expect(error).toBeUndefined();
-          done();
+          // setup expected results
+          const expectedUser: CleanUser = { ...newUser,id: client.id };
+
+          // emit event from client
+          client.emit(SocketEvents.JOIN, reqData, (resData: JoinEmitResponseData) => {
+            const { user, queue, userCount, error } = resData;
+            expect(user).toEqual(expectedUser);
+            expect(queue).toHaveLength(0);
+            expect(userCount).toBe(1);
+            expect(error).toBeUndefined();
+            done();
+          });
+        });
+      });
+
+      // TODO should test when a different client receives a join event
+      test('SUCCESS: new user should be added to filled room', (done) => {
+        // setup room on server
+        const newRoom: NewRoom = {
+          name: 'CPSC 110 Office Hours',
+          adminPassword: '110'
+        };
+        const room = roomService.addRoom(newRoom);
+
+        // setup users on server
+        const dummyUsers: User[] = [
+          { id: '1', name: 'Jessica', isAdmin: false },
+          { id: '2', name: 'Sam', isAdmin: true },
+          { id: '3', name: 'Kenny', isAdmin: false },
+        ];
+
+        for (const dummyUser of dummyUsers) {
+          room.addUser(dummyUser);
+        }
+
+        room.addQueueUser(dummyUsers[0]);
+        room.addQueueUser(dummyUsers[2]);
+
+        client.on(SocketEvents.CONNECT, () => {
+          // setup event data
+          const newUser: NewUser = { name: 'John', isAdmin: false };
+          const reqData: JoinRequestData = { roomId: room.id, newUser };
+
+          // setup expected results
+          const expectedUser: CleanUser = { ...newUser, id: client.id };
+
+          // emit event from client
+          client.emit(SocketEvents.JOIN, reqData, (resData: JoinEmitResponseData) => {
+            const { user, queue, userCount, error } = resData;
+            expect(user).toEqual(expectedUser);
+            expect(queue).toHaveLength(2);
+            expect(userCount).toBe(4);
+            expect(error).toBeUndefined();
+            done();
+          });
         });
       });
     });
 
-    test('SUCCESS: new user should be added to filled room', (done) => {
-      // setup room on server
-      const newRoom: NewRoom = {
-        name: 'CPSC 110 Office Hours',
-        adminPassword: '110'
-      };
-      const room = roomService.addRoom(newRoom);
+    describe('receiving client POV', () => {
+      test('SUCCESS: different client already in room receives JOIN event from server', (done) => {
+        // setup 2nd client
+        const client2 = ioClient.connect(socketUrl, socketOptions);
 
-      // setup users on server
-      const dummyUsers: User[] = [
-        { id: '1', name: 'Jessica', isAdmin: false },
-        { id: '2', name: 'Sam', isAdmin: true },
-        { id: '3', name: 'Kenny', isAdmin: false },
-      ];
-
-      for (const dummyUser of dummyUsers) {
-        room.addUser(dummyUser);
-      }
-
-      room.addQueueUser(dummyUsers[0]);
-      room.addQueueUser(dummyUsers[2]);
-
-      client.on(SocketEvents.CONNECT, () => {
-        // setup event data
-        const newUser: NewUser = {
-          name: 'John',
-          isAdmin: false
+        // setup room on server
+        const newRoom: NewRoom = {
+          name: 'CPSC 110 Office Hours',
+          adminPassword: '110'
         };
-        const reqData: JoinRequestData = {
-          roomId: room.id,
-          newUser
-        };
+        const room = roomService.addRoom(newRoom);
 
-        // setup expected results
-        const expectedUser: CleanUser = {
-          ...newUser,
-          id: client.id
-        };
-
-        // emit event from client
-        client.emit(SocketEvents.JOIN, reqData, (resData: JoinResponseData) => {
-          const { user, queue, userCount, error } = resData;
-          expect(user).toEqual(expectedUser);
-          expect(queue).toHaveLength(2);
-          expect(userCount).toBe(4);
-          expect(error).toBeUndefined();
+        // listen for join event from 2nd client
+        client.on(SocketEvents.JOIN, (resData: JoinOnResponseData) => {
+          expect(resData.newUser.name).toEqual('Bob');
+          client.close(); // close all extra clients
           done();
+        });
+
+        client.on(SocketEvents.CONNECT, () => {
+          const newUser: NewUser = { name: 'John', isAdmin: false };
+          const reqData: JoinRequestData = { roomId: room.id, newUser };
+
+          // have 1st client join room
+          client.emit(SocketEvents.JOIN, reqData, (_resData: JoinEmitResponseData) => {
+            const newUser: NewUser = { name: 'Bob', isAdmin: false };
+            const reqData: JoinRequestData = { roomId: room.id, newUser };
+
+            // have 2nd client join room
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            client2.emit(SocketEvents.JOIN, reqData, (_resData: JoinEmitResponseData) => {});
+          });
         });
       });
     });
+
+    // TODO write some JOIN fail tests
   });
 });

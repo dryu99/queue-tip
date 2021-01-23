@@ -52,11 +52,15 @@ export type AcknowledgementCallback = (object: any) => void;
 
 export type EventData = Record<string, unknown>;
 
-export interface JoinResponseData {
+export interface JoinEmitResponseData {
   user: User,
   queue: User[],
   userCount: number,
   error: string
+}
+
+export interface JoinOnResponseData {
+  newUser: User
 }
 
 export interface JoinRequestData {
