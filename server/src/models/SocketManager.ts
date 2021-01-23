@@ -68,6 +68,7 @@ export default class SocketManager {
           const user = toUser(data.user);
 
           // enqueue user
+          // TODO dont' use push, use addQueueUser
           room.queue.push(user);
 
           // broadcast new enqueued user to all clients in room including sender
@@ -85,6 +86,7 @@ export default class SocketManager {
           const room = roomService.getRoom(roomId);
 
           // dequeue user
+          // TODO dont' use shift, use removeQueueUser
           const user = room.queue.shift();
 
           if (user) {

@@ -4,6 +4,14 @@
 
 import { NewRoom, NewUser, CleanRoom, User, IRoom } from '../types';
 
+// ensure given value exists, otherwise throw error
+export const ensure = <T>(val: T | undefined | null): T => {
+  if (val === undefined || val === null) {
+    throw new Error('This value was promised to be there.');
+  }
+  return val;
+};
+
 export const toNewRoom = (object: any): NewRoom  => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
   return {
