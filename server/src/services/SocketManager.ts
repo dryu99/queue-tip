@@ -1,7 +1,7 @@
 import { SocketEvents, AcknowledgementCallback as AckCallback, EventData } from '../types';
 import { parseString, toCleanRoom, toNewRoom, toNewUser, toUser } from '../utils';
 import logger from '../utils/logger';
-import roomService from '../services/roomService';
+import roomService from './roomService';
 
 export default class SocketManager {
   private io: SocketIO.Server;

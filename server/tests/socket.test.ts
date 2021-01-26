@@ -3,7 +3,7 @@ import { describe, beforeEach, afterEach, expect, test } from '@jest/globals';
 import ioServer from 'socket.io';
 import ioClient from 'socket.io-client';
 
-import SocketManager from '../src/models/SocketManager';
+import SocketManager from '../src/services/SocketManager';
 import roomService from '../src/services/roomService';
 import { CleanUser, JoinRequestData, JoinEmitResponseData, NewRoom, NewUser, SocketEvents, User, JoinOnResponseData } from '../src/types';
 

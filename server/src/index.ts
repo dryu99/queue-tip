@@ -5,7 +5,7 @@ import socketio from 'socket.io';
 import app from './app';
 import config from './utils/config';
 import logger from './utils/logger';
-import SocketManager from './models/SocketManager';
+import SocketManager from './services/SocketManager';
 
 // set up database connection
 mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })

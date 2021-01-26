@@ -6,6 +6,7 @@ export default class Room {
   adminPassword: string;
   users: User[];
   queue: User[];
+  totalUsersJoined: number;
 
   constructor(id: string, name: string, adminPassword: string) {
     this.id = id;
@@ -13,6 +14,7 @@ export default class Room {
     this.adminPassword = adminPassword;
     this.users = [];
     this.queue = [];
+    this.totalUsersJoined = 0;
   }
 
   public addUser(user: User): void {
@@ -28,6 +30,7 @@ export default class Room {
     }
 
     this.users.push(user);
+    this.totalUsersJoined++;
   }
 
   public removeUser(userId: string): User {

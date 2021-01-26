@@ -1,3 +1,5 @@
+import { Document } from 'mongoose';
+
 export enum SocketEvents {
   JOIN = 'join',
   LEAVE = 'leave',
@@ -28,6 +30,7 @@ export interface RoomBase {
   name: string,
 }
 
+// TODO delete this type, and delete toJSON method in Room
 export interface IRoom extends RoomBase {
   id: string,
   users: User[] // TODO consider making this a Map<userid,User>
@@ -45,6 +48,10 @@ export interface NewRoom extends RoomBase {
 export interface CleanRoom extends RoomBase {
   id: string
   userCount: number
+}
+
+export interface MongoRoom extends Document, RoomBase {
+
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
