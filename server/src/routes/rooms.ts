@@ -1,12 +1,12 @@
 import express from 'express';
-import roomService from '../services/roomService';
+import RoomManager from '../services/RoomManager';
 import { parseObject, parseString, toCleanRoom, toNewRoom } from '../utils';
 
 const router = express.Router();
 
 router.get('/', (_req, res) => {
   try {
-    return res.json(roomService.getAllRooms());
+    return res.json(RoomManager.getAllRooms());
   } catch (e) {
     const error = e as Error;
     return res.status(400).json({ error: error.message });
@@ -15,7 +15,7 @@ router.get('/', (_req, res) => {
 
 router.get('/:id', (req, res) => {
   try {
-    const room = roomService.getRoom(req.params.id);
+    const room = RoomManager.getRoom(req.params.id);
     const cleanRoom = toCleanRoom(room);
     return res.json(cleanRoom);
   } catch (e) {
@@ -27,7 +27,7 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   try {
     const newRoom = toNewRoom(req.body);
-    const room = roomService.addRoom(newRoom);
+    const room = RoomManager.addRoom(newRoom);
 
     const cleanRoom = toCleanRoom(room);
     return res.status(201).json(cleanRoom);
@@ -44,7 +44,7 @@ router.post('/check-admin-password', (req, res) => {
     const adminPassword = parseString(body.adminPassword);
     const roomId = parseString(body.roomId);
 
-    const room = roomService.getRoom(roomId);
+    const room = RoomManager.getRoom(roomId);
 
     if (!room.checkAdminPassword(adminPassword)) {
       return res.status(401).json({ error: 'Given admin password is invalid.' });

@@ -1,7 +1,7 @@
 import { SocketEvents, AcknowledgementCallback as AckCallback, EventData } from '../types';
 import { parseString, toCleanRoom, toNewRoom, toNewUser, toUser } from '../utils';
 import logger from '../utils/logger';
-import roomService from './roomService';
+import RoomManager from './RoomManager';
 
 export default class SocketManager {
   private io: SocketIO.Server;
@@ -21,7 +21,7 @@ export default class SocketManager {
       socket.on(SocketEvents.CREATE_ROOM, (data: EventData, callback: AckCallback) => {
         this.handleSocketEvent(SocketEvents.CREATE_ROOM, data, callback, () => {
           const newRoom = toNewRoom(data.newRoom);
-          const room = roomService.addRoom(newRoom);
+          const room = RoomManager.addRoom(newRoom);
 
           const newUser = toNewUser(data.newUser);
           const user = toUser({ ...newUser, id: socket.id });
@@ -40,7 +40,7 @@ export default class SocketManager {
       socket.on(SocketEvents.JOIN, (data: EventData, callback: AckCallback) => {
         this.handleSocketEvent(SocketEvents.JOIN, data, callback, () => {
           const roomId = parseString(data.roomId);
-          const room = roomService.getRoom(roomId);
+          const room = RoomManager.getRoom(roomId);
 
           const newUser = toNewUser(data.newUser);
           const user = toUser({ ...newUser, id: socket.id });
@@ -64,7 +64,7 @@ export default class SocketManager {
       socket.on(SocketEvents.ENQUEUE, (data: EventData, callback: AckCallback) => {
         this.handleSocketEvent(SocketEvents.ENQUEUE, data, callback, () => {
           const roomId = parseString(data.roomId);
-          const room = roomService.getRoom(roomId);
+          const room = RoomManager.getRoom(roomId);
           const user = toUser(data.user);
 
           // enqueue user
@@ -83,7 +83,7 @@ export default class SocketManager {
       socket.on(SocketEvents.DEQUEUE, (data: EventData, callback: AckCallback) => {
         this.handleSocketEvent(SocketEvents.DEQUEUE, data, callback, () => {
           const roomId = parseString(data.roomId);
-          const room = roomService.getRoom(roomId);
+          const room = RoomManager.getRoom(roomId);
 
           // dequeue user
           // TODO dont' use shift, use removeQueueUser
@@ -111,7 +111,7 @@ export default class SocketManager {
           if (socketSids.length > 1) {
             // NOTE: this logic assumes that the user will be in 1 room max at a time
             const roomId = socketSids[1];
-            const room = roomService.getRoom(roomId);
+            const room = RoomManager.getRoom(roomId);
 
             // update user count
             room.removeUser(socket.id);
@@ -126,7 +126,7 @@ export default class SocketManager {
             const socketRoom = this.io.sockets.adapter.rooms[roomId];
             if (!socketRoom || socketRoom.length === 1) {
               logger.info(`Room ${roomId} is empty now, deleting from memory...`);
-              roomService.removeRoom(roomId);
+              RoomManager.removeRoom(roomId);
             }
           }
         } catch (e) {

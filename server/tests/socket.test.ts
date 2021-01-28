@@ -4,7 +4,7 @@ import ioServer from 'socket.io';
 import ioClient from 'socket.io-client';
 
 import SocketManager from '../src/services/SocketManager';
-import roomService from '../src/services/roomService';
+import RoomManager from '../src/services/RoomManager';
 import { CleanUser, JoinRequestData, JoinEmitResponseData, NewRoom, NewUser, SocketEvents, User, JoinOnResponseData } from '../src/types';
 
 const socketUrl = 'http://localhost:5000';
@@ -30,6 +30,9 @@ describe('socket.io integration tests', () => {
     // close connections on client and server to isolate tests
     server.close();
     client.close();
+
+    // delete rooms
+    RoomManager.clear();
   });
 
   describe(SocketEvents.CONNECT, () => {
@@ -50,7 +53,7 @@ describe('socket.io integration tests', () => {
           name: 'CPSC 110 Office Hours',
           adminPassword: '110'
         };
-        const room = roomService.addRoom(newRoom);
+        const room = RoomManager.addRoom(newRoom);
 
         client.on(SocketEvents.CONNECT, () => {
           // setup event data
@@ -79,7 +82,7 @@ describe('socket.io integration tests', () => {
           name: 'CPSC 110 Office Hours',
           adminPassword: '110'
         };
-        const room = roomService.addRoom(newRoom);
+        const room = RoomManager.addRoom(newRoom);
 
         // setup users on server
         const dummyUsers: User[] = [
@@ -126,7 +129,7 @@ describe('socket.io integration tests', () => {
           name: 'CPSC 110 Office Hours',
           adminPassword: '110'
         };
-        const room = roomService.addRoom(newRoom);
+        const room = RoomManager.addRoom(newRoom);
 
         // listen for join event from 2nd client
         client.on(SocketEvents.JOIN, (resData: JoinOnResponseData) => {

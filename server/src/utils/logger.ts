@@ -1,4 +1,4 @@
-import roomService from '../services/roomService';
+import RoomManager from '../services/RoomManager';
 // import userService from '../services/userService';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -25,7 +25,7 @@ const error = (...params: any[]): void => {
 
 const printAppState = (): void => {
   info('--- SERVER STATE ---');
-  info('ROOMS: ', roomService.getAllRooms().map(r => ({
+  info('ROOMS: ', RoomManager.getAllRooms().map(r => ({
     id: r.id,
     name: r.name,
     users: r.users.map(u => `${u.name}: ${u.id}`),
