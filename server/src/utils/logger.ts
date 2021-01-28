@@ -20,7 +20,9 @@ const event = (...params: any[]): void => {
 };
 
 const error = (...params: any[]): void => {
-  console.error('<ER>', ...params);
+  if (process.env.NODE_ENV === 'development') {
+    console.error('<ER>', ...params);
+  }
 };
 
 const printAppState = (): void => {

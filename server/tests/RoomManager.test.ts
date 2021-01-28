@@ -4,10 +4,8 @@ import RoomManager from '../src/services/RoomManager';
 describe('RoomManager unit tests', () => {
 
   beforeEach(() => {
-    // // reset rooms map in service before each test
-    // roomService.removeAllRooms();
-    // const rooms = roomService.getAllRooms();
-    // expect(rooms).toHaveLength(0);
+    // reset room manager before each test
+    RoomManager.clear();
   });
 
   test('putRoom: create a new room', () => {
