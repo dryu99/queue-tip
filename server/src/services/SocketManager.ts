@@ -68,8 +68,7 @@ export default class SocketManager {
           const user = toUser(data.user);
 
           // enqueue user
-          // TODO dont' use push, use addQueueUser
-          room.queue.push(user);
+          room.addQueueUser(user);
 
           // broadcast new enqueued user to all clients in room including sender
           this.io.in(roomId).emit(
@@ -83,11 +82,11 @@ export default class SocketManager {
       socket.on(SocketEvents.DEQUEUE, (data: EventData, callback: AckCallback) => {
         this.handleSocketEvent(SocketEvents.DEQUEUE, data, callback, () => {
           const roomId = parseString(data.roomId);
+          const userId = parseString(data.userId);
           const room = RoomManager.getRoom(roomId);
 
           // dequeue user
-          // TODO dont' use shift, use removeQueueUser
-          const user = room.queue.shift();
+          const user = room.removeQueueUser(userId);
 
           if (user) {
             // broadcast dequeued user to all clients in room including sender

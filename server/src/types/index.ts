@@ -72,5 +72,5 @@ export interface JoinOnResponseData {
 
 export interface JoinRequestData {
   roomId: string,
-  newUser: NewUser
+  newUser?: NewUser
 }

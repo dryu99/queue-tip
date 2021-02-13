@@ -77,7 +77,8 @@ const QueueUser = ({ user, i }) => {
 const AdminRoomView = ({ room, queue, userCount }) => {
 
   const dequeue = () => {
-    socket.emit(SocketEvents.DEQUEUE, { roomId: room.id }, (res) => {
+    const firstUser = queue[0];
+    socket.emit(SocketEvents.DEQUEUE, { roomId: room.id, userId: firstUser.id }, (res) => {
       const { error } = res;
       error && logger.error(error);
       alert('Something went wrong on server!');
