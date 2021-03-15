@@ -1,7 +1,7 @@
 # queue-tip
 Simple web app that allows users to facilitate online queues with ease. No sign-up required!
 
-You can check it out [here](https://queue-tip.herokuapp.com/)!
+You can check it out [here](http://www.queuetip.org/)!
 
 ## Purpose
 I primarily developed this for teaching staff who host online office hours or labs. Using google docs and the like to manage queues can be a hassle, so I thought building this single purpose app would help maintain sanity. 
